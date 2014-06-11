@@ -5,8 +5,15 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import dc.longshot.LongshotGame;
 
 public class DesktopLauncher {
+	
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new LongshotGame(), config);
+		LwjglApplicationConfiguration configuration = new LwjglApplicationConfiguration();
+		configuration.title = "Longshot";
+//		configuration.fullscreen = true;
+		configuration.width = 1024;
+		configuration.height = 768;
+		
+		new LwjglApplication(new LongshotGame(), configuration);
 	}
+	
 }
