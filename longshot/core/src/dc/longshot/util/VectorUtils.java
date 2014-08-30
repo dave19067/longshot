@@ -27,4 +27,14 @@ public class VectorUtils {
 		return angle;
 	}
 	
+	public static Vector2 center(Vector2 position, Vector2 size) {
+		Vector2 center = new Vector2(position.x + size.x / 2, position.y + size.y / 2);
+		return center;
+	}
+	
+	public static Vector2 relativeCenter(Vector2 pivotCenter, Vector2 objectSize) {
+		Vector2 relativeCenter = pivotCenter.cpy().sub(objectSize.cpy().scl(0.5f));
+		return relativeCenter;
+	}
+	
 }

@@ -1,8 +1,10 @@
 package dc.longshot.parts;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
+import dc.longshot.util.VectorUtils;
 
 public class TransformPart extends Part {
 
@@ -31,7 +33,13 @@ public class TransformPart extends Part {
 	}
 	
 	public Vector2 getCenter() {
-		return getPosition().add(getSize().scl(0.5f));
+		return VectorUtils.center(position, size);
+	}
+	
+	public Rectangle getBoundingBox() {
+		Vector2 position = getPosition();
+		Vector2 size = getSize();
+		return new Rectangle(position.x, position.y, size.x, size.y);
 	}
 	
 }

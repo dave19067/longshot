@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -15,13 +16,18 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.SpriteKey;
+import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsPart;
+import dc.longshot.parts.CollisionTypePart;
+import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
+import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.SpawnerPart;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.util.EventManager;
+import dc.longshot.util.RandomUtils;
 import dc.longshot.util.VectorUtils;
 
 public class LongshotGame extends ApplicationAdapter {
@@ -36,6 +42,8 @@ public class LongshotGame extends ApplicationAdapter {
 	private EntityManager entityManager = new EntityManager(eventManager);
 	private SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
 	private EntityFactory entityFactory = new EntityFactory(spriteCache);
+	private CollisionManager collisionManager = new CollisionManager(eventManager);
+	
 	private Entity shooter;
 	
 	@Override
@@ -45,8 +53,13 @@ public class LongshotGame extends ApplicationAdapter {
 		spriteBatch = new SpriteBatch();
 		
 		loadSprites();
+		
 		shooter = entityFactory.createShooter(new Vector2(0, 0));
 		entityManager.add(shooter);
+		
+		// TODO: temporary
+		for (int i = 0; i < 5; i++)
+			spawnEnemy(entityFactory.createBomb());
 	}
 
 	@Override
@@ -57,10 +70,8 @@ public class LongshotGame extends ApplicationAdapter {
 		entityManager.update();
 		camera.update();
 		
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		spriteBatch.setProjectionMatrix(camera.combined);
-		spriteBatch.begin();
+		collisionManager.checkCollisions(entityManager.getAll());
+		
 		for (Entity entity : entityManager.getAll()) {
 			entity.update(delta);
 			
@@ -76,16 +87,57 @@ public class LongshotGame extends ApplicationAdapter {
 				if (position.x + size.x > levelSize.x) {
 					newPosition.x = levelSize.x - size.x;
 				}
-				if (position.y < 0) {
-					newPosition.y = 0;
-				}
-				if (position.y + size.y > levelSize.y) {
-					newPosition.y = levelSize.y - size.y;
-				}
 				
 				entity.get(TransformPart.class).setPosition(newPosition);
 			}
 			
+			// Bounce entity off walls
+			if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
+				Rectangle boundingBox = entity.get(TransformPart.class).getBoundingBox();
+				Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
+				Vector2 newVelocity = velocity.cpy();
+
+				if (boundingBox.x + boundingBox.width >= levelSize.x) {
+					// right bounds
+					if (velocity.x > 0)
+					{
+						newVelocity.x *= -1;
+					}
+				}
+				if (boundingBox.x <= 0) {
+					// left bounds
+					if (velocity.x < 0) {
+						newVelocity.x *= -1;
+					}
+				}
+				
+				entity.get(TranslatePart.class).setVelocity(newVelocity);
+			}
+			
+			// Go through collisions
+			for (Entity other : collisionManager.getCollisions(entity)) {
+				if (other.has(CollisionTypePart.class)) {
+					if (entity.has(DamageOnCollisionPart.class) && other.has(HealthPart.class)) {
+						DamageOnCollisionPart damageOnCollisionPart = entity.get(DamageOnCollisionPart.class);
+						if (damageOnCollisionPart.getCollisionTypes().contains(
+								other.get(CollisionTypePart.class).getCollisionType())) {
+							other.get(HealthPart.class).subtract(damageOnCollisionPart.getDamage());
+						}
+					}
+				}
+			}
+			
+			// Remove entities with no health
+			if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
+				entityManager.remove(entity);
+			}
+		}
+		
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		spriteBatch.setProjectionMatrix(camera.combined);
+		spriteBatch.begin();
+		for (Entity entity : entityManager.getAll()) {
 			// Draw entity
 			if (entity.has(TransformPart.class) && entity.has(DrawablePart.class)) {
 				Vector2 size = entity.get(TransformPart.class).getSize().scl(DRAW_SCALE);
@@ -117,9 +169,10 @@ public class LongshotGame extends ApplicationAdapter {
 				Vector2 mouseWorldCoords = getScreenToWorldCoords(Gdx.input.getX(), Gdx.input.getY());
 				Entity bullet = spawnerPart.createSpawn();
 				Vector2 shooterCenter = shooter.get(TransformPart.class).getCenter();
-				// TODO: Center in center
-				bullet.get(TransformPart.class).setPosition(shooterCenter);
-				Vector2 offset = mouseWorldCoords.cpy().sub(shooterCenter);
+				Vector2 bulletPosition = VectorUtils.relativeCenter(shooterCenter, 
+						bullet.get(TransformPart.class).getSize());
+				bullet.get(TransformPart.class).setPosition(bulletPosition);
+				Vector2 offset = mouseWorldCoords.cpy().sub(bulletPosition);
 				bullet.get(TranslatePart.class).setVelocity(offset);
 				entityManager.add(bullet);
 			}
@@ -130,6 +183,17 @@ public class LongshotGame extends ApplicationAdapter {
 			Vector2 newPosition = shooter.get(TransformPart.class).getPosition().add(velocity);
 			shooter.get(TransformPart.class).setPosition(newPosition);
 		}
+	}
+	
+	private void spawnEnemy(Entity entity) {
+		float spawnX = RandomUtils.nextFloat(0, levelSize.x - entity.get(TransformPart.class).getSize().x);
+		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y);
+		entity.get(TransformPart.class).setPosition(spawnPosition);
+		float destX = RandomUtils.nextFloat(0, levelSize.x - entity.get(TransformPart.class).getSize().x);
+		Vector2 destPosition = new Vector2(destX, 0);
+		Vector2 offset = destPosition.cpy().sub(spawnPosition);
+		entity.get(TranslatePart.class).setVelocity(offset);
+		entityManager.add(entity);
 	}
 	
 	private Vector2 getScreenToWorldCoords(int screenX, int screenY) {

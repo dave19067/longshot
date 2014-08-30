@@ -68,7 +68,6 @@ public class EntityManager {
 	 * @param entity entity to remove
 	 */
 	public void remove(Entity entity) {
-		entity.cleanup();
 		entitiesToRemove.add(entity);
 	}
 
@@ -81,7 +80,9 @@ public class EntityManager {
 		}
 		
 		while (!entitiesToRemove.isEmpty()) {
-			entities.remove(entitiesToRemove.remove(0));
+			Entity entity = entitiesToRemove.remove(0);
+			entity.cleanup();
+			entities.remove(entity);
 		}
 	}
 	

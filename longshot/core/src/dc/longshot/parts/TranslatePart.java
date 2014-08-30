@@ -9,7 +9,12 @@ public class TranslatePart extends Part {
 
 	private Vector2 velocity = new Vector2(0, 0);
 	
+	public Vector2 getVelocity() {
+		return velocity;
+	}
+	
 	public void setVelocity(Vector2 velocity) {
+		// TODO: move speed logic
 		this.velocity = VectorUtils.lengthen(velocity, Math.min(velocity.len(), 
 				getEntity().get(SpeedPart.class).getSpeed()));
 	}
