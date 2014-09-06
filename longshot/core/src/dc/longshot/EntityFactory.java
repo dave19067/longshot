@@ -11,6 +11,7 @@ import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.SpriteKey;
 import dc.longshot.models.CollisionType;
 import dc.longshot.parts.BouncePart;
+import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
@@ -18,6 +19,7 @@ import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.SpawnerPart;
 import dc.longshot.parts.SpeedPart;
+import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
@@ -41,20 +43,23 @@ public class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new SpawnerPart(createShooterBullet(), 1));
+		entity.attach(new SpawnerPart(createShooterBullet(), 3, 0.5f));
 		return entity;
 	}
 	
 	public Entity createShooterBullet() {
 		Entity entity = new Entity();
 		entity.attach(new SpeedPart(20));
-		entity.attach(new TransformPart(new Vector2(0.1f, 0.1f)));
+		entity.attach(new TransformPart(new Vector2(0.2f, 0.2f)));
 		Texture texture = spriteCache.getTexture(SpriteKey.BULLET);
 		entity.attach(new DrawablePart(texture));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
 		entity.attach(new TranslatePart());
 		entity.attach(new BouncePart());
+		entity.attach(new BoundsPart());
+		entity.attach(new TimedDeathPart(4));
+		entity.attach(new BoundsDiePart());
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -63,13 +68,14 @@ public class EntityFactory {
 	
 	public Entity createBomb() {
 		Entity entity = new Entity();
-		entity.attach(new SpeedPart(10));
-		entity.attach(new TransformPart(new Vector2(0.2f, 0.2f)));
+		entity.attach(new SpeedPart(2));
+		entity.attach(new TransformPart(new Vector2(0.5f, 0.5f)));
 		Texture texture = spriteCache.getTexture(SpriteKey.BULLET);
 		entity.attach(new DrawablePart(texture));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		entity.attach(new TranslatePart());
+		entity.attach(new BoundsDiePart());
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));

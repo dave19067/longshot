@@ -13,6 +13,7 @@ import dc.longshot.util.EventManager;
  */
 public class EntityManager {
 
+	private EventManager eventManager;
 	private List<Entity> entities = new ArrayList<Entity>();
 	private List<Entity> entitiesToAdd = new ArrayList<Entity>();
 	private List<Entity> entitiesToRemove = new ArrayList<Entity>();
@@ -22,19 +23,7 @@ public class EntityManager {
 	 * @param eventManager the event manager that publishes entity create and entity remove events.
 	 */
 	public EntityManager(EventManager eventManager) {
-		eventManager.listen(EntityCreateEvent.class, new EntityCreateListener() {
-			@Override
-			public void create(Entity entity) {
-				add(entity);
-			}
-		});
-		
-		eventManager.listen(EntityRemoveEvent.class, new EntityRemoveListener() {
-			@Override
-			public void remove(Entity entity) {
-				remove(entity);
-			}
-		});
+		this.eventManager = eventManager;
 	}
 	
 	/**
@@ -51,6 +40,7 @@ public class EntityManager {
 	public void add(Entity entity) {
 		entity.initialize();
 		entitiesToAdd.add(entity);
+		eventManager.notify(new EntityCreateEvent(entity));
 	}
 	
 	/**
@@ -69,6 +59,7 @@ public class EntityManager {
 	 */
 	public void remove(Entity entity) {
 		entitiesToRemove.add(entity);
+		eventManager.notify(new EntityRemoveEvent(entity));
 	}
 
 	/**
