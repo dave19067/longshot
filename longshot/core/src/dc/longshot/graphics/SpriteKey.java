@@ -2,6 +2,6 @@ package dc.longshot.graphics;
 
 public enum SpriteKey {
 
-	SHOOTER, BULLET
+	CROSSHAIRS, SHOOTER, BULLET
 	
 }

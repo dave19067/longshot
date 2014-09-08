@@ -10,10 +10,16 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
@@ -28,6 +34,7 @@ import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.HealthPart;
+import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.SpawnerPart;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TimedDeathPart;
@@ -42,6 +49,11 @@ public class LongshotGame extends ApplicationAdapter {
 	
 	private Camera camera;
 	private SpriteBatch spriteBatch;
+
+	private Skin skin;
+	private Stage stage;
+	private Label healthLabel;
+	private Label scoreLabel;
 	
 	private EventManager eventManager = new EventManager();
 	private EntityManager entityManager = new EntityManager(eventManager);
@@ -49,8 +61,11 @@ public class LongshotGame extends ApplicationAdapter {
 	private EntityFactory entityFactory = new EntityFactory(spriteCache);
 	private CollisionManager collisionManager = new CollisionManager(eventManager);
 	private LevelController levelController;
+
+	private Texture cursorTexture;
 	
 	private int health = 3;
+	private int score = 0;
 	
 	private Level level;
 	private Entity shooter;
@@ -62,9 +77,14 @@ public class LongshotGame extends ApplicationAdapter {
 		camera = new OrthographicCamera(levelSize.x * DRAW_SCALE, levelSize.y * DRAW_SCALE);
 		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 		spriteBatch = new SpriteBatch();
+		stage = new Stage();
 		levelController = new LevelController(entityFactory, entityManager, level);
+		skin = new Skin(Gdx.files.internal("ui/default/uiskin.json"));
+		Gdx.input.setCursorCatched(true);
 		
+		setupStage();
 		loadSprites();
+		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 		
 		shooter = entityFactory.createShooter(new Vector2(0, 0));
 		entityManager.add(shooter);
@@ -73,10 +93,12 @@ public class LongshotGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 		float delta = Gdx.graphics.getDeltaTime();
-		
+
+		stage.act(delta);
 		handleInput(delta);
 		entityManager.update();
 		camera.update();
+		boundCursor();
 		collisionManager.checkCollisions(entityManager.getAll());
 		levelController.update(delta);
 		
@@ -135,6 +157,11 @@ public class LongshotGame extends ApplicationAdapter {
 						if (damageOnCollisionPart.getCollisionTypes().contains(
 								other.get(CollisionTypePart.class).getCollisionType())) {
 							other.get(HealthPart.class).subtract(damageOnCollisionPart.getDamage());
+							// if dead, increase score
+							if (entity.has(HealthPart.class) && entity.has(ScorePart.class)
+									&& !entity.get(HealthPart.class).isAlive()) {
+								score += entity.get(ScorePart.class).getScore();
+							}
 						}
 					}
 				}
@@ -149,7 +176,7 @@ public class LongshotGame extends ApplicationAdapter {
 				}
 			}
 			
-			// Remove if no health
+			// Remove if dead
 			if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
 				entityManager.remove(entity);
 			}
@@ -164,6 +191,9 @@ public class LongshotGame extends ApplicationAdapter {
 				entityManager.remove(entity);
 			}
 		}
+		
+		healthLabel.setText("HEALTH: " + health);
+		scoreLabel.setText("SCORE: " + score);
 		
 		if (health <= 0)
 		{
@@ -184,9 +214,19 @@ public class LongshotGame extends ApplicationAdapter {
 			}
 		}
 		spriteBatch.end();
+		
+		spriteBatch.setProjectionMatrix(getUIMatrix());
+		spriteBatch.begin();
+		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 
+				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight() / 2);
+		spriteBatch.end();
+		
+		stage.draw();
+		Table.drawDebug(stage);
 	}
 	
 	private void loadSprites() {
+		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 	}
@@ -221,6 +261,38 @@ public class LongshotGame extends ApplicationAdapter {
 			shooter.get(TransformPart.class).setPosition(newPosition);
 		}
 	}
+
+	@Override
+	public void dispose() {
+		spriteCache.dispose();
+		stage.dispose();
+	}
+	
+	private void setupStage() {
+		// View table
+		Table viewTable = new Table(skin);
+		viewTable.debug();
+
+		// Status table
+		Table statusTable = new Table(skin);
+		healthLabel = new Label("", skin);
+		statusTable.add(healthLabel).expandX().right();
+		statusTable.row();
+		scoreLabel = new Label("", skin);
+		statusTable.add(scoreLabel).right();
+		statusTable.debug();
+		
+		// Main table
+		Table mainTable = new Table(skin).top().left();
+		mainTable.setFillParent(true);
+		mainTable.debug();
+		mainTable.add(viewTable).expand().fill();
+		mainTable.row();
+		mainTable.add(statusTable).expandX().fillX();
+		mainTable.row();
+		
+		stage.addActor(mainTable);
+	}
 	
 	private List<Bound> checkOutOfBounds(Rectangle collisionBox) {
 		List<Bound> bounds = new ArrayList<Bound>();
@@ -240,6 +312,27 @@ public class LongshotGame extends ApplicationAdapter {
 		}
 		
 		return bounds;
+	}
+	
+	private void boundCursor() {
+		if (Gdx.input.getX() > Gdx.graphics.getWidth()) {
+			Gdx.input.setCursorPosition(Gdx.graphics.getWidth(), Gdx.input.getY());
+		}
+		if (Gdx.input.getX() < 0) {
+			Gdx.input.setCursorPosition(0, Gdx.input.getY());
+		}
+		if (Gdx.input.getY() > Gdx.graphics.getHeight()) {
+			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight());
+		}
+		if (Gdx.input.getY() < 0) {
+			Gdx.input.setCursorPosition(Gdx.input.getX(), 0);
+		}
+	}
+	
+	private Matrix4 getUIMatrix() {
+		Matrix4 uiMatrix = camera.combined.cpy();
+		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		return uiMatrix;
 	}
 	
 	private Vector2 getScreenToWorldCoords(int screenX, int screenY) {

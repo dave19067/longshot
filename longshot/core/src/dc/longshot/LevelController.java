@@ -25,6 +25,7 @@ public class LevelController {
 		this.entityFactory = entityFactory;
 		this.entityManager = entityManager;
 		this.level = level;
+		
 		for (int i = 0; i < level.getEnemySpawns(); i++) {
 			spawnTimes.add(RandomUtils.nextFloat(0, level.getSpawnDuration()));
 		}

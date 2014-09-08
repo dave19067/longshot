@@ -22,6 +22,7 @@ import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
+import dc.longshot.util.RandomUtils;
 
 public class EntityFactory {
 	
@@ -43,7 +44,7 @@ public class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new SpawnerPart(createShooterBullet(), 3, 0.5f));
+		entity.attach(new SpawnerPart(createShooterBullet(), 2, 0.5f));
 		return entity;
 	}
 	
@@ -68,7 +69,8 @@ public class EntityFactory {
 	
 	public Entity createBomb() {
 		Entity entity = new Entity();
-		entity.attach(new SpeedPart(2));
+		float speed = RandomUtils.nextFloat(1, 3);
+		entity.attach(new SpeedPart(speed));
 		entity.attach(new TransformPart(new Vector2(0.5f, 0.5f)));
 		Texture texture = spriteCache.getTexture(SpriteKey.BULLET);
 		entity.attach(new DrawablePart(texture));
