@@ -7,7 +7,7 @@ import dc.longshot.util.Event;
  * @author David Chen
  *
  */
-public class EntityCreateEvent implements Event<EntityCreateListener> {
+public class EntityAddedEvent implements Event<EntityAddedListener> {
 
 	private Entity entity;
 	
@@ -15,13 +15,13 @@ public class EntityCreateEvent implements Event<EntityCreateListener> {
 	 * Constructor.
 	 * @param entity entity to be created
 	 */
-	public EntityCreateEvent(Entity entity) {
+	public EntityAddedEvent(Entity entity) {
 		this.entity = entity;
 	}
 	
 	@Override
-	public void notify(EntityCreateListener listener) {
-		listener.create(entity);
+	public void notify(EntityAddedListener listener) {
+		listener.created(entity);
 	}
 	
 }

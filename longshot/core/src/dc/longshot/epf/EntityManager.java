@@ -40,7 +40,6 @@ public class EntityManager {
 	public void add(Entity entity) {
 		entity.initialize();
 		entitiesToAdd.add(entity);
-		eventManager.notify(new EntityCreateEvent(entity));
 	}
 	
 	/**
@@ -59,7 +58,6 @@ public class EntityManager {
 	 */
 	public void remove(Entity entity) {
 		entitiesToRemove.add(entity);
-		eventManager.notify(new EntityRemoveEvent(entity));
 	}
 
 	/**
@@ -67,13 +65,16 @@ public class EntityManager {
 	 */
 	public void update() {
 		while (!entitiesToAdd.isEmpty()) {
-			entities.add(entitiesToAdd.remove(0));
+			Entity entityToAdd = entitiesToAdd.remove(0);
+			entities.add(entityToAdd);
+			eventManager.notify(new EntityAddedEvent(entityToAdd));
 		}
 		
 		while (!entitiesToRemove.isEmpty()) {
-			Entity entity = entitiesToRemove.remove(0);
-			entity.cleanup();
-			entities.remove(entity);
+			Entity entityToRemove = entitiesToRemove.remove(0);
+			entityToRemove.cleanup();
+			entities.remove(entityToRemove);
+			eventManager.notify(new EntityRemovedEvent(entityToRemove));
 		}
 	}
 	

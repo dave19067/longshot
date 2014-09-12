@@ -7,7 +7,7 @@ import dc.longshot.util.Event;
  * @author David Chen
  *
  */
-public class EntityRemoveEvent implements Event<EntityRemoveListener> {
+public class EntityRemovedEvent implements Event<EntityRemovedListener> {
 
 	private Entity entity;
 	
@@ -15,13 +15,13 @@ public class EntityRemoveEvent implements Event<EntityRemoveListener> {
 	 * Constructor.
 	 * @param entity entity to be removed
 	 */
-	public EntityRemoveEvent(Entity entity) {
+	public EntityRemovedEvent(Entity entity) {
 		this.entity = entity;
 	}
 	
 	@Override
-	public void notify(EntityRemoveListener listener) {
-		listener.remove(entity);
+	public void notify(EntityRemovedListener listener) {
+		listener.removed(entity);
 	}
 
 }

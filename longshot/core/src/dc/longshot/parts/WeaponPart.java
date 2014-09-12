@@ -9,7 +9,7 @@ import com.rits.cloning.Cloner;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 
-public class SpawnerPart extends Part {
+public class WeaponPart extends Part {
 	
 	private Entity original;
 	private List<Entity> spawns = new ArrayList<Entity>();
@@ -17,7 +17,7 @@ public class SpawnerPart extends Part {
 	private float maxSpawnTime;
 	private float spawnTime;
 
-	public SpawnerPart(Entity original, int maxSpawns, float maxSpawnTime) {
+	public WeaponPart(Entity original, int maxSpawns, float maxSpawnTime) {
 		this.original = original;
 		this.maxSpawns = maxSpawns;
 		this.maxSpawnTime = maxSpawnTime;

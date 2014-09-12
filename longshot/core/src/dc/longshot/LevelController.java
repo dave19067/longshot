@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
+import dc.longshot.models.CollisionType;
+import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.util.RandomUtils;
@@ -38,13 +40,27 @@ public class LevelController {
 		while (it.hasNext()) {
 			Float spawnTime = it.next();
 			if (spawnTime <= time) {
-				spawnEnemy(entityFactory.createBomb());
+				spawnEnemy(entityFactory.createMissile());
 				it.remove();
 			}
 			else {
 				break;
 			}
 		}
+	}
+	
+	public boolean isComplete() {
+		boolean enemiesExist = false;
+		
+		for (Entity entity : entityManager.getAll()) {
+			if (entity.has(CollisionTypePart.class) && entity.get(CollisionTypePart.class)
+					.getCollisionType() == CollisionType.ENEMY) {
+				enemiesExist = true;
+				break;
+			}
+		}
+		
+		return !enemiesExist && spawnTimes.size() <= 0;
 	}
 
 	private void spawnEnemy(Entity entity) {

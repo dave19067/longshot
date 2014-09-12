@@ -5,12 +5,12 @@ package dc.longshot.epf;
  * @author David Chen
  *
  */
-public interface EntityRemoveListener {
+public interface EntityRemovedListener {
 
 	/**
 	 * Handles the event that an entity is to be removed.
 	 * @param entity entity to be removed.
 	 */
-	public void remove(final Entity entity);
+	public void removed(final Entity entity);
 	
 }
