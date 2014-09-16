@@ -1,7 +1,9 @@
 package dc.longshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -32,13 +34,15 @@ import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.SpriteKey;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
+import dc.longshot.models.EntityType;
+import dc.longshot.models.Level;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
-import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
+import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.ShotStatsPart;
@@ -50,6 +54,7 @@ import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.util.EventManager;
 import dc.longshot.util.VectorUtils;
+import dc.longshot.util.XmlUtils;
 
 public class LongshotGame extends ApplicationAdapter {
 	
@@ -82,19 +87,19 @@ public class LongshotGame extends ApplicationAdapter {
 	
 	@Override
 	public void create() {
-		level = new Level(new Vector2(40, 30), 60, 30);
+		loadSprites();
+		level = XmlUtils.read("bin/levels/level1.xml", new Class[] { Level.class });
 		Vector2 levelSize = level.getSize();
 		camera = new OrthographicCamera(levelSize.x * DRAW_SCALE, levelSize.y * DRAW_SCALE);
 		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 		spriteBatch = new SpriteBatch();
 		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage = new Stage();
-		levelController = new LevelController(entityFactory, entityManager, level);
+		levelController = new LevelController(entityManager, entityFactory, level);
 		skin = new Skin(Gdx.files.internal("ui/default/uiskin.json"));
 		Gdx.input.setCursorCatched(true);
 		
 		setupStage();
-		loadSprites();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
@@ -102,8 +107,10 @@ public class LongshotGame extends ApplicationAdapter {
 		Entity ground = entityFactory.createDecoration(new Vector2(level.getSize().x, 0.1f), new Vector2(0, 0), 
 				SpriteKey.GREEN);
 		entityManager.add(ground);
+		Vector2 shooterSize = new Vector2(2, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
-		shooter = entityFactory.createShooter(new Vector2(0, groundTransform.getPosition().y
+		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
+		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
 				+ groundTransform.getSize().y));
 		entityManager.add(shooter);
 	}
@@ -114,11 +121,11 @@ public class LongshotGame extends ApplicationAdapter {
 			public void created(Entity entity) {
 				if (entity.has(ExplodeOnSpawnPart.class) && entity.has(TransformPart.class)) {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
-					Vector2 entityPosition = entity.get(TransformPart.class).getPosition();
+					Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
 					for (Entity other : entityManager.getAll()) {
-						if (other.has(CollisionTypePart.class) && other.has(TransformPart.class)) {
-							Vector2 otherPosition = other.get(TransformPart.class).getPosition();
-							if (otherPosition.cpy().sub(entityPosition).len() <= explodeOnSpawnPart.getRadius()) {
+						if (other != entity && other.has(CollisionTypePart.class) && other.has(TransformPart.class)) {
+							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
+							if (otherCenter.cpy().sub(entityCenter).len() <= explodeOnSpawnPart.getRadius()) {
 								entityManager.remove(other);
 							}
 						}
@@ -139,6 +146,14 @@ public class LongshotGame extends ApplicationAdapter {
 							spawnTransform.getSize());
 					spawnTransform.setPosition(position);
 					entityManager.add(spawn);
+				}
+				
+
+				// if killed, increase score
+				if (entity.has(ScorePart.class)) {
+					if (!isOutOfBounds(entity.get(TransformPart.class).getBoundingBox())) {
+						score += entity.get(ScorePart.class).getScore();
+					}
 				}
 			}
 		};
@@ -218,21 +233,17 @@ public class LongshotGame extends ApplicationAdapter {
 						if (damageOnCollisionPart.getCollisionTypes().contains(
 								other.get(CollisionTypePart.class).getCollisionType())) {
 							other.get(HealthPart.class).subtract(damageOnCollisionPart.getDamage());
-							// if killed, increase score
-							if (other.has(HealthPart.class) && other.has(ScorePart.class)
-									&& !other.get(HealthPart.class).isAlive()) {
-								score += other.get(ScorePart.class).getScore();
-							}
 						}
 					}
 				}
 			}
 			
 			// Decrease city health if missile hits it
-			if (entity.has(CollisionTypePart.class)) {
+			if (entity.has(CollisionTypePart.class) && entity.has(DamageOnCollisionPart.class)) {
 				if (entity.get(CollisionTypePart.class).getCollisionType() == CollisionType.ENEMY
 						&& bounds.contains(Bound.BOTTOM)) {
-					health--;
+					float damage = entity.get(DamageOnCollisionPart.class).getDamage();
+					health -= damage;
 				}
 			}
 			
@@ -274,10 +285,12 @@ public class LongshotGame extends ApplicationAdapter {
 		for (Entity entity : entityManager.getAll()) {
 			// Draw entity
 			if (entity.has(TransformPart.class) && entity.has(DrawablePart.class)) {
-				Vector2 size = entity.get(TransformPart.class).getSize().scl(DRAW_SCALE);
-				Vector2 position = entity.get(TransformPart.class).getPosition().scl(DRAW_SCALE);
-				spriteBatch.draw(entity.get(DrawablePart.class).getTextureRegion(), 
-						position.x, position.y, size.x, size.y);
+				DrawablePart drawablePart = entity.get(DrawablePart.class);
+				spriteBatch.setColor(drawablePart.getColor());
+				TransformPart transformPart = entity.get(TransformPart.class);
+				Vector2 size = transformPart.getSize().scl(DRAW_SCALE);
+				Vector2 position = transformPart.getPosition().scl(DRAW_SCALE);
+				spriteBatch.draw(drawablePart.getTextureRegion(), position.x, position.y, size.x, size.y);
 			}
 		}
 		spriteBatch.end();
@@ -307,8 +320,44 @@ public class LongshotGame extends ApplicationAdapter {
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
+		spriteCache.add(SpriteKey.RED, "images/red.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
+		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
+	}
+	
+	private void setupStage() {
+		// View table
+		worldTable = new Table(skin);
+		worldTable.debug();
+
+		// Status table
+		Table statusTable = new Table(skin);
+		healthLabel = new Label("", skin);
+		statusTable.add(healthLabel).expandX().left();
+		statusTable.row();
+		scoreLabel = new Label("", skin);
+		statusTable.add(scoreLabel).left();
+		statusTable.debug();
+		
+		// Main table
+		Table mainTable = new Table(skin).top().left();
+		mainTable.setFillParent(true);
+		mainTable.debug();
+		mainTable.add(worldTable).expand().fill();
+		mainTable.row();
+		mainTable.add(statusTable).expandX().fillX();
+		mainTable.row();
+		
+		stage.addActor(mainTable);
+	}
+	
+	private Level createLevel() {
+		Map<EntityType, Integer> spawns = new HashMap<EntityType, Integer>();
+		spawns.put(EntityType.MISSLE, 30);
+		spawns.put(EntityType.WARHEAD, 10);
+		Level level = new Level(new Vector2(40, 30), 60, spawns);
+		return level;
 	}
 	
 	private void handleInput(float delta) {
@@ -337,36 +386,14 @@ public class LongshotGame extends ApplicationAdapter {
 		}
 		
 		if (moveDirection.len() > 0) {
-			Vector2 velocity = VectorUtils.lengthen(moveDirection, shooter.get(SpeedPart.class).getSpeed() * delta);
+			Vector2 velocity = VectorUtils.getLengthened(moveDirection, shooter.get(SpeedPart.class).getSpeed() * delta);
 			Vector2 newPosition = shooter.get(TransformPart.class).getPosition().add(velocity);
 			shooter.get(TransformPart.class).setPosition(newPosition);
 		}
 	}
 	
-	private void setupStage() {
-		// View table
-		worldTable = new Table(skin);
-		worldTable.debug();
-
-		// Status table
-		Table statusTable = new Table(skin);
-		healthLabel = new Label("", skin);
-		statusTable.add(healthLabel).expandX().left();
-		statusTable.row();
-		scoreLabel = new Label("", skin);
-		statusTable.add(scoreLabel).left();
-		statusTable.debug();
-		
-		// Main table
-		Table mainTable = new Table(skin).top().left();
-		mainTable.setFillParent(true);
-		mainTable.debug();
-		mainTable.add(worldTable).expand().fill();
-		mainTable.row();
-		mainTable.add(statusTable).expandX().fillX();
-		mainTable.row();
-		
-		stage.addActor(mainTable);
+	private boolean isOutOfBounds(Rectangle collisionBox) {
+		return checkOutOfBounds(collisionBox).size() > 0;
 	}
 	
 	private List<Bound> checkOutOfBounds(Rectangle collisionBox) {

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<level>
+    <size>
+        <x>40.0</x>
+        <y>30.0</y>
+    </size>
+    <spawnDuration>60.0</spawnDuration>
+    <spawns>
+        <entry>
+            <key>WARHEAD</key>
+            <value>10</value>
+        </entry>
+        <entry>
+            <key>MISSLE</key>
+            <value>30</value>
+        </entry>
+    </spawns>
+</level>

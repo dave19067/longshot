@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class VectorUtils {
 	
-	public static Vector2 lengthen(Vector2 vector, float length) {
+	public static Vector2 getLengthened(Vector2 vector, float length) {
 		Vector2 newVector = unit(vector);
 		newVector.scl(length);
 		return newVector;
@@ -35,6 +35,11 @@ public class VectorUtils {
 	public static Vector2 relativeCenter(Vector2 pivotCenter, Vector2 objectSize) {
 		Vector2 relativeCenter = pivotCenter.cpy().sub(objectSize.cpy().scl(0.5f));
 		return relativeCenter;
+	}
+	
+	public static float relativeMiddle(float pivotMiddle, float objectLength) {
+		float relativeMiddle = pivotMiddle - objectLength / 2;
+		return relativeMiddle;
 	}
 	
 }

@@ -2,45 +2,63 @@ package dc.longshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.models.CollisionType;
+import dc.longshot.models.EntityType;
+import dc.longshot.models.Level;
+import dc.longshot.models.SpawnInfo;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
-import dc.longshot.util.RandomUtils;
 
 public class LevelController {
 	
-	private EntityFactory entityFactory;
 	private EntityManager entityManager;
+	private EntityFactory entityFactory;
 	private Level level;
-	private List<Float> spawnTimes = new ArrayList<Float>();
+	private List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
 	private float time = 0;
 
-	public LevelController(EntityFactory entityFactory, EntityManager entityManager, Level level) {
-		this.entityFactory = entityFactory;
+	public LevelController(EntityManager entityManager, EntityFactory entityFactory, Level level) {
 		this.entityManager = entityManager;
+		this.entityFactory = entityFactory;
 		this.level = level;
 		
-		for (int i = 0; i < level.getEnemySpawns(); i++) {
-			spawnTimes.add(RandomUtils.nextFloat(0, level.getSpawnDuration()));
+		Map<EntityType, Integer> spawns = level.getSpawns();
+		for (Entry<EntityType, Integer> entry : spawns.entrySet()) {
+			for (int i = 0; i < entry.getValue(); i++) {
+				SpawnInfo spawnInfo = new SpawnInfo(entry.getKey(), MathUtils.random(0, level.getSpawnDuration()));
+				spawnInfos.add(spawnInfo);
+			}
 		}
-		Collections.sort(spawnTimes);
+		
+		Collections.sort(spawnInfos, new Comparator<SpawnInfo>() {
+			@Override
+			public int compare(SpawnInfo spawnInfo1, SpawnInfo spawnInfo2) {
+				return Float.compare(spawnInfo1.getSpawnTime(), spawnInfo2.getSpawnTime());
+			}
+		});
 	}
 	
 	public void update(float delta) {
 		time += delta;
-		Iterator<Float> it = spawnTimes.iterator();
-		while (it.hasNext()) {
-			Float spawnTime = it.next();
-			if (spawnTime <= time) {
-				spawnEnemy(entityFactory.createMissile());
+		Iterator<SpawnInfo> it = spawnInfos.iterator();
+		
+		for (int i = 0; i < spawnInfos.size(); i++) {
+			SpawnInfo spawnInfo = it.next();
+			if (spawnInfo.getSpawnTime() <= time) {
+				Entity spawn = entityFactory.create(spawnInfo.getEntityType());
+				spawnEnemy(spawn);
 				it.remove();
 			}
 			else {
@@ -60,16 +78,16 @@ public class LevelController {
 			}
 		}
 		
-		return !enemiesExist && spawnTimes.size() <= 0;
+		return !enemiesExist && spawnInfos.size() <= 0;
 	}
 
 	private void spawnEnemy(Entity entity) {
 		Vector2 levelSize = level.getSize();
 		Vector2 size = entity.get(TransformPart.class).getSize();
-		float spawnX = RandomUtils.nextFloat(0, levelSize.x - size.x);
+		float spawnX = MathUtils.random(0, levelSize.x - size.x);
 		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y - size.y);
 		entity.get(TransformPart.class).setPosition(spawnPosition);
-		float destX = RandomUtils.nextFloat(0, levelSize.x - size.x);
+		float destX = MathUtils.random(0, levelSize.x - size.x);
 		Vector2 destPosition = new Vector2(destX, 0);
 		Vector2 offset = destPosition.cpy().sub(spawnPosition);
 		entity.get(TranslatePart.class).setVelocity(offset);

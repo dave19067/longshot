@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.rits.cloning.Cloner;
-
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
+import dc.longshot.util.Cloning;
 
 public class WeaponPart extends Part {
 	
@@ -31,8 +30,7 @@ public class WeaponPart extends Part {
 	public Entity createSpawn() {
 		if (canSpawn()) {
 			spawnTime = 0;
-			Cloner cloner = new Cloner();
-			Entity newSpawn = cloner.deepClone(original);
+			Entity newSpawn = Cloning.clone(original);
 			spawns.add(newSpawn);
 			return newSpawn;
 		}
