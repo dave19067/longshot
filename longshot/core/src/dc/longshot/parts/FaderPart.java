@@ -1,6 +1,7 @@
 package dc.longshot.parts;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import dc.longshot.epf.Part;
 
@@ -16,7 +17,7 @@ public class FaderPart extends Part {
 	
 	@Override
 	public void initialize() {
-		startingAlpha = entity.get(DrawablePart.class).getColor().a;
+		startingAlpha = entity.get(DrawablePart.class).getSprite().getColor().a;
 	}
 
 	@Override
@@ -24,9 +25,10 @@ public class FaderPart extends Part {
 		fadeTime += delta;
 		float fadePercent = fadeTime / maxFadeTime;
 		float alpha = Math.max((1 - fadePercent) * startingAlpha, 0);
-		DrawablePart drawablePart = entity.get(DrawablePart.class);
-		Color color = drawablePart.getColor();
+		Sprite sprite = entity.get(DrawablePart.class).getSprite();
+		Color color = sprite.getColor();
 		color.a = alpha;
+		sprite.setColor(color);
 	}
 	
 }

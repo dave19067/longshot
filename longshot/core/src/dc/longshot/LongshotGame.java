@@ -1,9 +1,7 @@
 package dc.longshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -17,7 +15,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -34,7 +31,6 @@ import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.SpriteKey;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
-import dc.longshot.models.EntityType;
 import dc.longshot.models.Level;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
@@ -53,12 +49,11 @@ import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.util.EventManager;
+import dc.longshot.util.UnitConversion;
 import dc.longshot.util.VectorUtils;
 import dc.longshot.util.XmlUtils;
 
 public class LongshotGame extends ApplicationAdapter {
-	
-	public static final float DRAW_SCALE = 64;
 	
 	private Camera camera;
 	private SpriteBatch spriteBatch;
@@ -84,13 +79,15 @@ public class LongshotGame extends ApplicationAdapter {
 	
 	private Level level;
 	private Entity shooter;
+	private Entity shooterCannon;
 	
 	@Override
 	public void create() {
 		loadSprites();
 		level = XmlUtils.read("bin/levels/level1.xml", new Class[] { Level.class });
 		Vector2 levelSize = level.getSize();
-		camera = new OrthographicCamera(levelSize.x * DRAW_SCALE, levelSize.y * DRAW_SCALE);
+		camera = new OrthographicCamera(levelSize.x * UnitConversion.PIXELS_PER_UNIT, 
+				levelSize.y * UnitConversion.PIXELS_PER_UNIT);
 		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 		spriteBatch = new SpriteBatch();
 		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -103,16 +100,7 @@ public class LongshotGame extends ApplicationAdapter {
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
-		
-		Entity ground = entityFactory.createDecoration(new Vector2(level.getSize().x, 0.1f), new Vector2(0, 0), 
-				SpriteKey.GREEN);
-		entityManager.add(ground);
-		Vector2 shooterSize = new Vector2(2, 1);
-		TransformPart groundTransform = ground.get(TransformPart.class);
-		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
-		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
-				+ groundTransform.getSize().y));
-		entityManager.add(shooter);
+		createInitialEntities();
 	}
 	
 	private EntityAddedListener handleEntityAdded() {
@@ -143,11 +131,10 @@ public class LongshotGame extends ApplicationAdapter {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					TransformPart spawnTransform = spawn.get(TransformPart.class);
 					Vector2 position = VectorUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
-							spawnTransform.getSize());
+							spawnTransform.getBoundedSize());
 					spawnTransform.setPosition(position);
 					entityManager.add(spawn);
 				}
-				
 
 				// if killed, increase score
 				if (entity.has(ScorePart.class)) {
@@ -209,7 +196,7 @@ public class LongshotGame extends ApplicationAdapter {
 			
 			// Restrict entity in bounds
 			if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
-				Vector2 size = entity.get(TransformPart.class).getSize();
+				Vector2 size = entity.get(TransformPart.class).getBoundedSize();
 				Vector2 position = entity.get(TransformPart.class).getPosition();
 				Vector2 newPosition = position.cpy();
 				
@@ -246,6 +233,15 @@ public class LongshotGame extends ApplicationAdapter {
 					health -= damage;
 				}
 			}
+
+			// TODO: clean up
+			TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
+			Vector2 shooterPosition = shooter.get(TransformPart.class).getCenter().sub(cannonTransform.getOrigin());
+			shooterCannon.get(TransformPart.class).setPosition(shooterPosition);
+			Vector2 mouseCoords = UnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
+					getRectangle(worldTable));
+			Vector2 offset = mouseCoords.cpy().sub(cannonTransform.getPosition());
+			cannonTransform.setRotation(offset.angle());
 			
 			// Remove if no health
 			if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
@@ -284,13 +280,9 @@ public class LongshotGame extends ApplicationAdapter {
 		spriteBatch.begin();
 		for (Entity entity : entityManager.getAll()) {
 			// Draw entity
-			if (entity.has(TransformPart.class) && entity.has(DrawablePart.class)) {
+			if (entity.has(DrawablePart.class)) {
 				DrawablePart drawablePart = entity.get(DrawablePart.class);
-				spriteBatch.setColor(drawablePart.getColor());
-				TransformPart transformPart = entity.get(TransformPart.class);
-				Vector2 size = transformPart.getSize().scl(DRAW_SCALE);
-				Vector2 position = transformPart.getPosition().scl(DRAW_SCALE);
-				spriteBatch.draw(drawablePart.getTextureRegion(), position.x, position.y, size.x, size.y);
+				drawablePart.getSprite().draw(spriteBatch);
 			}
 		}
 		spriteBatch.end();
@@ -322,6 +314,7 @@ public class LongshotGame extends ApplicationAdapter {
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.RED, "images/red.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
+		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
 	}
@@ -352,12 +345,18 @@ public class LongshotGame extends ApplicationAdapter {
 		stage.addActor(mainTable);
 	}
 	
-	private Level createLevel() {
-		Map<EntityType, Integer> spawns = new HashMap<EntityType, Integer>();
-		spawns.put(EntityType.MISSLE, 30);
-		spawns.put(EntityType.WARHEAD, 10);
-		Level level = new Level(new Vector2(40, 30), 60, spawns);
-		return level;
+	private void createInitialEntities() {
+		Entity ground = entityFactory.createBaseEntity(new Vector2(level.getSize().x, 0.1f), new Vector2(0, 0), 
+				SpriteKey.GREEN);
+		entityManager.add(ground);
+		Vector2 shooterSize = new Vector2(2, 1);
+		TransformPart groundTransform = ground.get(TransformPart.class);
+		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
+		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
+				+ groundTransform.getBoundedSize().y));
+		entityManager.add(shooter);
+		shooterCannon = entityFactory.createShooterCannon();
+		entityManager.add(shooterCannon);
 	}
 	
 	private void handleInput(float delta) {
@@ -372,12 +371,12 @@ public class LongshotGame extends ApplicationAdapter {
 		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			WeaponPart weaponPart = shooter.get(WeaponPart.class);
 			if (weaponPart.canSpawn()) {
-				Vector2 mouseWorldCoords = getScreenToWorldCoords(
-						Gdx.input.getX(), Gdx.input.getY(), getRectangle(worldTable));
+				Vector2 mouseWorldCoords = UnitConversion.getScreenToWorldCoords(
+						camera, Gdx.input.getX(), Gdx.input.getY(), getRectangle(worldTable));
 				Entity bullet = weaponPart.createSpawn();
 				Vector2 shooterCenter = shooter.get(TransformPart.class).getCenter();
 				Vector2 bulletPosition = VectorUtils.relativeCenter(shooterCenter, 
-						bullet.get(TransformPart.class).getSize());
+						bullet.get(TransformPart.class).getBoundedSize());
 				bullet.get(TransformPart.class).setPosition(bulletPosition);
 				Vector2 offset = mouseWorldCoords.cpy().sub(bulletPosition);
 				bullet.get(TranslatePart.class).setVelocity(offset);
@@ -429,14 +428,6 @@ public class LongshotGame extends ApplicationAdapter {
 		if (Gdx.input.getY() < 0) {
 			Gdx.input.setCursorPosition(Gdx.input.getX(), 0);
 		}
-	}
-	
-	private Vector2 getScreenToWorldCoords(int screenX, int screenY, Rectangle worldViewPort) {
-		Vector3 worldCoords3 = new Vector3(screenX, screenY, 0);
-		camera.unproject(worldCoords3, worldViewPort.x, worldViewPort.y, worldViewPort.width, worldViewPort.height);
-		worldCoords3.scl(1 / DRAW_SCALE, 1 / DRAW_SCALE, 1);
-		Vector2 worldCoords = new Vector2(worldCoords3.x, worldCoords3.y);
-		return worldCoords;
 	}
 	
 	private Matrix4 getUIMatrix() {

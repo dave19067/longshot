@@ -83,7 +83,7 @@ public class LevelController {
 
 	private void spawnEnemy(Entity entity) {
 		Vector2 levelSize = level.getSize();
-		Vector2 size = entity.get(TransformPart.class).getSize();
+		Vector2 size = entity.get(TransformPart.class).getBoundedSize();
 		float spawnX = MathUtils.random(0, levelSize.x - size.x);
 		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y - size.y);
 		entity.get(TransformPart.class).setPosition(spawnPosition);

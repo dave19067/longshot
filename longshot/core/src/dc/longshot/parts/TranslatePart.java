@@ -7,7 +7,7 @@ import dc.longshot.util.VectorUtils;
 
 public class TranslatePart extends Part {
 
-	private Vector2 velocity = new Vector2(0, 0);
+	private Vector2 velocity = new Vector2();
 	
 	public Vector2 getVelocity() {
 		return velocity;
@@ -21,7 +21,8 @@ public class TranslatePart extends Part {
 	@Override
 	public void update(float delta) {
 		TransformPart transformPart = getEntity().get(TransformPart.class);
-		Vector2 newPosition = transformPart.getPosition().add(velocity.cpy().scl(delta));
+		Vector2 offset = velocity.cpy().scl(delta);
+		Vector2 newPosition = transformPart.getPosition().add(offset);
 		transformPart.setPosition(newPosition);
 	}
 	
