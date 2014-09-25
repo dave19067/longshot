@@ -86,7 +86,8 @@ public class LevelController {
 		Vector2 size = entity.get(TransformPart.class).getBoundedSize();
 		float spawnX = MathUtils.random(0, levelSize.x - size.x);
 		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y - size.y);
-		entity.get(TransformPart.class).setPosition(spawnPosition);
+		TransformPart transform = entity.get(TransformPart.class);
+		transform.setPosition(spawnPosition);
 		float destX = MathUtils.random(0, levelSize.x - size.x);
 		Vector2 destPosition = new Vector2(destX, 0);
 		Vector2 offset = destPosition.cpy().sub(spawnPosition);

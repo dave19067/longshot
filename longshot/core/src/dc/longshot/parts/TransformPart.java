@@ -1,5 +1,8 @@
 package dc.longshot.parts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -24,6 +27,15 @@ public class TransformPart extends Part {
 		polygon.setPosition(position.x, position.y);
 		polygon.setOrigin(origin.x, origin.y);
 		polygon.setRotation(rotation);
+	}
+	
+	public List<Vector2> getTransformedVertices() {
+		List<Vector2> verticesList = new ArrayList<Vector2>();
+		float[] vertices = polygon.getTransformedVertices();
+		for (int i = 0; i < vertices.length / 2; i++) {
+			verticesList.add(new Vector2(vertices[i * 2], vertices[i * 2 + 1]));
+		}
+		return verticesList;
 	}
 	
 	public Vector2 getSize() {

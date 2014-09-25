@@ -27,6 +27,11 @@ public class VectorUtils {
 		return angle;
 	}
 	
+	public static Vector2 getVectorFromAngle(float degrees) {
+		Vector2 vector = new Vector2(MathUtils.cosDeg(degrees), MathUtils.sinDeg(degrees));
+		return vector;
+	}
+	
 	public static Vector2 center(Vector2 position, Vector2 size) {
 		Vector2 center = new Vector2(position.x + size.x / 2, position.y + size.y / 2);
 		return center;

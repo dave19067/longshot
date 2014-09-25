@@ -74,7 +74,7 @@ public class LongshotGame extends ApplicationAdapter {
 
 	private Texture cursorTexture;
 	
-	private int health = 3;
+	private int health = 5;
 	private int score = 0;
 	
 	private Level level;
@@ -196,15 +196,17 @@ public class LongshotGame extends ApplicationAdapter {
 			
 			// Restrict entity in bounds
 			if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
-				Vector2 size = entity.get(TransformPart.class).getBoundedSize();
-				Vector2 position = entity.get(TransformPart.class).getPosition();
-				Vector2 newPosition = position.cpy();
+				TransformPart transformPart = entity.get(TransformPart.class);
+				Rectangle boundingBox = transformPart.getBoundingBox();
+				Vector2 newPosition = transformPart.getPosition();
+				// Buffer required for floating point calculations to make sure object is completely in bounds
+				float buffer = 0.00000001f;
 				
 				if (bounds.contains(Bound.LEFT)) {
-					newPosition.x = 0;
+					newPosition.x -= (boundingBox.x - buffer);
 				}
 				if (bounds.contains(Bound.RIGHT)) {
-					newPosition.x = level.getSize().x - size.x;
+					newPosition.x -= (boundingBox.x + boundingBox.width - level.getSize().x);
 				}
 				
 				entity.get(TransformPart.class).setPosition(newPosition);
@@ -234,10 +236,10 @@ public class LongshotGame extends ApplicationAdapter {
 				}
 			}
 
-			// TODO: clean up
+			// Set the cannon position and angle
 			TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
-			Vector2 shooterPosition = shooter.get(TransformPart.class).getCenter().sub(cannonTransform.getOrigin());
-			shooterCannon.get(TransformPart.class).setPosition(shooterPosition);
+			Vector2 shooterCenter = shooter.get(TransformPart.class).getCenter();
+			shooterCannon.get(TransformPart.class).setPosition(shooterCenter);
 			Vector2 mouseCoords = UnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
 					getRectangle(worldTable));
 			Vector2 offset = mouseCoords.cpy().sub(cannonTransform.getPosition());
@@ -371,15 +373,11 @@ public class LongshotGame extends ApplicationAdapter {
 		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			WeaponPart weaponPart = shooter.get(WeaponPart.class);
 			if (weaponPart.canSpawn()) {
-				Vector2 mouseWorldCoords = UnitConversion.getScreenToWorldCoords(
-						camera, Gdx.input.getX(), Gdx.input.getY(), getRectangle(worldTable));
 				Entity bullet = weaponPart.createSpawn();
-				Vector2 shooterCenter = shooter.get(TransformPart.class).getCenter();
-				Vector2 bulletPosition = VectorUtils.relativeCenter(shooterCenter, 
-						bullet.get(TransformPart.class).getBoundedSize());
-				bullet.get(TransformPart.class).setPosition(bulletPosition);
-				Vector2 offset = mouseWorldCoords.cpy().sub(bulletPosition);
-				bullet.get(TranslatePart.class).setVelocity(offset);
+				Vector2 spawnPosition = getBulletSpawnPosition(bullet);
+				bullet.get(TransformPart.class).setPosition(spawnPosition);
+				Vector2 velocity = VectorUtils.getVectorFromAngle(shooterCannon.get(TransformPart.class).getRotation());
+				bullet.get(TranslatePart.class).setVelocity(velocity);
 				entityManager.add(bullet);
 			}
 		}
@@ -442,6 +440,20 @@ public class LongshotGame extends ApplicationAdapter {
 			.scl(1 / defaultScreenSize.x, 1 / defaultScreenSize.y);
 		return new Rectangle(actorCoords.x * resizeRatio.x, actorCoords.y * resizeRatio.y, 
 				actor.getWidth() * resizeRatio.x, actor.getHeight() * resizeRatio.y);
+	}
+	
+	private Vector2 getBulletSpawnPosition(Entity bullet) {
+		// TODO: Figure out a better/shorter way to calculate this
+		// Position to spawn the bullet in the middle of the cannon's mouth
+		TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
+		List<Vector2> vertices = cannonTransform.getTransformedVertices();
+		Vector2 start = vertices.get(1);
+		Vector2 end = vertices.get(2);
+		Vector2 difference = end.cpy().sub(start);
+		TransformPart bulletTransform = bullet.get(TransformPart.class);
+		Vector2 offset = VectorUtils.getLengthened(difference, (difference.len() - bulletTransform.getSize().x) / 2);
+		Vector2 spawnPosition = start.cpy().add(offset);
+		return spawnPosition;
 	}
 	
 }

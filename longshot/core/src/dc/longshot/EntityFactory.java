@@ -73,7 +73,6 @@ public class EntityFactory {
 	public Entity createShooterCannon() {
 		Vector2 size = new Vector2(1, 0.25f);
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
-		// TODO: Maybe move this to createBaseEntity
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
 		return entity;
 	}
@@ -96,12 +95,12 @@ public class EntityFactory {
 	}
 	
 	public Entity createMissle() {
-		Entity entity = createProjectile(1, 0.5f, SpriteKey.BULLET);
+		Entity entity = createProjectile(1, 1f, SpriteKey.BULLET);
 		return entity;
 	}
 	
 	public Entity createWarhead() {
-		Entity entity = createProjectile(3, 3, SpriteKey.RED);
+		Entity entity = createProjectile(3, 4, SpriteKey.RED);
 		return entity;
 	}
 	

@@ -14,8 +14,8 @@ public class TranslatePart extends Part {
 	}
 	
 	public void setVelocity(Vector2 offset) {
-		// TODO: move speed logic
-		this.velocity = VectorUtils.getLengthened(offset, getEntity().get(SpeedPart.class).getSpeed());
+		velocity = VectorUtils.getLengthened(offset, getEntity().get(SpeedPart.class).getSpeed());
+		getEntity().get(TransformPart.class).setRotation(velocity.angle());
 	}
 	
 	@Override
