@@ -68,7 +68,7 @@ public class Entity {
 	 */
 	public void attach(Part part) {
 		if (has(part.getClass())) {
-			throw new IllegalArgumentException("Part of type " + part.getClass().getName() + " already exists.");
+			throw new IllegalArgumentException("Part of type " + part.getClass().getName() + " is already attached.");
 		}
 		
 		parts.put(part.getClass(), part);

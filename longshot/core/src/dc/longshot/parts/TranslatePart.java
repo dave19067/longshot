@@ -7,15 +7,27 @@ import dc.longshot.util.VectorUtils;
 
 public class TranslatePart extends Part {
 
-	private Vector2 velocity = new Vector2();
+	private boolean autoRotate;
+	private Vector2 velocity = new Vector2(0, 0);
+	
+	public TranslatePart(boolean autoRotate) {
+		this.autoRotate = autoRotate;
+	}
 	
 	public Vector2 getVelocity() {
 		return velocity;
 	}
 	
 	public void setVelocity(Vector2 offset) {
-		velocity = VectorUtils.getLengthened(offset, getEntity().get(SpeedPart.class).getSpeed());
-		getEntity().get(TransformPart.class).setRotation(velocity.angle());
+		if (offset.equals(new Vector2(0, 0))) {
+			velocity = new Vector2(0, 0);
+		}
+		else {
+			velocity = VectorUtils.getLengthened(offset, getEntity().get(SpeedPart.class).getSpeed());
+			if (autoRotate) {
+				getEntity().get(TransformPart.class).setRotation(velocity.angle());
+			}
+		}
 	}
 	
 	@Override

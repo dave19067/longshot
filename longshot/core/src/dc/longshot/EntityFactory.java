@@ -63,6 +63,7 @@ public class EntityFactory {
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
 		entity.attach(new BoundsPart());
+		entity.attach(new TranslatePart(false));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -82,7 +83,7 @@ public class EntityFactory {
 		entity.attach(new SpeedPart(20));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
-		entity.attach(new TranslatePart());
+		entity.attach(new TranslatePart(true));
 		entity.attach(new BouncePart());
 		entity.attach(new BoundsPart());
 		entity.attach(new TimedDeathPart(4));
@@ -110,8 +111,8 @@ public class EntityFactory {
 		entity.attach(new SpeedPart(speed));;
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(100));
+		entity.attach(new TranslatePart(true));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
-		entity.attach(new TranslatePart());
 		entity.attach(new BoundsDiePart());
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);

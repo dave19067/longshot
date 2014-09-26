@@ -43,7 +43,6 @@ import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
-import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
@@ -57,6 +56,9 @@ public class LongshotGame extends ApplicationAdapter {
 	
 	private Camera camera;
 	private SpriteBatch spriteBatch;
+	private Input input = new Input();
+	private Session session = new Session();
+	private float speedMultiplier = 1f;
 	private Vector2 defaultScreenSize;
 
 	private Skin skin;
@@ -95,6 +97,7 @@ public class LongshotGame extends ApplicationAdapter {
 		levelController = new LevelController(entityManager, entityFactory, level);
 		skin = new Skin(Gdx.files.internal("ui/default/uiskin.json"));
 		Gdx.input.setCursorCatched(true);
+		input.addProcessor(new GameInputProcessor(session));
 		
 		setupStage();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
@@ -149,12 +152,118 @@ public class LongshotGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 		float delta = Gdx.graphics.getDeltaTime();
-
+		
+		handleInput();
 		stage.act(delta);
-		handleInput(delta);
 		entityManager.update();
 		camera.update();
 		boundCursor();
+		
+		healthLabel.setText("HEALTH: " + health);
+		scoreLabel.setText("SCORE: " + score);
+		
+		if (health <= 0) {
+			Gdx.app.exit();
+		}
+		
+		if (levelController.isComplete()) {
+			// TODO: win case
+			Gdx.app.exit();
+		}
+		
+		if (session.isRunning()) {
+			updateWorld(delta * speedMultiplier);
+		}
+		
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Rectangle worldTableRect = getRectangle(worldTable);
+		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
+				(int)worldTableRect.getHeight());
+		spriteBatch.setProjectionMatrix(camera.combined);
+		spriteBatch.begin();
+		for (Entity entity : entityManager.getAll()) {
+			// Draw entity
+			if (entity.has(DrawablePart.class)) {
+				DrawablePart drawablePart = entity.get(DrawablePart.class);
+				drawablePart.getSprite().draw(spriteBatch);
+			}
+		}
+		spriteBatch.end();
+
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		spriteBatch.setProjectionMatrix(getUIMatrix());
+		spriteBatch.begin();
+		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 
+				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight() / 2);
+		spriteBatch.end();
+		
+		stage.draw();
+		// Table.drawDebug(stage);
+	}
+	
+	@Override
+	public void resize(int width, int height) {
+	    stage.getViewport().update(width, height, true);
+	}
+
+	@Override
+	public void dispose() {
+		spriteCache.dispose();
+		stage.dispose();
+	}
+	
+	private void loadSprites() {
+		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
+		spriteCache.add(SpriteKey.GREEN, "images/green.png");
+		spriteCache.add(SpriteKey.RED, "images/red.png");
+		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
+		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
+		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
+		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
+	}
+	
+	private void setupStage() {
+		// View table
+		worldTable = new Table(skin);
+		worldTable.debug();
+
+		// Status table
+		Table statusTable = new Table(skin);
+		healthLabel = new Label("", skin);
+		statusTable.add(healthLabel).expandX().left();
+		statusTable.row();
+		scoreLabel = new Label("", skin);
+		statusTable.add(scoreLabel).left();
+		statusTable.debug();
+		
+		// Main table
+		Table mainTable = new Table(skin).top().left();
+		mainTable.setFillParent(true);
+		mainTable.debug();
+		mainTable.add(worldTable).expand().fill();
+		mainTable.row();
+		mainTable.add(statusTable).expandX().fillX();
+		mainTable.row();
+		
+		stage.addActor(mainTable);
+	}
+	
+	private void createInitialEntities() {
+		Entity ground = entityFactory.createBaseEntity(new Vector2(level.getSize().x, 0.1f), new Vector2(0, 0), 
+				SpriteKey.GREEN);
+		entityManager.add(ground);
+		Vector2 shooterSize = new Vector2(2, 1);
+		TransformPart groundTransform = ground.get(TransformPart.class);
+		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
+		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
+				+ groundTransform.getBoundedSize().y));
+		entityManager.add(shooter);
+		shooterCannon = entityFactory.createShooterCannon();
+		entityManager.add(shooterCannon);
+	}
+	
+	private void updateWorld(float delta) {
 		collisionManager.checkCollisions(entityManager.getAll());
 		levelController.update(delta);
 		
@@ -260,108 +369,9 @@ public class LongshotGame extends ApplicationAdapter {
 				entityManager.remove(entity);
 			}
 		}
-		
-		healthLabel.setText("HEALTH: " + health);
-		scoreLabel.setText("SCORE: " + score);
-		
-		if (health <= 0) {
-			Gdx.app.exit();
-		}
-		
-		if (levelController.isComplete()) {
-			// TODO: win case
-			Gdx.app.exit();
-		}
-		
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Rectangle worldTableRect = getRectangle(worldTable);
-		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
-				(int)worldTableRect.getHeight());
-		spriteBatch.setProjectionMatrix(camera.combined);
-		spriteBatch.begin();
-		for (Entity entity : entityManager.getAll()) {
-			// Draw entity
-			if (entity.has(DrawablePart.class)) {
-				DrawablePart drawablePart = entity.get(DrawablePart.class);
-				drawablePart.getSprite().draw(spriteBatch);
-			}
-		}
-		spriteBatch.end();
-
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		spriteBatch.setProjectionMatrix(getUIMatrix());
-		spriteBatch.begin();
-		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 
-				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight() / 2);
-		spriteBatch.end();
-		
-		stage.draw();
-		// Table.drawDebug(stage);
 	}
 	
-	@Override
-	public void resize(int width, int height) {
-	    stage.getViewport().update(width, height, true);
-	}
-
-	@Override
-	public void dispose() {
-		spriteCache.dispose();
-		stage.dispose();
-	}
-	
-	private void loadSprites() {
-		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
-		spriteCache.add(SpriteKey.GREEN, "images/green.png");
-		spriteCache.add(SpriteKey.RED, "images/red.png");
-		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
-		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
-		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
-		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
-	}
-	
-	private void setupStage() {
-		// View table
-		worldTable = new Table(skin);
-		worldTable.debug();
-
-		// Status table
-		Table statusTable = new Table(skin);
-		healthLabel = new Label("", skin);
-		statusTable.add(healthLabel).expandX().left();
-		statusTable.row();
-		scoreLabel = new Label("", skin);
-		statusTable.add(scoreLabel).left();
-		statusTable.debug();
-		
-		// Main table
-		Table mainTable = new Table(skin).top().left();
-		mainTable.setFillParent(true);
-		mainTable.debug();
-		mainTable.add(worldTable).expand().fill();
-		mainTable.row();
-		mainTable.add(statusTable).expandX().fillX();
-		mainTable.row();
-		
-		stage.addActor(mainTable);
-	}
-	
-	private void createInitialEntities() {
-		Entity ground = entityFactory.createBaseEntity(new Vector2(level.getSize().x, 0.1f), new Vector2(0, 0), 
-				SpriteKey.GREEN);
-		entityManager.add(ground);
-		Vector2 shooterSize = new Vector2(2, 1);
-		TransformPart groundTransform = ground.get(TransformPart.class);
-		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
-		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
-				+ groundTransform.getBoundedSize().y));
-		entityManager.add(shooter);
-		shooterCannon = entityFactory.createShooterCannon();
-		entityManager.add(shooterCannon);
-	}
-	
-	private void handleInput(float delta) {
+	private void handleInput() {
 		Vector2 moveDirection = new Vector2(0, 0);
 		
 		if (Gdx.input.isKeyPressed(Keys.A)) {
@@ -382,11 +392,7 @@ public class LongshotGame extends ApplicationAdapter {
 			}
 		}
 		
-		if (moveDirection.len() > 0) {
-			Vector2 velocity = VectorUtils.getLengthened(moveDirection, shooter.get(SpeedPart.class).getSpeed() * delta);
-			Vector2 newPosition = shooter.get(TransformPart.class).getPosition().add(velocity);
-			shooter.get(TransformPart.class).setPosition(newPosition);
-		}
+		shooter.get(TranslatePart.class).setVelocity(moveDirection);
 	}
 	
 	private boolean isOutOfBounds(Rectangle collisionBox) {

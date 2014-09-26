@@ -19,14 +19,9 @@ public class TransformPart extends Part {
 	}
 	
 	public TransformPart(Vector2 size, Vector2 position) {
-		this(size, position, new Vector2(0, 0), 0);
-	}
-	
-	public TransformPart(Vector2 size, Vector2 position, Vector2 origin, float rotation) {
 		polygon = PolygonFactory.createRectangle(size);
 		polygon.setPosition(position.x, position.y);
-		polygon.setOrigin(origin.x, origin.y);
-		polygon.setRotation(rotation);
+		polygon.setOrigin(0, 0);
 	}
 	
 	public List<Vector2> getTransformedVertices() {
