@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Entity;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.SpriteKey;
+import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
 import dc.longshot.parts.BouncePart;
@@ -96,24 +97,26 @@ public class EntityFactory {
 	}
 	
 	public Entity createMissle() {
-		Entity entity = createProjectile(1, 1f, SpriteKey.BULLET);
+		Entity entity = createProjectile(new Vector2(1, 0.25f), 1, 1f, SpriteKey.MISSLE);
 		return entity;
 	}
 	
 	public Entity createWarhead() {
-		Entity entity = createProjectile(3, 4, SpriteKey.RED);
+		Entity entity = createProjectile(new Vector2(1, 0.75f),3, 4, SpriteKey.NUKE);
 		return entity;
 	}
 	
-	public Entity createProjectile(float damage, float explosionRadius, SpriteKey spriteKey) {
-		Entity entity = createBaseEntity(new Vector2(0.5f, 0.5f), new Vector2(), spriteKey);
+	public Entity createProjectile(Vector2 size, float damage, float explosionRadius, SpriteKey spriteKey) {
+		Entity entity = createBaseEntity(new Vector2(size), new Vector2(), spriteKey);
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));;
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(100));
 		entity.attach(new TranslatePart(true));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
-		entity.attach(new BoundsDiePart());
+		List<Bound> deathBounds = new ArrayList<Bound>();
+		deathBounds.add(Bound.BOTTOM);
+		entity.attach(new BoundsDiePart(deathBounds));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, damage));

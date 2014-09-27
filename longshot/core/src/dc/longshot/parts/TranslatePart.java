@@ -15,15 +15,15 @@ public class TranslatePart extends Part {
 	}
 	
 	public Vector2 getVelocity() {
-		return velocity;
+		return new Vector2(velocity);
 	}
 	
-	public void setVelocity(Vector2 offset) {
-		if (offset.equals(new Vector2(0, 0))) {
+	public void setVelocity(Vector2 direction) {
+		if (direction.equals(new Vector2(0, 0))) {
 			velocity = new Vector2(0, 0);
 		}
 		else {
-			velocity = VectorUtils.getLengthened(offset, getEntity().get(SpeedPart.class).getSpeed());
+			velocity = VectorUtils.getLengthened(direction, getEntity().get(SpeedPart.class).getSpeed());
 			if (autoRotate) {
 				getEntity().get(TransformPart.class).setRotation(velocity.angle());
 			}

@@ -134,14 +134,15 @@ public class LongshotGame extends ApplicationAdapter {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					TransformPart spawnTransform = spawn.get(TransformPart.class);
 					Vector2 position = VectorUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
-							spawnTransform.getBoundedSize());
+							spawnTransform.getBoundingSize());
 					spawnTransform.setPosition(position);
 					entityManager.add(spawn);
 				}
 
 				// if killed, increase score
 				if (entity.has(ScorePart.class)) {
-					if (!isOutOfBounds(entity.get(TransformPart.class).getBoundingBox())) {
+					if (!isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), 
+						entity.get(BoundsDiePart.class).getBounds())) {
 						score += entity.get(ScorePart.class).getScore();
 					}
 				}
@@ -216,10 +217,11 @@ public class LongshotGame extends ApplicationAdapter {
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
-		spriteCache.add(SpriteKey.RED, "images/red.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
+		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
+		spriteCache.add(SpriteKey.NUKE, "images/nuke.png");
 		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
 	}
 	
@@ -257,7 +259,7 @@ public class LongshotGame extends ApplicationAdapter {
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
 		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
-				+ groundTransform.getBoundedSize().y));
+				+ groundTransform.getBoundingSize().y));
 		entityManager.add(shooter);
 		shooterCannon = entityFactory.createShooterCannon();
 		entityManager.add(shooterCannon);
@@ -270,13 +272,10 @@ public class LongshotGame extends ApplicationAdapter {
 		for (Entity entity : entityManager.getAll()) {
 			entity.update(delta);
 			
-			List<Bound> bounds = new ArrayList<Bound>();
-			if (entity.has(TransformPart.class)) {
-				bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
-			}
 			
 			// Bounce entity off walls
 			if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
+				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
 				Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
 				Vector2 newVelocity = velocity.cpy();
 
@@ -293,23 +292,24 @@ public class LongshotGame extends ApplicationAdapter {
 				}
 				
 				entity.get(TranslatePart.class).setVelocity(newVelocity);
-			}
-			
-			// Increase bounce stat
-			if (entity.has(ShotStatsPart.class) && entity.has(BouncePart.class)) {
-				if (bounds.contains(Bound.RIGHT) || bounds.contains(Bound.LEFT)) {
-					ShotStatsPart shotStatsPart = entity.get(ShotStatsPart.class);
-					shotStatsPart.setBounceNum(shotStatsPart.getBounceNum() + 1);
+				
+				// Increase bounce stat
+				if (entity.has(ShotStatsPart.class)) {
+					if (bounds.contains(Bound.RIGHT) || bounds.contains(Bound.LEFT)) {
+						ShotStatsPart shotStatsPart = entity.get(ShotStatsPart.class);
+						shotStatsPart.setBounceNum(shotStatsPart.getBounceNum() + 1);
+					}
 				}
 			}
 			
 			// Restrict entity in bounds
 			if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
+				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
 				TransformPart transformPart = entity.get(TransformPart.class);
 				Rectangle boundingBox = transformPart.getBoundingBox();
 				Vector2 newPosition = transformPart.getPosition();
 				// Buffer required for floating point calculations to make sure object is completely in bounds
-				float buffer = 0.00000001f;
+				float buffer = 0.00001f;
 				
 				if (bounds.contains(Bound.LEFT)) {
 					newPosition.x -= (boundingBox.x - buffer);
@@ -319,7 +319,6 @@ public class LongshotGame extends ApplicationAdapter {
 				}
 				
 				entity.get(TransformPart.class).setPosition(newPosition);
-				bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
 			}
 			
 			// Go through collisions
@@ -338,6 +337,7 @@ public class LongshotGame extends ApplicationAdapter {
 			
 			// Decrease city health if missile hits it
 			if (entity.has(CollisionTypePart.class) && entity.has(DamageOnCollisionPart.class)) {
+				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
 				if (entity.get(CollisionTypePart.class).getCollisionType() == CollisionType.ENEMY
 						&& bounds.contains(Bound.BOTTOM)) {
 					float damage = entity.get(DamageOnCollisionPart.class).getDamage();
@@ -360,7 +360,8 @@ public class LongshotGame extends ApplicationAdapter {
 			}
 			// Remove if out of bounds
 			if (entity.has(BoundsDiePart.class)) {
-				if (bounds.size() > 0) {
+				if (isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), 
+						entity.get(BoundsDiePart.class).getBounds())) {
 					entityManager.remove(entity);
 				}
 			}
@@ -379,7 +380,9 @@ public class LongshotGame extends ApplicationAdapter {
 		}
 		if (Gdx.input.isKeyPressed(Keys.S)) {
 			moveDirection.x += 1;
-		}
+		}	
+		shooter.get(TranslatePart.class).setVelocity(moveDirection);
+		
 		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			WeaponPart weaponPart = shooter.get(WeaponPart.class);
 			if (weaponPart.canSpawn()) {
@@ -391,28 +394,36 @@ public class LongshotGame extends ApplicationAdapter {
 				entityManager.add(bullet);
 			}
 		}
-		
-		shooter.get(TranslatePart.class).setVelocity(moveDirection);
 	}
 	
-	private boolean isOutOfBounds(Rectangle collisionBox) {
-		return checkOutOfBounds(collisionBox).size() > 0;
+	private boolean isOutOfBounds(Rectangle collisionBox, List<Bound> bounds) {
+		for (Bound bound : checkOutOfBounds(collisionBox)) {
+			if (bounds.contains(bound)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private List<Bound> checkOutOfBounds(Rectangle collisionBox) {
-		List<Bound> bounds = new ArrayList<Bound>();
 		Vector2 levelSize = level.getSize();
+		Rectangle boundsBox = new Rectangle(0, 0, levelSize.x, levelSize.y);
+		return checkOutOfBounds(collisionBox, boundsBox);
+	}
+	
+	private List<Bound> checkOutOfBounds(Rectangle collisionBox, Rectangle boundsBox) {
+		List<Bound> bounds = new ArrayList<Bound>();
 		
-		if (collisionBox.x < 0) {
+		if (collisionBox.x < boundsBox.x) {
 			bounds.add(Bound.LEFT);
 		}
-		else if (collisionBox.x + collisionBox.width > levelSize.x) {
+		else if (collisionBox.x + collisionBox.width > boundsBox.x + boundsBox.width) {
 			bounds.add(Bound.RIGHT);
 		}
-		if (collisionBox.y < 0) {
+		if (collisionBox.y < boundsBox.y) {
 			bounds.add(Bound.BOTTOM);
 		}
-		else if (collisionBox.y + collisionBox.height > levelSize.y) {
+		else if (collisionBox.y + collisionBox.height > boundsBox.y + boundsBox.height) {
 			bounds.add(Bound.TOP);
 		}
 		

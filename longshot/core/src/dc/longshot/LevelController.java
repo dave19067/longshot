@@ -83,15 +83,29 @@ public class LevelController {
 
 	private void spawnEnemy(Entity entity) {
 		Vector2 levelSize = level.getSize();
-		Vector2 size = entity.get(TransformPart.class).getBoundedSize();
-		float spawnX = MathUtils.random(0, levelSize.x - size.x);
-		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y - size.y);
+		
+		// Get the spawn position, which is a random point from the skyline
+		Vector2 size = entity.get(TransformPart.class).getSize();
+		float spawnX = MathUtils.random(0, levelSize.x - size.y);
+		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y);
 		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);
-		float destX = MathUtils.random(0, levelSize.x - size.x);
+		
+		// Get the destination, which is a random point on the ground
+		float destX = MathUtils.random(0, levelSize.x - size.y);
 		Vector2 destPosition = new Vector2(destX, 0);
+		
+		// Find the direction to get from the entity spawn position to the destination
 		Vector2 offset = destPosition.cpy().sub(spawnPosition);
-		entity.get(TranslatePart.class).setVelocity(offset);
+		TranslatePart translate = entity.get(TranslatePart.class);
+		translate.setVelocity(offset);
+		
+		// If the enemy is partially in bounds, move to just out of bounds using the negative velocity
+		float unboundedOverlapY = levelSize.y - transform.getBoundingBox().y;
+		Vector2 velocity = translate.getVelocity();
+		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
+		transform.setPosition(spawnPosition.cpy().add(outOfBoundsOffset));
+		
 		entityManager.add(entity);
 	}
 	
