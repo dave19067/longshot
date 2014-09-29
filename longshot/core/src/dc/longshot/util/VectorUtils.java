@@ -42,6 +42,12 @@ public class VectorUtils {
 		return relativeCenter;
 	}
 	
+	public static Vector2 relativeEdgeMiddle(Vector2 edgeStart, Vector2 edgeEnd, float objectLength) {
+		Vector2 difference = edgeEnd.cpy().sub(edgeStart);
+		Vector2 offset = getLengthened(difference, (difference.len() - objectLength) / 2);
+		return edgeStart.cpy().add(offset);
+	}
+	
 	public static float relativeMiddle(float pivotMiddle, float objectLength) {
 		float relativeMiddle = pivotMiddle - objectLength / 2;
 		return relativeMiddle;

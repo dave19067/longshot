@@ -38,6 +38,7 @@ import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
+import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
@@ -132,10 +133,6 @@ public class LongshotGame extends ApplicationAdapter {
 			public void removed(Entity entity) {
 				if (entity.has(SpawnOnDeathPart.class)) {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
-					TransformPart spawnTransform = spawn.get(TransformPart.class);
-					Vector2 position = VectorUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
-							spawnTransform.getBoundingSize());
-					spawnTransform.setPosition(position);
 					entityManager.add(spawn);
 				}
 
@@ -216,6 +213,7 @@ public class LongshotGame extends ApplicationAdapter {
 	
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
+		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
@@ -344,6 +342,15 @@ public class LongshotGame extends ApplicationAdapter {
 					health -= damage;
 				}
 			}
+			
+			// Emit
+			if (entity.has(EmitterPart.class)) {
+				EmitterPart emitterPart = entity.get(EmitterPart.class);
+				if (emitterPart.canEmit()) {
+					Entity spawn = emitterPart.emit();
+					entityManager.add(spawn);
+				}
+			}
 
 			// Set the cannon position and angle
 			TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
@@ -460,16 +467,13 @@ public class LongshotGame extends ApplicationAdapter {
 	}
 	
 	private Vector2 getBulletSpawnPosition(Entity bullet) {
-		// TODO: Figure out a better/shorter way to calculate this
 		// Position to spawn the bullet in the middle of the cannon's mouth
 		TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
 		List<Vector2> vertices = cannonTransform.getTransformedVertices();
-		Vector2 start = vertices.get(1);
-		Vector2 end = vertices.get(2);
-		Vector2 difference = end.cpy().sub(start);
 		TransformPart bulletTransform = bullet.get(TransformPart.class);
-		Vector2 offset = VectorUtils.getLengthened(difference, (difference.len() - bulletTransform.getSize().x) / 2);
-		Vector2 spawnPosition = start.cpy().add(offset);
+		// TODO: Find a better way to get the edge
+		Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(1), vertices.get(2), 
+				bulletTransform.getSize().y);
 		return spawnPosition;
 	}
 	
