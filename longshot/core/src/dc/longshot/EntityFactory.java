@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.graphics.SpriteCache;
@@ -60,7 +61,7 @@ public class EntityFactory {
 		return entity;
 	}
 
-	public Entity createShooter(Vector2 size, Vector2 position) {
+	public Entity createShooter(Vector3 size, Vector2 position) {
 		Entity entity = createBaseEntity(size, position, SpriteKey.SHOOTER);
 		entity.attach(new SpeedPart(7));
 		entity.attach(new HealthPart(1));
@@ -75,14 +76,14 @@ public class EntityFactory {
 	}
 
 	public Entity createShooterCannon() {
-		Vector2 size = new Vector2(1, 0.25f);
+		Vector3 size = new Vector3(1, 0.25f, 0.25f);
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
 		return entity;
 	}
 	
 	public Entity createShooterBullet() {
-		Entity entity = createBaseEntity(new Vector2(0.6f, 0.1f), new Vector2(), SpriteKey.BULLET);
+		Entity entity = createBaseEntity(new Vector3(0.6f, 0.1f, 0.1f), new Vector2(), SpriteKey.BULLET);
 		entity.attach(new SpeedPart(20));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
@@ -99,20 +100,20 @@ public class EntityFactory {
 	}
 	
 	public Entity createMissle() {
-		Entity trailParticle = createTrailParticle(new Vector2(0.1f, 0.1f), Color.GRAY.cpy(), Color.CLEAR.cpy());
-		Entity entity = createProjectile(new Vector2(1, 0.25f), 1, 1f, SpriteKey.MISSLE, trailParticle);
+		Entity trailParticle = createTrailParticle(new Vector3(0.1f, 0.1f, 0.1f), Color.GRAY.cpy(), Color.CLEAR.cpy());
+		Entity entity = createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 1f, SpriteKey.MISSLE, trailParticle);
 		return entity;
 	}
 	
 	public Entity createWarhead() {
-		Entity trailParticle = createTrailParticle(new Vector2(0.5f, 0.5f), Color.GRAY.cpy(), Color.CLEAR.cpy());
-		Entity entity = createProjectile(new Vector2(1, 0.75f),3, 4, SpriteKey.NUKE, trailParticle);
+		Entity trailParticle = createTrailParticle(new Vector3(0.5f, 0.5f, 0.5f), Color.GRAY.cpy(), Color.CLEAR.cpy());
+		Entity entity = createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 4, SpriteKey.NUKE, trailParticle);
 		return entity;
 	}
 	
-	public Entity createProjectile(Vector2 size, float damage, float explosionRadius, SpriteKey spriteKey, 
+	public Entity createProjectile(Vector3 size, float damage, float explosionRadius, SpriteKey spriteKey, 
 			Entity trailParticle) {
-		Entity entity = createBaseEntity(new Vector2(size), new Vector2(), spriteKey);
+		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));;
 		entity.attach(new HealthPart(1));
@@ -131,7 +132,9 @@ public class EntityFactory {
 	}
 	
 	public Entity createExplosion(float radius, float maxLifeTime) {
-		Entity entity = createBaseEntity(new Vector2(radius * 2, radius * 2), new Vector2(), SpriteKey.EXPLOSION);
+		float diameter = radius * 2;
+		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), 
+				SpriteKey.EXPLOSION);
 		entity.attach(new ExplodeOnSpawnPart(radius));
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		Color endColor = Color.ORANGE.cpy();
@@ -140,7 +143,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createTrailParticle(Vector2 size, Color startColor, Color endColor) {
+	public Entity createTrailParticle(Vector3 size, Color startColor, Color endColor) {
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.WHITE);
 		float maxLifeTime = 3;
 		entity.attach(new TimedDeathPart(maxLifeTime));
@@ -148,11 +151,11 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createBaseEntity(Vector2 size, Vector2 position, SpriteKey spriteKey) {
+	public Entity createBaseEntity(Vector3 size, Vector2 position, SpriteKey spriteKey) {
 		Entity entity = new Entity();
-		entity.attach(new TransformPart(size, position));
+		entity.attach(new TransformPart(new Vector2(size.x, size.y), position));
 		Texture texture = spriteCache.getTexture(spriteKey);
-		entity.attach(new DrawablePart(new Sprite(texture)));
+		entity.attach(new DrawablePart(new Sprite(texture), size.z));
 		entity.attach(new DrawableUpdaterPart());
 		return entity;
 	}

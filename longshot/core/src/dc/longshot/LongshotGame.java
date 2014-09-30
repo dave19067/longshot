@@ -1,6 +1,8 @@
 package dc.longshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -15,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -180,7 +183,9 @@ public class LongshotGame extends ApplicationAdapter {
 				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
-		for (Entity entity : entityManager.getAll()) {
+		List<Entity> entities = entityManager.getAll();
+		Collections.sort(entities, new ZComparator());
+		for (Entity entity : entities) {
 			// Draw entity
 			if (entity.has(DrawablePart.class)) {
 				DrawablePart drawablePart = entity.get(DrawablePart.class);
@@ -250,10 +255,10 @@ public class LongshotGame extends ApplicationAdapter {
 	}
 	
 	private void createInitialEntities() {
-		Entity ground = entityFactory.createBaseEntity(new Vector2(level.getSize().x, 0.1f), new Vector2(0, 0), 
-				SpriteKey.GREEN);
+		Entity ground = entityFactory.createBaseEntity(new Vector3(level.getSize().x, 0.1f, level.getSize().x), 
+				new Vector2(0, 0), SpriteKey.GREEN);
 		entityManager.add(ground);
-		Vector2 shooterSize = new Vector2(2, 1);
+		Vector3 shooterSize = new Vector3(2, 1, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
 		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
@@ -475,6 +480,18 @@ public class LongshotGame extends ApplicationAdapter {
 		Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(1), vertices.get(2), 
 				bulletTransform.getSize().y);
 		return spawnPosition;
+	}
+	
+	public class ZComparator implements Comparator<Entity> {
+	    @Override
+	    public int compare(Entity e1, Entity e2) {
+	    	if (e1.has(DrawablePart.class) && e2.has(DrawablePart.class)) {
+	    		return Float.compare(e1.get(DrawablePart.class).getZ(), e2.get(DrawablePart.class).getZ());
+	    	}
+	    	else {
+	    		return 0;
+	    	}
+	    }
 	}
 	
 }
