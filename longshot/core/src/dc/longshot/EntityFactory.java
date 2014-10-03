@@ -126,7 +126,7 @@ public class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, damage));
-		entity.attach(new EmitterPart(trailParticle, 0.5f));
+		entity.attach(new EmitterPart(trailParticle, 0.2f));
 		entity.attach(new SpawnOnDeathPart(createExplosion(explosionRadius, 3)));
 		return entity;
 	}

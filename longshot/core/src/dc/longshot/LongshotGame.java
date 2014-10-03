@@ -10,9 +10,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,6 +23,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
@@ -66,6 +69,8 @@ public class LongshotGame extends ApplicationAdapter {
 	private Vector2 defaultScreenSize;
 
 	private Skin skin;
+	private BitmapFont ocrFont;
+	private LabelStyle ocrStyle;
 	private Stage stage;
 	private Table worldTable;
 	private Label healthLabel;
@@ -80,7 +85,7 @@ public class LongshotGame extends ApplicationAdapter {
 
 	private Texture cursorTexture;
 	
-	private int health = 5;
+	private int health = 5; 
 	private int score = 0;
 	
 	private Level level;
@@ -100,6 +105,8 @@ public class LongshotGame extends ApplicationAdapter {
 		stage = new Stage();
 		levelController = new LevelController(entityManager, entityFactory, level);
 		skin = new Skin(Gdx.files.internal("ui/default/uiskin.json"));
+		ocrFont = new BitmapFont(Gdx.files.internal("ui/ocr/ocr.fnt"));
+		ocrStyle = new LabelStyle(ocrFont, Color.WHITE);
 		Gdx.input.setCursorCatched(true);
 		input.addProcessor(new GameInputProcessor(session));
 		
@@ -214,13 +221,14 @@ public class LongshotGame extends ApplicationAdapter {
 	public void dispose() {
 		spriteCache.dispose();
 		stage.dispose();
+		ocrFont.dispose();
 	}
 	
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
-		spriteCache.add(SpriteKey.SHOOTER, "images/shooter.png");
+		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
@@ -235,10 +243,10 @@ public class LongshotGame extends ApplicationAdapter {
 
 		// Status table
 		Table statusTable = new Table(skin);
-		healthLabel = new Label("", skin);
+		healthLabel = new Label("", ocrStyle);
 		statusTable.add(healthLabel).expandX().left();
 		statusTable.row();
-		scoreLabel = new Label("", skin);
+		scoreLabel = new Label("", ocrStyle);
 		statusTable.add(scoreLabel).left();
 		statusTable.debug();
 		
@@ -258,7 +266,7 @@ public class LongshotGame extends ApplicationAdapter {
 		Entity ground = entityFactory.createBaseEntity(new Vector3(level.getSize().x, 0.1f, level.getSize().x), 
 				new Vector2(0, 0), SpriteKey.GREEN);
 		entityManager.add(ground);
-		Vector3 shooterSize = new Vector3(2, 1, 1);
+		Vector3 shooterSize = new Vector3(2, 1.5f, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
 		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
