@@ -5,6 +5,6 @@ import javax.xml.bind.annotation.XmlEnum;
 @XmlEnum
 public enum EntityType {
 
-	MISSLE, WARHEAD
+	MISSLE, WARHEAD, UFO
 	
 }

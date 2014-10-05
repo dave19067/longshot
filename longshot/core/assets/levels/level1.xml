@@ -7,11 +7,15 @@
     <spawnDuration>60.0</spawnDuration>
     <spawns>
         <entry>
+            <key>MISSLE</key>
+            <value>30</value>
+        </entry>
+        <entry>
             <key>WARHEAD</key>
             <value>10</value>
         </entry>
         <entry>
-            <key>MISSLE</key>
+            <key>UFO</key>
             <value>30</value>
         </entry>
     </spawns>

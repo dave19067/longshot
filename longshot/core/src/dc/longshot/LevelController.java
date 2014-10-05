@@ -58,7 +58,16 @@ public class LevelController {
 			SpawnInfo spawnInfo = it.next();
 			if (spawnInfo.getSpawnTime() <= time) {
 				Entity spawn = entityFactory.create(spawnInfo.getEntityType());
-				spawnEnemy(spawn);
+				switch (spawnInfo.getEntityType()) {
+				case MISSLE:
+				case WARHEAD:
+					placeAbove(spawn);
+					break;
+				case UFO:
+					placeInSpace(spawn);
+					break;
+				}
+				entityManager.add(spawn);
 				it.remove();
 			}
 			else {
@@ -81,14 +90,14 @@ public class LevelController {
 		return !enemiesExist && spawnInfos.size() <= 0;
 	}
 
-	private void spawnEnemy(Entity entity) {
+	private void placeAbove(Entity entity) {
 		Vector2 levelSize = level.getSize();
 		
 		// Get the spawn position, which is a random point from the skyline
-		Vector2 size = entity.get(TransformPart.class).getSize();
+		TransformPart transform = entity.get(TransformPart.class);
+		Vector2 size = transform.getSize();
 		float spawnX = MathUtils.random(0, levelSize.x - size.y);
 		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y);
-		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);
 		
 		// Get the destination, which is a random point on the ground
@@ -105,8 +114,17 @@ public class LevelController {
 		Vector2 velocity = translate.getVelocity();
 		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
 		transform.setPosition(spawnPosition.cpy().add(outOfBoundsOffset));
-		
-		entityManager.add(entity);
+	}
+
+	private void placeInSpace(Entity entity) {
+		// Get the spawn position, which is a random point above the halfline
+		Vector2 levelSize = level.getSize();
+		Vector2 size = entity.get(TransformPart.class).getSize();
+		float spawnX = MathUtils.random(0, levelSize.x - size.x);
+		float spawnY = MathUtils.random(2 / 3f * levelSize.y, levelSize.y - size.y);
+		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
+		TransformPart transform = entity.get(TransformPart.class);
+		transform.setPosition(spawnPosition);
 	}
 	
 }

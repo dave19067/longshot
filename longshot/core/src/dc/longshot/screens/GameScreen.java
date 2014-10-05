@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -41,9 +42,11 @@ import dc.longshot.graphics.SpriteKey;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.Level;
+import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
+import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
@@ -249,6 +252,7 @@ public class GameScreen implements Screen {
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
 		spriteCache.add(SpriteKey.NUKE, "images/nuke.png");
+		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
 		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
 	}
 	
@@ -305,16 +309,31 @@ public class GameScreen implements Screen {
 				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
 				Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
 				Vector2 newVelocity = velocity.cpy();
-
-				if (bounds.contains(Bound.RIGHT)) {
-					if (velocity.x > 0) {
-						newVelocity.x *= -1;
-					}
-				}
-				if (bounds.contains(Bound.LEFT)) {
-					// left bounds
-					if (velocity.x < 0) {
-						newVelocity.x *= -1;
+				
+				for (Bound checkedBound : entity.get(BouncePart.class).getBounds()) {
+					if (bounds.contains(checkedBound)) {
+						switch (checkedBound) {
+						case LEFT:
+							if (velocity.x < 0) {
+								newVelocity.x *= -1;
+							}
+							break;
+						case RIGHT:
+							if (velocity.x > 0) {
+								newVelocity.x *= -1;
+							}
+							break;
+						case TOP:
+							if (velocity.y > 0) {
+								newVelocity.y *= -1;
+							}
+							break;
+						case BOTTOM:
+							if (velocity.y < 0) {
+								newVelocity.y *= -1;
+							}
+							break;
+						}
 					}
 				}
 				
@@ -338,11 +357,23 @@ public class GameScreen implements Screen {
 				// Buffer required for floating point calculations to make sure object is completely in bounds
 				float buffer = 0.00001f;
 				
-				if (bounds.contains(Bound.LEFT)) {
-					newPosition.x -= (boundingBox.x - buffer);
-				}
-				if (bounds.contains(Bound.RIGHT)) {
-					newPosition.x -= (boundingBox.x + boundingBox.width - level.getSize().x);
+				for (Bound checkedBound : entity.get(BoundsPart.class).getBounds()) {
+					if (bounds.contains(checkedBound)) {
+						switch (checkedBound) {
+						case LEFT:
+							newPosition.x -= (boundingBox.x - buffer);
+							break;
+						case RIGHT:
+							newPosition.x -= (boundingBox.x + boundingBox.width - level.getSize().x);
+							break;
+						case TOP:
+							newPosition.y -= (boundingBox.y + boundingBox.height - level.getSize().y);
+							break;
+						case BOTTOM:
+							newPosition.y -= (boundingBox.y - buffer);
+							break;
+						}
+					}
 				}
 				
 				entity.get(TransformPart.class).setPosition(newPosition);
@@ -363,7 +394,8 @@ public class GameScreen implements Screen {
 			}
 			
 			// Decrease city health if missile hits it
-			if (entity.has(CollisionTypePart.class) && entity.has(DamageOnCollisionPart.class)) {
+			if (entity.has(CityDamagePart.class) && entity.has(CollisionTypePart.class)
+					&& entity.has(DamageOnCollisionPart.class)) {
 				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
 				if (entity.get(CollisionTypePart.class).getCollisionType() == CollisionType.ENEMY
 						&& bounds.contains(Bound.BOTTOM)) {
@@ -378,6 +410,25 @@ public class GameScreen implements Screen {
 				if (emitterPart.canEmit()) {
 					Entity spawn = emitterPart.emit();
 					entityManager.add(spawn);
+				}
+			}
+			
+			// Shoot automatically using AI
+			if (entity.has(AIShooterPart.class)) {
+				AIShooterPart aiShooterPart = entity.get(AIShooterPart.class);
+				if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
+					WeaponPart weaponPart = entity.get(WeaponPart.class);
+					if (weaponPart.canSpawn()) {
+						Entity spawn = weaponPart.createSpawn();
+						TransformPart spawnTransform = spawn.get(TransformPart.class);
+						TransformPart transform = entity.get(TransformPart.class);
+						spawnTransform.setPosition(VectorUtils.relativeCenter(transform.getCenter(), 
+								spawnTransform.getBoundingSize()));
+						TransformPart shooterTransform = shooter.get(TransformPart.class);
+						spawn.get(TranslatePart.class).setVelocity(shooterTransform.getCenter().sub(
+								spawnTransform.getCenter()));
+						entityManager.add(spawn);
+					}
 				}
 			}
 
