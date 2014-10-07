@@ -12,10 +12,10 @@ import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.graphics.SpriteCache;
-import dc.longshot.graphics.SpriteKey;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
+import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
@@ -58,7 +58,7 @@ public class EntityFactory {
 				entity = createWarhead();
 				break;
 			case UFO:
-				entity = createUFO();
+				entity = createUFOGlow();
 				break;
 			default:
 				throw new IllegalArgumentException(entityType + " is not a valid entity type to create");
@@ -141,8 +141,18 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createUFO() {
-		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), SpriteKey.UFO);
+	public Entity createUFOGlow() {
+		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), SpriteKey.UFO_GLOW);
+		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
+		entity.attach(new SpawnOnDeathPart(createUFO(new Vector3(1, 0.5f, 1))));
+		float maxLifeTime = 3;
+		entity.attach(new TimedDeathPart(maxLifeTime));
+		entity.attach(new ColorChangePart(maxLifeTime, Color.CLEAR.cpy(), Color.TEAL.cpy()));
+		return entity;
+	}
+	
+	public Entity createUFO(Vector3 size) {
+		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.UFO);
 		entity.attach(new SpeedPart(3));
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(300));
@@ -164,7 +174,7 @@ public class EntityFactory {
 	}
 	
 	public Entity createUFOLaser() {
-		Entity entity = createBaseEntity(new Vector3(0.3f, 0.1f, 0.1f), new Vector2(), SpriteKey.BULLET);
+		Entity entity = createBaseEntity(new Vector3(0.3f, 0.1f, 0.1f), new Vector2(), SpriteKey.GREEN);
 		entity.attach(new SpeedPart(10));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));

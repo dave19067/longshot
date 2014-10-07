@@ -16,7 +16,6 @@ public class SpriteCache<T> {
 			throw new IllegalArgumentException("There is no texture associate with key " + key.toString());
 		}
 		
-		// create a drawable
 		Texture texture = textureMap.get(key);
 		return texture;
 	}

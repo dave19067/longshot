@@ -10,10 +10,12 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
@@ -38,10 +40,11 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.graphics.SpriteCache;
-import dc.longshot.graphics.SpriteKey;
+import dc.longshot.graphics.TextureFactory;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.Level;
+import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
@@ -60,6 +63,7 @@ import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
+import dc.longshot.services.BackdropManager;
 import dc.longshot.services.Input;
 import dc.longshot.ui.Skins;
 import dc.longshot.util.EventManager;
@@ -89,9 +93,11 @@ public class GameScreen implements Screen {
 	private SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
 	private EntityFactory entityFactory = new EntityFactory(spriteCache);
 	private CollisionManager collisionManager = new CollisionManager(eventManager);
+	private BackdropManager backdropManager;
 	private LevelController levelController;
 
 	private Texture cursorTexture;
+	private TextureRegion starTextureRegion;
 	
 	private int health = 5; 
 	private int score = 0;
@@ -104,6 +110,8 @@ public class GameScreen implements Screen {
 		loadSprites();
 		level = XmlUtils.read("bin/levels/level1.xml", new Class[] { Level.class });
 		Vector2 levelSize = level.getSize();
+		backdropManager = new BackdropManager(new Rectangle(0, 0, levelSize.x, levelSize.y), Bound.LEFT, 2, 0.5f, 
+				0.05f, 0.1f);
 		camera = new OrthographicCamera(levelSize.x * UnitConversion.PIXELS_PER_UNIT, 
 				levelSize.y * UnitConversion.PIXELS_PER_UNIT);
 		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
@@ -118,6 +126,7 @@ public class GameScreen implements Screen {
 		
 		setupStage();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
+		starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
 		createInitialEntities();
@@ -154,6 +163,7 @@ public class GameScreen implements Screen {
 				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
+		backdropManager.draw(spriteBatch, starTextureRegion);
 		List<Entity> entities = entityManager.getAll();
 		Collections.sort(entities, new ZComparator());
 		for (Entity entity : entities) {
@@ -227,6 +237,7 @@ public class GameScreen implements Screen {
 		return new EntityRemovedListener() {
 			@Override
 			public void removed(Entity entity) {
+				// Spawn on death of the entity
 				if (entity.has(SpawnOnDeathPart.class)) {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					entityManager.add(spawn);
@@ -245,6 +256,7 @@ public class GameScreen implements Screen {
 	
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
+		spriteCache.add(SpriteKey.STAR, "images/star.png");
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
@@ -253,6 +265,8 @@ public class GameScreen implements Screen {
 		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
 		spriteCache.add(SpriteKey.NUKE, "images/nuke.png");
 		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
+		Texture colorizedUFOTexture = TextureFactory.createColorized(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
+		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
 		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
 	}
 	
@@ -298,11 +312,11 @@ public class GameScreen implements Screen {
 	
 	private void updateWorld(float delta) {
 		collisionManager.checkCollisions(entityManager.getAll());
+		backdropManager.update(delta);
 		levelController.update(delta);
 		
 		for (Entity entity : entityManager.getAll()) {
 			entity.update(delta);
-			
 			
 			// Bounce entity off walls
 			if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
