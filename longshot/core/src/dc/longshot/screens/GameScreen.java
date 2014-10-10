@@ -46,11 +46,14 @@ import dc.longshot.models.CollisionType;
 import dc.longshot.models.Level;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AIShooterPart;
+import dc.longshot.parts.AlliancePart;
+import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
+import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.EmitterPart;
@@ -66,12 +69,15 @@ import dc.longshot.parts.WeaponPart;
 import dc.longshot.services.BackdropManager;
 import dc.longshot.services.Input;
 import dc.longshot.ui.Skins;
+import dc.longshot.util.ColorUtils;
 import dc.longshot.util.EventManager;
 import dc.longshot.util.UnitConversion;
 import dc.longshot.util.VectorUtils;
 import dc.longshot.util.XmlUtils;
 
 public class GameScreen implements Screen {
+	
+	private static final Color midnightBlue = ColorUtils.toGdxColor(0, 12, 36);
 	
 	private Camera camera;
 	private SpriteBatch spriteBatch;
@@ -97,7 +103,6 @@ public class GameScreen implements Screen {
 	private LevelController levelController;
 
 	private Texture cursorTexture;
-	private TextureRegion starTextureRegion;
 	
 	private int health = 5; 
 	private int score = 0;
@@ -110,8 +115,9 @@ public class GameScreen implements Screen {
 		loadSprites();
 		level = XmlUtils.read("bin/levels/level1.xml", new Class[] { Level.class });
 		Vector2 levelSize = level.getSize();
-		backdropManager = new BackdropManager(new Rectangle(0, 0, levelSize.x, levelSize.y), Bound.LEFT, 2, 0.5f, 
-				0.05f, 0.1f);
+		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
+		backdropManager = new BackdropManager(new Rectangle(0, 0, levelSize.x, levelSize.y), Bound.LEFT, 1, 0.5f, 
+				0.02f, 0.1f, starTextureRegion);
 		camera = new OrthographicCamera(levelSize.x * UnitConversion.PIXELS_PER_UNIT, 
 				levelSize.y * UnitConversion.PIXELS_PER_UNIT);
 		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
@@ -126,7 +132,6 @@ public class GameScreen implements Screen {
 		
 		setupStage();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
-		starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
 		createInitialEntities();
@@ -156,14 +161,14 @@ public class GameScreen implements Screen {
 			updateWorld(delta * speedMultiplier);
 		}
 		
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClearColor(midnightBlue.r, midnightBlue.g, midnightBlue.b, midnightBlue.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Rectangle worldTableRect = getRectangle(worldTable);
 		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
 				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
-		backdropManager.draw(spriteBatch, starTextureRegion);
+		backdropManager.draw(spriteBatch);
 		List<Entity> entities = entityManager.getAll();
 		Collections.sort(entities, new ZComparator());
 		for (Entity entity : entities) {
@@ -250,6 +255,12 @@ public class GameScreen implements Screen {
 						score += entity.get(ScorePart.class).getScore();
 					}
 				}
+				
+				for (Entity other : entityManager.getAll()) {
+					if (other.has(AttachmentPart.class) && other.get(AttachmentPart.class).getParent() == entity) {
+						entityManager.remove(other);
+					}
+				}
 			}
 		};
 	}
@@ -306,7 +317,7 @@ public class GameScreen implements Screen {
 		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
 				+ groundTransform.getBoundingSize().y));
 		entityManager.add(shooter);
-		shooterCannon = entityFactory.createShooterCannon();
+		shooterCannon = entityFactory.createShooterCannon(shooter);
 		entityManager.add(shooterCannon);
 	}
 	
@@ -433,27 +444,32 @@ public class GameScreen implements Screen {
 				if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
 					WeaponPart weaponPart = entity.get(WeaponPart.class);
 					if (weaponPart.canSpawn()) {
-						Entity spawn = weaponPart.createSpawn();
-						TransformPart spawnTransform = spawn.get(TransformPart.class);
-						TransformPart transform = entity.get(TransformPart.class);
-						spawnTransform.setPosition(VectorUtils.relativeCenter(transform.getCenter(), 
-								spawnTransform.getBoundingSize()));
-						TransformPart shooterTransform = shooter.get(TransformPart.class);
-						spawn.get(TranslatePart.class).setVelocity(shooterTransform.getCenter().sub(
-								spawnTransform.getCenter()));
-						entityManager.add(spawn);
+						for (Entity other : entityManager.getAll()) {
+							if (other != entity && other.has(AlliancePart.class) && other.get(AlliancePart.class).getAlliance()
+									== aiShooterPart.getTargetAlliance()) {
+								Entity spawn = weaponPart.createSpawn();
+								TransformPart spawnTransform = spawn.get(TransformPart.class);
+								TransformPart transform = entity.get(TransformPart.class);
+								spawnTransform.setPosition(VectorUtils.relativeCenter(transform.getCenter(), 
+										spawnTransform.getBoundingSize()));
+								TransformPart otherTransform = other.get(TransformPart.class);
+								spawn.get(TranslatePart.class).setVelocity(otherTransform.getCenter().sub(
+										spawnTransform.getCenter()));
+								entityManager.add(spawn);
+							}
+						}
 					}
 				}
 			}
 
-			// Set the cannon position and angle
-			TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
-			Vector2 shooterCenter = shooter.get(TransformPart.class).getCenter();
-			shooterCannon.get(TransformPart.class).setPosition(shooterCenter);
-			Vector2 mouseCoords = UnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
-					getRectangle(worldTable));
-			Vector2 offset = mouseCoords.cpy().sub(cannonTransform.getPosition());
-			cannonTransform.setRotation(offset.angle());
+			// Set the angle towards the mouse
+			if (entity.has(RotateToCursorPart.class)) {
+				Vector2 mouseCoords = UnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
+						getRectangle(worldTable));
+				TransformPart transform = entity.get(TransformPart.class);
+				Vector2 offset = mouseCoords.cpy().sub(entity.get(TransformPart.class).getPosition());
+				transform.setRotation(offset.angle());
+			}
 			
 			// Remove if no health
 			if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {

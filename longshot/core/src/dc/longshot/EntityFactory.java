@@ -12,16 +12,20 @@ import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.graphics.SpriteCache;
+import dc.longshot.models.Alliance;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AIShooterPart;
+import dc.longshot.parts.AlliancePart;
+import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
+import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.DrawableUpdaterPart;
@@ -71,6 +75,7 @@ public class EntityFactory {
 		Entity entity = createBaseEntity(size, position, SpriteKey.SHOOTER);
 		entity.attach(new SpeedPart(7));
 		entity.attach(new HealthPart(1));
+		entity.attach(new AlliancePart(Alliance.PLAYER));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
 		entity.attach(new BoundsPart());
 		entity.attach(new TranslatePart(false));
@@ -81,10 +86,12 @@ public class EntityFactory {
 		return entity;
 	}
 
-	public Entity createShooterCannon() {
+	public Entity createShooterCannon(Entity parent) {
 		Vector3 size = new Vector3(1, 0.25f, 0.25f);
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
+		entity.attach(new AttachmentPart(parent));
+		entity.attach(new RotateToCursorPart());
 		return entity;
 	}
 	
@@ -128,6 +135,7 @@ public class EntityFactory {
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(100));
 		entity.attach(new TranslatePart(true));
+		entity.attach(new AlliancePart(Alliance.ENEMY));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		deathBounds.add(Bound.BOTTOM);
@@ -143,7 +151,7 @@ public class EntityFactory {
 	
 	public Entity createUFOGlow() {
 		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), SpriteKey.UFO_GLOW);
-		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
+		entity.attach(new AlliancePart(Alliance.ENEMY));
 		entity.attach(new SpawnOnDeathPart(createUFO(new Vector3(1, 0.5f, 1))));
 		float maxLifeTime = 3;
 		entity.attach(new TimedDeathPart(maxLifeTime));
@@ -160,6 +168,7 @@ public class EntityFactory {
 		entity.attach(new BouncePart());
 		entity.attach(new BoundsPart());
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
+		entity.attach(new AlliancePart(Alliance.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		deathBounds.add(Bound.BOTTOM);
 		entity.attach(new BoundsDiePart(deathBounds));
@@ -169,7 +178,7 @@ public class EntityFactory {
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
 		entity.attach(new WeaponPart(createUFOLaser(), 1, 0));
 		entity.attach(new WanderMovementPart(3, 1));
-		entity.attach(new AIShooterPart(3));
+		entity.attach(new AIShooterPart(3, Alliance.PLAYER));
 		return entity;
 	}
 	

@@ -13,11 +13,11 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
-import dc.longshot.models.CollisionType;
+import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.Level;
 import dc.longshot.models.SpawnInfo;
-import dc.longshot.parts.CollisionTypePart;
+import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
@@ -80,8 +80,7 @@ public class LevelController {
 		boolean enemiesExist = false;
 		
 		for (Entity entity : entityManager.getAll()) {
-			if (entity.has(CollisionTypePart.class) && entity.get(CollisionTypePart.class)
-					.getCollisionType() == CollisionType.ENEMY) {
+			if (entity.has(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
 				enemiesExist = true;
 				break;
 			}
