@@ -25,14 +25,15 @@ import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
-import dc.longshot.parts.RotateToCursorPart;
+import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.DrawableUpdaterPart;
 import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.ExplodeOnSpawnPart;
-import dc.longshot.parts.ColorChangePart;
+import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
+import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
@@ -83,6 +84,8 @@ public class EntityFactory {
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.2f));
+		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
+		entity.attach(new GhostPart(3, outlineTexture));
 		return entity;
 	}
 
@@ -204,7 +207,7 @@ public class EntityFactory {
 		float diameter = radius * 2;
 		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), 
 				SpriteKey.EXPLOSION);
-		entity.attach(new ExplodeOnSpawnPart(radius));
+		entity.attach(new ExplodeOnSpawnPart(radius, 1));
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		Color endColor = Color.ORANGE.cpy();
 		endColor.a = 0;

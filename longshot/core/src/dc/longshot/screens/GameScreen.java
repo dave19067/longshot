@@ -41,6 +41,7 @@ import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
+import dc.longshot.models.Alliance;
 import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.Level;
@@ -53,6 +54,7 @@ import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
+import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
@@ -226,10 +228,11 @@ public class GameScreen implements Screen {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
 					Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
 					for (Entity other : entityManager.getAll()) {
-						if (other != entity && other.has(CollisionTypePart.class) && other.has(TransformPart.class)) {
+						if (other != entity && other.has(HealthPart.class) && other.has(CollisionTypePart.class)
+								&& other.has(TransformPart.class)) {
 							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
 							if (otherCenter.cpy().sub(entityCenter).len() <= explodeOnSpawnPart.getRadius()) {
-								entityManager.remove(other);
+								other.get(HealthPart.class).subtract(explodeOnSpawnPart.getDamage());
 							}
 						}
 					}
@@ -271,6 +274,9 @@ public class GameScreen implements Screen {
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
+		Texture shooterOutlineTexture = TextureFactory.createColorized(spriteCache.getTexture(SpriteKey.SHOOTER), 
+				Color.GREEN);
+		spriteCache.add(SpriteKey.SHOOTER_OUTLINE, shooterOutlineTexture);
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
@@ -407,12 +413,15 @@ public class GameScreen implements Screen {
 			// Go through collisions
 			for (Entity other : collisionManager.getCollisions(entity)) {
 				if (other.isActive() && other.has(CollisionTypePart.class)) {
-					if (entity.has(DamageOnCollisionPart.class) && other.has(HealthPart.class)) {
-						// Damage the other entity
-						DamageOnCollisionPart damageOnCollisionPart = entity.get(DamageOnCollisionPart.class);
-						if (damageOnCollisionPart.getCollisionTypes().contains(
-								other.get(CollisionTypePart.class).getCollisionType())) {
-							other.get(HealthPart.class).subtract(damageOnCollisionPart.getDamage());
+					CollisionTypePart otherCollisionTypePart = other.get(CollisionTypePart.class);
+					if (otherCollisionTypePart.isActive()) {
+						if (entity.has(DamageOnCollisionPart.class) && other.has(HealthPart.class)) {
+							// Damage the other entity
+							DamageOnCollisionPart damageOnCollisionPart = entity.get(DamageOnCollisionPart.class);
+							if (damageOnCollisionPart.isActive() && damageOnCollisionPart.getCollisionTypes().contains(
+									otherCollisionTypePart.getCollisionType())) {
+								other.get(HealthPart.class).subtract(damageOnCollisionPart.getDamage());
+							}
 						}
 					}
 				}
@@ -461,6 +470,20 @@ public class GameScreen implements Screen {
 					}
 				}
 			}
+			
+			if (entity.has(AlliancePart.class) && entity.has(TranslatePart.class)) {
+				if (entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
+					Vector2 moveDirection = new Vector2(0, 0);
+					
+					if (Gdx.input.isKeyPressed(Keys.A)) {
+						moveDirection.x -= 1;
+					}
+					if (Gdx.input.isKeyPressed(Keys.S)) {
+						moveDirection.x += 1;
+					}	
+					entity.get(TranslatePart.class).setVelocity(moveDirection);
+				}
+			}
 
 			// Set the angle towards the mouse
 			if (entity.has(RotateToCursorPart.class)) {
@@ -473,7 +496,12 @@ public class GameScreen implements Screen {
 			
 			// Remove if no health
 			if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
-				entityManager.remove(entity);
+				if (entity.has(GhostPart.class)) {
+					entity.get(GhostPart.class).activate();
+				}
+				else {
+					entityManager.remove(entity);
+				}
 			}
 			// Remove if out of bounds
 			if (entity.has(BoundsDiePart.class)) {
@@ -489,17 +517,7 @@ public class GameScreen implements Screen {
 		}
 	}
 	
-	private void handleInput() {
-		Vector2 moveDirection = new Vector2(0, 0);
-		
-		if (Gdx.input.isKeyPressed(Keys.A)) {
-			moveDirection.x -= 1;
-		}
-		if (Gdx.input.isKeyPressed(Keys.S)) {
-			moveDirection.x += 1;
-		}	
-		shooter.get(TranslatePart.class).setVelocity(moveDirection);
-		
+	private void handleInput() {		
 		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			WeaponPart weaponPart = shooter.get(WeaponPart.class);
 			if (weaponPart.canSpawn()) {

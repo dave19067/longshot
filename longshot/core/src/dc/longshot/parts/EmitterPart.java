@@ -30,7 +30,7 @@ public class EmitterPart extends Part {
 		if (canEmit()) {
 			emitTime = 0;
 			Entity spawn = Cloning.clone(original);
-			TransformPart transform = getEntity().get(TransformPart.class);
+			TransformPart transform = entity.get(TransformPart.class);
 			List<Vector2> vertices = transform.getTransformedVertices();
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
 			Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(0), vertices.get(3), 

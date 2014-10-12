@@ -23,16 +23,16 @@ public class TranslatePart extends Part {
 			velocity = new Vector2(0, 0);
 		}
 		else {
-			velocity = VectorUtils.getLengthened(direction, getEntity().get(SpeedPart.class).getSpeed());
+			velocity = VectorUtils.getLengthened(direction, entity.get(SpeedPart.class).getSpeed());
 			if (autoRotate) {
-				getEntity().get(TransformPart.class).setRotation(velocity.angle());
+				entity.get(TransformPart.class).setRotation(velocity.angle());
 			}
 		}
 	}
 	
 	@Override
 	public void update(float delta) {
-		TransformPart transformPart = getEntity().get(TransformPart.class);
+		TransformPart transformPart = entity.get(TransformPart.class);
 		Vector2 offset = velocity.cpy().scl(delta);
 		Vector2 newPosition = transformPart.getPosition().add(offset);
 		transformPart.setPosition(newPosition);

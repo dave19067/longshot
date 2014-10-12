@@ -17,6 +17,10 @@ public abstract class Part {
 		return isActive;
 	}
 	
+	public final void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+	
 	/**
 	 * @return The entity the part is attached to.
 	 */

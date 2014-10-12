@@ -33,7 +33,7 @@ public class WanderMovementPart extends Part {
 	}
 	
 	public void act() {
-		TranslatePart translatePart = getEntity().get(TranslatePart.class);
+		TranslatePart translatePart = entity.get(TranslatePart.class);
 		Vector2 direction;
 		
 		if (MathUtils.random(idleToMoveRatio + 1) < idleToMoveRatio) {

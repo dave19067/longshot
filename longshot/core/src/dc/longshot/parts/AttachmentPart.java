@@ -21,7 +21,7 @@ public class AttachmentPart extends Part {
 	public void update(float delta) {
 		if (parent.isActive()) {
 			Vector2 parentCenter = parent.get(TransformPart.class).getCenter();
-			getEntity().get(TransformPart.class).setPosition(parentCenter);
+			entity.get(TransformPart.class).setPosition(parentCenter);
 		}
 	}
 	
