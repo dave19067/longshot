@@ -5,28 +5,32 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
+
+import dc.longshot.utils.xmladapters.RectangleAdapter;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Level {
-
-	private Vector2 size;
+	 
+	@XmlJavaTypeAdapter(RectangleAdapter.class)
+	private Rectangle boundsBox;
 	private float spawnDuration;
 	private Map<EntityType, Integer> spawns;
 	
 	public Level() {
 	}
 	
-	public Level(Vector2 size, float spawnDuration, Map<EntityType, Integer> spawns) {
-		this.size = size;
+	public Level(Rectangle boundsBox, float spawnDuration, Map<EntityType, Integer> spawns) {
+		this.boundsBox = boundsBox;
 		this.spawnDuration = spawnDuration;
 		this.spawns = spawns;
 	}
 	
-	public Vector2 getSize() {
-		return size;
+	public Rectangle getBoundsBox() {
+		return new Rectangle(boundsBox);
 	}
 	
 	public float getSpawnDuration() {

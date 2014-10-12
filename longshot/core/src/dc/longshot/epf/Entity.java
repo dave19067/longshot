@@ -36,6 +36,14 @@ public class Entity {
 	
 	/**
 	 * @param partClass The class of the part to check.
+	 * @return If there is an active part of type T attached to the entity.
+	 */
+	public <T extends Part> boolean hasActive(Class<T> partClass) {
+		return has(partClass) && get(partClass).isActive();
+	}
+	
+	/**
+	 * @param partClass The class of the part to check.
 	 * @return If there is a part of type T attached to the entity.
 	 */
 	public <T extends Part> boolean has(Class<T> partClass) {

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <level>
-    <size>
-        <x>40.0</x>
-        <y>30.0</y>
-    </size>
+    <boundsBox>
+        <x>0</x>
+        <y>0</y>
+        <width>40.0</width>
+        <height>30.0</height>
+    </boundsBox>
     <spawnDuration>60.0</spawnDuration>
     <spawns>
         <entry>

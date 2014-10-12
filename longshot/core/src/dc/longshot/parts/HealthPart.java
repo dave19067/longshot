@@ -24,7 +24,7 @@ public class HealthPart extends Part {
 		return maxHealth;
 	}
 	
-	public void subtract(float value) {
+	public void decrease(float value) {
 		health -= value;
 	}
 	

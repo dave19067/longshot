@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
@@ -90,17 +91,17 @@ public class LevelController {
 	}
 
 	private void placeAbove(Entity entity) {
-		Vector2 levelSize = level.getSize();
+		Rectangle boundsBox = level.getBoundsBox();
 		
 		// Get the spawn position, which is a random point from the skyline
 		TransformPart transform = entity.get(TransformPart.class);
 		Vector2 size = transform.getSize();
-		float spawnX = MathUtils.random(0, levelSize.x - size.y);
-		Vector2 spawnPosition = new Vector2(spawnX, levelSize.y);
+		float spawnX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width - size.y);
+		Vector2 spawnPosition = new Vector2(spawnX, boundsBox.y + boundsBox.height);
 		transform.setPosition(spawnPosition);
 		
 		// Get the destination, which is a random point on the ground
-		float destX = MathUtils.random(0, levelSize.x - size.y);
+		float destX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width - size.y);
 		Vector2 destPosition = new Vector2(destX, 0);
 		
 		// Find the direction to get from the entity spawn position to the destination
@@ -109,7 +110,7 @@ public class LevelController {
 		translate.setVelocity(offset);
 		
 		// If the enemy is partially in bounds, move to just out of bounds using the negative velocity
-		float unboundedOverlapY = levelSize.y - transform.getBoundingBox().y;
+		float unboundedOverlapY = boundsBox.y + boundsBox.height - transform.getBoundingBox().y;
 		Vector2 velocity = translate.getVelocity();
 		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
 		transform.setPosition(spawnPosition.cpy().add(outOfBoundsOffset));
@@ -117,10 +118,11 @@ public class LevelController {
 
 	private void placeInSpace(Entity entity) {
 		// Get the spawn position, which is a random point above the halfline
-		Vector2 levelSize = level.getSize();
+		Rectangle boundsBox = level.getBoundsBox();
 		Vector2 size = entity.get(TransformPart.class).getSize();
-		float spawnX = MathUtils.random(0, levelSize.x - size.x);
-		float spawnY = MathUtils.random(2 / 3f * levelSize.y, levelSize.y - size.y);
+		float spawnX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width - size.x);
+		float spawnY = MathUtils.random(boundsBox.y + 2 / 3f * boundsBox.height, 
+				boundsBox.y + boundsBox.height - size.y);
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);

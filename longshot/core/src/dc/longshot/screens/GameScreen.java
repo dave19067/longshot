@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -16,12 +15,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -33,46 +30,48 @@ import dc.longshot.EntityFactory;
 import dc.longshot.GameInputProcessor;
 import dc.longshot.LevelController;
 import dc.longshot.Session;
+import dc.longshot.entitysystems.AIShooterSystem;
+import dc.longshot.entitysystems.BounceSystem;
+import dc.longshot.entitysystems.BoundPositionSystem;
+import dc.longshot.entitysystems.CityDamageSystem;
+import dc.longshot.entitysystems.CollisionDamageSystem;
+import dc.longshot.entitysystems.EmitSystem;
+import dc.longshot.entitysystems.InputMovementSystem;
+import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
+import dc.longshot.entitysystems.RotateToCursorSystem;
+import dc.longshot.entitysystems.TimedDeathSystem;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityAddedEvent;
 import dc.longshot.epf.EntityAddedListener;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
+import dc.longshot.epf.EntitySystem;
+import dc.longshot.epf.NoHealthSystem;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
-import dc.longshot.models.Alliance;
 import dc.longshot.models.Bound;
-import dc.longshot.models.CollisionType;
 import dc.longshot.models.Level;
+import dc.longshot.models.LevelSession;
 import dc.longshot.models.SpriteKey;
-import dc.longshot.parts.AIShooterPart;
-import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
-import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
-import dc.longshot.parts.BoundsPart;
-import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
-import dc.longshot.parts.GhostPart;
-import dc.longshot.parts.RotateToCursorPart;
-import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
-import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
-import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
-import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.services.BackdropManager;
 import dc.longshot.services.Input;
 import dc.longshot.ui.Skins;
+import dc.longshot.util.BoundUtils;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.EventManager;
+import dc.longshot.util.UIUtils;
 import dc.longshot.util.UnitConversion;
 import dc.longshot.util.VectorUtils;
 import dc.longshot.util.XmlUtils;
@@ -99,6 +98,7 @@ public class GameScreen implements Screen {
 	private EventManager eventManager = new EventManager();
 	private EntityManager entityManager = new EntityManager(eventManager);
 	private SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
+	private List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
 	private EntityFactory entityFactory = new EntityFactory(spriteCache);
 	private CollisionManager collisionManager = new CollisionManager(eventManager);
 	private BackdropManager backdropManager;
@@ -106,7 +106,7 @@ public class GameScreen implements Screen {
 
 	private Texture cursorTexture;
 	
-	private int health = 5; 
+	private LevelSession levelSession = new LevelSession(); 
 	private int score = 0;
 	
 	private Level level;
@@ -116,13 +116,12 @@ public class GameScreen implements Screen {
 	public GameScreen() {
 		loadSprites();
 		level = XmlUtils.read("bin/levels/level1.xml", new Class[] { Level.class });
-		Vector2 levelSize = level.getSize();
+		Rectangle boundsBox = level.getBoundsBox();
 		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
-		backdropManager = new BackdropManager(new Rectangle(0, 0, levelSize.x, levelSize.y), Bound.LEFT, 1, 0.5f, 
-				0.02f, 0.1f, starTextureRegion);
-		camera = new OrthographicCamera(levelSize.x * UnitConversion.PIXELS_PER_UNIT, 
-				levelSize.y * UnitConversion.PIXELS_PER_UNIT);
-		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+		backdropManager = new BackdropManager(boundsBox, Bound.LEFT, 1, 0.5f, 0.02f, 0.1f, starTextureRegion);
+		camera = new OrthographicCamera(boundsBox.width * UnitConversion.PIXELS_PER_UNIT, 
+				boundsBox.height * UnitConversion.PIXELS_PER_UNIT);
+		camera.position.set(boundsBox.x + camera.viewportWidth / 2, boundsBox.y + camera.viewportHeight / 2, 0);
 		spriteBatch = new SpriteBatch();
 		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		skin = Skins.skin;
@@ -136,6 +135,17 @@ public class GameScreen implements Screen {
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
+		entitySystems.add(new BounceSystem(level.getBoundsBox()));
+		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
+		entitySystems.add(new CollisionDamageSystem(collisionManager));
+		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
+		entitySystems.add(new EmitSystem(entityManager));
+		entitySystems.add(new AIShooterSystem(entityManager));
+		entitySystems.add(new InputMovementSystem());
+		entitySystems.add(new RotateToCursorSystem(camera, worldTable, defaultScreenSize));
+		entitySystems.add(new NoHealthSystem(entityManager));
+		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
+		entitySystems.add(new TimedDeathSystem(entityManager));
 		createInitialEntities();
 	}
 
@@ -147,10 +157,10 @@ public class GameScreen implements Screen {
 		camera.update();
 		boundCursor();
 		
-		healthLabel.setText("HEALTH: " + health);
+		healthLabel.setText("HEALTH: " + levelSession.getHealth());
 		scoreLabel.setText("SCORE: " + score);
 		
-		if (health <= 0) {
+		if (levelSession.getHealth() <= 0) {
 			Gdx.app.exit();
 		}
 		
@@ -165,7 +175,7 @@ public class GameScreen implements Screen {
 		
 		Gdx.gl.glClearColor(midnightBlue.r, midnightBlue.g, midnightBlue.b, midnightBlue.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Rectangle worldTableRect = getRectangle(worldTable);
+		Rectangle worldTableRect = UIUtils.getRectangle(worldTable, defaultScreenSize);
 		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
 				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);
@@ -232,7 +242,7 @@ public class GameScreen implements Screen {
 								&& other.has(TransformPart.class)) {
 							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
 							if (otherCenter.cpy().sub(entityCenter).len() <= explodeOnSpawnPart.getRadius()) {
-								other.get(HealthPart.class).subtract(explodeOnSpawnPart.getDamage());
+								other.get(HealthPart.class).decrease(explodeOnSpawnPart.getDamage());
 							}
 						}
 					}
@@ -250,11 +260,11 @@ public class GameScreen implements Screen {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					entityManager.add(spawn);
 				}
-
+				
 				// if killed, increase score
 				if (entity.has(ScorePart.class)) {
-					if (!isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), 
-						entity.get(BoundsDiePart.class).getBounds())) {
+					if (!BoundUtils.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
+							entity.get(BoundsDiePart.class).getBounds())) {
 						score += entity.get(ScorePart.class).getScore();
 					}
 				}
@@ -314,12 +324,13 @@ public class GameScreen implements Screen {
 	}
 	
 	private void createInitialEntities() {
-		Entity ground = entityFactory.createBaseEntity(new Vector3(level.getSize().x, 0.1f, level.getSize().x), 
-				new Vector2(0, 0), SpriteKey.GREEN);
+		Rectangle boundsBox = level.getBoundsBox();
+		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
+				new Vector2(boundsBox.x, boundsBox.y), SpriteKey.GREEN);
 		entityManager.add(ground);
 		Vector3 shooterSize = new Vector3(2, 1.5f, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
-		float shooterX = VectorUtils.relativeMiddle(level.getSize().x / 2, shooterSize.x);
+		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
 		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
 				+ groundTransform.getBoundingSize().y));
 		entityManager.add(shooter);
@@ -334,185 +345,8 @@ public class GameScreen implements Screen {
 		
 		for (Entity entity : entityManager.getAll()) {
 			entity.update(delta);
-			
-			// Bounce entity off walls
-			if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
-				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
-				Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
-				Vector2 newVelocity = velocity.cpy();
-				
-				for (Bound checkedBound : entity.get(BouncePart.class).getBounds()) {
-					if (bounds.contains(checkedBound)) {
-						switch (checkedBound) {
-						case LEFT:
-							if (velocity.x < 0) {
-								newVelocity.x *= -1;
-							}
-							break;
-						case RIGHT:
-							if (velocity.x > 0) {
-								newVelocity.x *= -1;
-							}
-							break;
-						case TOP:
-							if (velocity.y > 0) {
-								newVelocity.y *= -1;
-							}
-							break;
-						case BOTTOM:
-							if (velocity.y < 0) {
-								newVelocity.y *= -1;
-							}
-							break;
-						}
-					}
-				}
-				
-				entity.get(TranslatePart.class).setVelocity(newVelocity);
-				
-				// Increase bounce stat
-				if (entity.has(ShotStatsPart.class)) {
-					if (bounds.contains(Bound.RIGHT) || bounds.contains(Bound.LEFT)) {
-						ShotStatsPart shotStatsPart = entity.get(ShotStatsPart.class);
-						shotStatsPart.setBounceNum(shotStatsPart.getBounceNum() + 1);
-					}
-				}
-			}
-			
-			// Restrict entity in bounds
-			if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
-				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
-				TransformPart transformPart = entity.get(TransformPart.class);
-				Rectangle boundingBox = transformPart.getBoundingBox();
-				Vector2 newPosition = transformPart.getPosition();
-				// Buffer required for floating point calculations to make sure object is completely in bounds
-				float buffer = 0.00001f;
-				
-				for (Bound checkedBound : entity.get(BoundsPart.class).getBounds()) {
-					if (bounds.contains(checkedBound)) {
-						switch (checkedBound) {
-						case LEFT:
-							newPosition.x -= (boundingBox.x - buffer);
-							break;
-						case RIGHT:
-							newPosition.x -= (boundingBox.x + boundingBox.width - level.getSize().x);
-							break;
-						case TOP:
-							newPosition.y -= (boundingBox.y + boundingBox.height - level.getSize().y);
-							break;
-						case BOTTOM:
-							newPosition.y -= (boundingBox.y - buffer);
-							break;
-						}
-					}
-				}
-				
-				entity.get(TransformPart.class).setPosition(newPosition);
-			}
-			
-			// Go through collisions
-			for (Entity other : collisionManager.getCollisions(entity)) {
-				if (other.isActive() && other.has(CollisionTypePart.class)) {
-					CollisionTypePart otherCollisionTypePart = other.get(CollisionTypePart.class);
-					if (otherCollisionTypePart.isActive()) {
-						if (entity.has(DamageOnCollisionPart.class) && other.has(HealthPart.class)) {
-							// Damage the other entity
-							DamageOnCollisionPart damageOnCollisionPart = entity.get(DamageOnCollisionPart.class);
-							if (damageOnCollisionPart.isActive() && damageOnCollisionPart.getCollisionTypes().contains(
-									otherCollisionTypePart.getCollisionType())) {
-								other.get(HealthPart.class).subtract(damageOnCollisionPart.getDamage());
-							}
-						}
-					}
-				}
-			}
-			
-			// Decrease city health if missile hits it
-			if (entity.has(CityDamagePart.class) && entity.has(CollisionTypePart.class)
-					&& entity.has(DamageOnCollisionPart.class)) {
-				List<Bound> bounds = checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox());
-				if (entity.get(CollisionTypePart.class).getCollisionType() == CollisionType.ENEMY
-						&& bounds.contains(Bound.BOTTOM)) {
-					float damage = entity.get(DamageOnCollisionPart.class).getDamage();
-					health -= damage;
-				}
-			}
-			
-			// Emit
-			if (entity.has(EmitterPart.class)) {
-				EmitterPart emitterPart = entity.get(EmitterPart.class);
-				if (emitterPart.canEmit()) {
-					Entity spawn = emitterPart.emit();
-					entityManager.add(spawn);
-				}
-			}
-			
-			// Shoot automatically using AI
-			if (entity.has(AIShooterPart.class)) {
-				AIShooterPart aiShooterPart = entity.get(AIShooterPart.class);
-				if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
-					WeaponPart weaponPart = entity.get(WeaponPart.class);
-					if (weaponPart.canSpawn()) {
-						for (Entity other : entityManager.getAll()) {
-							if (other != entity && other.has(AlliancePart.class) && other.get(AlliancePart.class).getAlliance()
-									== aiShooterPart.getTargetAlliance()) {
-								Entity spawn = weaponPart.createSpawn();
-								TransformPart spawnTransform = spawn.get(TransformPart.class);
-								TransformPart transform = entity.get(TransformPart.class);
-								spawnTransform.setPosition(VectorUtils.relativeCenter(transform.getCenter(), 
-										spawnTransform.getBoundingSize()));
-								TransformPart otherTransform = other.get(TransformPart.class);
-								spawn.get(TranslatePart.class).setVelocity(otherTransform.getCenter().sub(
-										spawnTransform.getCenter()));
-								entityManager.add(spawn);
-							}
-						}
-					}
-				}
-			}
-			
-			if (entity.has(AlliancePart.class) && entity.has(TranslatePart.class)) {
-				if (entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
-					Vector2 moveDirection = new Vector2(0, 0);
-					
-					if (Gdx.input.isKeyPressed(Keys.A)) {
-						moveDirection.x -= 1;
-					}
-					if (Gdx.input.isKeyPressed(Keys.S)) {
-						moveDirection.x += 1;
-					}	
-					entity.get(TranslatePart.class).setVelocity(moveDirection);
-				}
-			}
-
-			// Set the angle towards the mouse
-			if (entity.has(RotateToCursorPart.class)) {
-				Vector2 mouseCoords = UnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
-						getRectangle(worldTable));
-				TransformPart transform = entity.get(TransformPart.class);
-				Vector2 offset = mouseCoords.cpy().sub(entity.get(TransformPart.class).getPosition());
-				transform.setRotation(offset.angle());
-			}
-			
-			// Remove if no health
-			if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
-				if (entity.has(GhostPart.class)) {
-					entity.get(GhostPart.class).activate();
-				}
-				else {
-					entityManager.remove(entity);
-				}
-			}
-			// Remove if out of bounds
-			if (entity.has(BoundsDiePart.class)) {
-				if (isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), 
-						entity.get(BoundsDiePart.class).getBounds())) {
-					entityManager.remove(entity);
-				}
-			}
-			// Remove if timed death
-			if (entity.has(TimedDeathPart.class) && entity.get(TimedDeathPart.class).isDead()) {
-				entityManager.remove(entity);
+			for (EntitySystem entitySystem : entitySystems) {
+				entitySystem.update(delta, entity);
 			}
 		}
 	}
@@ -529,40 +363,6 @@ public class GameScreen implements Screen {
 				entityManager.add(bullet);
 			}
 		}
-	}
-	
-	private boolean isOutOfBounds(Rectangle collisionBox, List<Bound> bounds) {
-		for (Bound bound : checkOutOfBounds(collisionBox)) {
-			if (bounds.contains(bound)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private List<Bound> checkOutOfBounds(Rectangle collisionBox) {
-		Vector2 levelSize = level.getSize();
-		Rectangle boundsBox = new Rectangle(0, 0, levelSize.x, levelSize.y);
-		return checkOutOfBounds(collisionBox, boundsBox);
-	}
-	
-	private List<Bound> checkOutOfBounds(Rectangle collisionBox, Rectangle boundsBox) {
-		List<Bound> bounds = new ArrayList<Bound>();
-		
-		if (collisionBox.x < boundsBox.x) {
-			bounds.add(Bound.LEFT);
-		}
-		else if (collisionBox.x + collisionBox.width > boundsBox.x + boundsBox.width) {
-			bounds.add(Bound.RIGHT);
-		}
-		if (collisionBox.y < boundsBox.y) {
-			bounds.add(Bound.BOTTOM);
-		}
-		else if (collisionBox.y + collisionBox.height > boundsBox.y + boundsBox.height) {
-			bounds.add(Bound.TOP);
-		}
-		
-		return bounds;
 	}
 	
 	private void boundCursor() {
@@ -584,14 +384,6 @@ public class GameScreen implements Screen {
 		Matrix4 uiMatrix = camera.combined.cpy();
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		return uiMatrix;
-	}
-	
-	private Rectangle getRectangle(Actor actor) {
-		Vector2 actorCoords = actor.localToStageCoordinates(new Vector2(0, 0));
-		Vector2 resizeRatio = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight())
-			.scl(1 / defaultScreenSize.x, 1 / defaultScreenSize.y);
-		return new Rectangle(actorCoords.x * resizeRatio.x, actorCoords.y * resizeRatio.y, 
-				actor.getWidth() * resizeRatio.x, actor.getHeight() * resizeRatio.y);
 	}
 	
 	private Vector2 getBulletSpawnPosition(Entity bullet) {
