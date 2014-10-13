@@ -22,15 +22,15 @@ import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
-public class LevelController {
+public final class LevelController {
 	
-	private EntityManager entityManager;
-	private EntityFactory entityFactory;
+	private final EntityManager entityManager;
+	private final EntityFactory entityFactory;
 	private Level level;
-	private List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
+	private final List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
 	private float time = 0;
 
-	public LevelController(EntityManager entityManager, EntityFactory entityFactory, Level level) {
+	public LevelController(final EntityManager entityManager, final EntityFactory entityFactory, final Level level) {
 		this.entityManager = entityManager;
 		this.entityFactory = entityFactory;
 		this.level = level;
@@ -51,7 +51,7 @@ public class LevelController {
 		});
 	}
 	
-	public void update(float delta) {
+	public final void update(final float delta) {
 		time += delta;
 		Iterator<SpawnInfo> it = spawnInfos.iterator();
 		
@@ -77,7 +77,7 @@ public class LevelController {
 		}
 	}
 	
-	public boolean isComplete() {
+	public final boolean isComplete() {
 		boolean enemiesExist = false;
 		
 		for (Entity entity : entityManager.getAll()) {
@@ -90,7 +90,7 @@ public class LevelController {
 		return !enemiesExist && spawnInfos.size() <= 0;
 	}
 
-	private void placeAbove(Entity entity) {
+	private void placeAbove(final Entity entity) {
 		Rectangle boundsBox = level.getBoundsBox();
 		
 		// Get the spawn position, which is a random point from the skyline
@@ -116,7 +116,7 @@ public class LevelController {
 		transform.setPosition(spawnPosition.cpy().add(outOfBoundsOffset));
 	}
 
-	private void placeInSpace(Entity entity) {
+	private void placeInSpace(final Entity entity) {
 		// Get the spawn position, which is a random point above the halfline
 		Rectangle boundsBox = level.getBoundsBox();
 		Vector2 size = entity.get(TransformPart.class).getSize();

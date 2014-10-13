@@ -4,21 +4,21 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import dc.longshot.epf.Part;
 
-public class DrawablePart extends Part {
+public final class DrawablePart extends Part {
 
-	private Sprite sprite;
-	private float z;
+	private final Sprite sprite;
+	private final float z;
 	
-	public DrawablePart(Sprite sprite, float z) {
+	public DrawablePart(final Sprite sprite, final float z) {
 		this.sprite = sprite;
 		this.z = z;
 	}
 	
-	public Sprite getSprite() {
+	public final Sprite getSprite() {
 		return sprite;
 	}
 	
-	public float getZ() {
+	public final float getZ() {
 		return z;
 	}
 	

@@ -1,15 +1,15 @@
-package dc.longshot;
+package dc.longshot.models;
 
-public class Session {
+public final class Session {
 
 	private boolean isRunning = true;
 	
 	// TODO: replace with libgdx screen pause
-	public boolean isRunning() {
+	public final boolean isRunning() {
 		return isRunning;
 	}
 	
-	public void setRunning(boolean isRunning) {
+	public final void setRunning(final boolean isRunning) {
 		this.isRunning = isRunning;
 	}
 	

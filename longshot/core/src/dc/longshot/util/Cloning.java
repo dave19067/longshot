@@ -2,11 +2,11 @@ package dc.longshot.util;
 
 import com.rits.cloning.Cloner;
 
-public class Cloning {
+public final class Cloning {
 
-	private static Cloner cloner = new Cloner();
+	private static final Cloner cloner = new Cloner();
 	
-	public static <T> T clone(T object) {
+	public static final <T> T clone(final T object) {
 		return cloner.deepClone(object);
 	}
 	

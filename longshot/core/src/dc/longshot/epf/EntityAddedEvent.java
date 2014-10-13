@@ -1,26 +1,26 @@
 package dc.longshot.epf;
 
-import dc.longshot.util.Event;
+import dc.longshot.eventmanagement.Event;
 
 /**
  * Notify that an entity is ready to be created.
  * @author David Chen
  *
  */
-public class EntityAddedEvent implements Event<EntityAddedListener> {
+public final class EntityAddedEvent implements Event<EntityAddedListener> {
 
-	private Entity entity;
+	private final Entity entity;
 	
 	/**
 	 * Constructor.
 	 * @param entity entity to be created
 	 */
-	public EntityAddedEvent(Entity entity) {
+	public EntityAddedEvent(final Entity entity) {
 		this.entity = entity;
 	}
 	
 	@Override
-	public void notify(EntityAddedListener listener) {
+	public void notify(final EntityAddedListener listener) {
 		listener.created(entity);
 	}
 	

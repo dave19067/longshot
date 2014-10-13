@@ -7,29 +7,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.geometry.ScreenUnitConversion;
 import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.TransformPart;
-import dc.longshot.util.UIUtils;
-import dc.longshot.util.UnitConversion;
+import dc.longshot.ui.UIUtils;
 
-public class RotateToCursorSystem implements EntitySystem {
+public final class RotateToCursorSystem implements EntitySystem {
 	
-	private Camera camera;
-	private Table worldTable;
-	private Vector2 defaultScreenSize;
+	private final Camera camera;
+	private final Table worldTable;
+	private final Vector2 defaultScreenSize;
 	
-	public RotateToCursorSystem(Camera camera, Table worldTable, Vector2 defaultScreenSize) {
+	public RotateToCursorSystem(final Camera camera, final Table worldTable, final Vector2 defaultScreenSize) {
 		this.camera = camera;
 		this.worldTable = worldTable;
 		this.defaultScreenSize = defaultScreenSize;
 	}
 
 	@Override
-	public void update(float delta, Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		// Set the angle towards the mouse
 		if (entity.has(RotateToCursorPart.class)) {
-			Vector2 mouseCoords = UnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
-					UIUtils.getRectangle(worldTable, defaultScreenSize));
+			Vector2 mouseCoords = ScreenUnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
+					UIUtils.calcResizedBounds(worldTable, defaultScreenSize));
 			TransformPart transform = entity.get(TransformPart.class);
 			Vector2 offset = mouseCoords.cpy().sub(entity.get(TransformPart.class).getPosition());
 			transform.setRotation(offset.angle());

@@ -10,20 +10,20 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
 import dc.longshot.epf.Entity;
+import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.events.CollidedEvent;
 import dc.longshot.parts.TransformPart;
-import dc.longshot.util.EventManager;
 
-public class CollisionManager {
+public final class CollisionManager {
 	
-	private EventManager eventManager;
-	private Map<Entity, List<Entity>> collidedEntities = new HashMap<Entity, List<Entity>>();
+	private final EventManager eventManager;
+	private final Map<Entity, List<Entity>> collidedEntities = new HashMap<Entity, List<Entity>>();
 	
-	public CollisionManager(EventManager eventManager) {
+	public CollisionManager(final EventManager eventManager) {
 		this.eventManager = eventManager;
 	}
 	
-	public List<Entity> getCollisions(Entity entity) {
+	public final List<Entity> getCollisions(final Entity entity) {
 		List<Entity> collided = new ArrayList<Entity>();
 		if (collidedEntities.containsKey(entity)) {
 			collided.addAll(collidedEntities.get(entity));
@@ -31,7 +31,7 @@ public class CollisionManager {
 		return collided;
 	}
 
-	public void checkCollisions(List<Entity> entities) {
+	public final void checkCollisions(final List<Entity> entities) {
 		for (Entry<Entity, List<Entity>> entry : collidedEntities.entrySet()) {
 			entry.getValue().clear();
 		}

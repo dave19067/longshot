@@ -3,32 +3,31 @@ package dc.longshot;
 import com.badlogic.gdx.Game;
 
 import dc.longshot.screens.MainMenuScreen;
-import dc.longshot.ui.Skins;
-import dc.longshot.util.ScreenManager;
+import dc.longshot.services.ScreenManager;
 
-public class LongshotGame extends Game {
+public final class LongshotGame extends Game {
 	
-	private ScreenManager screenManager = new ScreenManager();
+	private final ScreenManager screenManager = new ScreenManager();
 	
 	@Override
-	public void create() {
+	public final void create() {
 		MainMenuScreen mainMenuScreen = new MainMenuScreen(screenManager);
 		screenManager.add(mainMenuScreen);
 	}
 
 	@Override
-	public void render() {
+	public final void render() {
 		screenManager.render();
 		screenManager.update();
 	}
 	
 	@Override
-	public void resize(int width, int height) {
+	public final void resize(final int width, final int height) {
 		screenManager.resize(width, height);
 	}
 
 	@Override
-	public void dispose() {
+	public final void dispose() {
 		screenManager.dispose();
 		Skins.dispose();
 	}

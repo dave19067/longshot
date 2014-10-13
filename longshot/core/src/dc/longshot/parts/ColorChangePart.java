@@ -5,21 +5,21 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import dc.longshot.epf.Part;
 
-public class ColorChangePart extends Part {
+public final class ColorChangePart extends Part {
 
-	private Color startColor;
-	private Color endColor;
-	private float maxChangeTime;
+	private final Color startColor;
+	private final Color endColor;
+	private final float maxChangeTime;
 	private float changeTime = 0;
 	
-	public ColorChangePart(float maxChangeTime, Color startColor, Color endColor) {
+	public ColorChangePart(final float maxChangeTime, final Color startColor, final Color endColor) {
 		this.startColor = startColor;
 		this.endColor = endColor;
 		this.maxChangeTime = maxChangeTime;
 	}
 
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		changeTime += delta;
 		float changePercent = changeTime / maxChangeTime;
 		Color color = startColor.cpy().lerp(endColor.r, endColor.g, endColor.b, endColor.a, changePercent);

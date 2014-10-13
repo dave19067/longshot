@@ -3,21 +3,23 @@ package dc.longshot;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 
-public class GameInputProcessor implements InputProcessor {
+import dc.longshot.models.Session;
 
-	private Session session;
+public final class GameInputProcessor implements InputProcessor {
+
+	private final Session session;
 	
-	public GameInputProcessor(Session session) {
+	public GameInputProcessor(final Session session) {
 		this.session = session;
 	}
 	
 	@Override
-	public boolean keyDown(int keycode) {
+	public final boolean keyDown(final int keycode) {
 		return false;
 	}
 
 	@Override
-	public boolean keyUp(int keycode) {
+	public final boolean keyUp(final int keycode) {
 		switch (keycode) {
 		case Keys.ESCAPE:
 			session.setRunning(!session.isRunning());
@@ -28,32 +30,32 @@ public class GameInputProcessor implements InputProcessor {
 	}
 
 	@Override
-	public boolean keyTyped(char character) {
+	public final boolean keyTyped(final char character) {
 		return false;
 	}
 
 	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+	public final boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
 		return false;
 	}
 
 	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+	public final boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
 		return false;
 	}
 
 	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
+	public final boolean touchDragged(final int screenX, final int screenY, final int pointer) {
 		return false;
 	}
 
 	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
+	public final boolean mouseMoved(final int screenX, final int screenY) {
 		return false;
 	}
 
 	@Override
-	public boolean scrolled(int amount) {
+	public final boolean scrolled(final int amount) {
 		return false;
 	}
 

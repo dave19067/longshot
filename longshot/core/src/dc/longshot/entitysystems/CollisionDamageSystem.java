@@ -7,16 +7,16 @@ import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.HealthPart;
 
-public class CollisionDamageSystem implements EntitySystem {
+public final class CollisionDamageSystem implements EntitySystem {
 	
-	private CollisionManager collisionManager;
+	private final CollisionManager collisionManager;
 
-	public CollisionDamageSystem(CollisionManager collisionManager) {
+	public CollisionDamageSystem(final CollisionManager collisionManager) {
 		this.collisionManager = collisionManager;
 	}
 	
 	@Override
-	public void update(float delta, Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		// Go through collisions
 		for (Entity other : collisionManager.getCollisions(entity)) {
 			if (other.isActive() && other.has(CollisionTypePart.class)) {

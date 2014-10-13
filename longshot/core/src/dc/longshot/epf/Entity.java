@@ -15,14 +15,14 @@ public class Entity {
 	
 	private boolean isInitialized = false;
 	private boolean isActive = false;
-	private Map<Class<? extends Part>, Part> parts = new HashMap<Class<? extends Part>, Part>();
-	private List<Part> partsToAdd = new ArrayList<Part>();
-	private List<Class<? extends Part>> partsToRemove = new ArrayList<Class<? extends Part>>();
+	private final Map<Class<? extends Part>, Part> parts = new HashMap<Class<? extends Part>, Part>();
+	private final List<Part> partsToAdd = new ArrayList<Part>();
+	private final List<Class<? extends Part>> partsToRemove = new ArrayList<Class<? extends Part>>();
 	
 	/**
 	 * @return If the entity will be updated.
 	 */
-	public boolean isActive() {
+	public final boolean isActive() {
 		return isActive;
 	}
 	
@@ -30,7 +30,7 @@ public class Entity {
 	 * Sets the entity to be active or inactive.
 	 * @param isActive True to make the entity active.  False to make it inactive.
 	 */
-	public void setActive(boolean isActive) {
+	public final void setActive(final boolean isActive) {
 		this.isActive = isActive;
 	}
 	
@@ -38,7 +38,7 @@ public class Entity {
 	 * @param partClass The class of the part to check.
 	 * @return If there is an active part of type T attached to the entity.
 	 */
-	public <T extends Part> boolean hasActive(Class<T> partClass) {
+	public final <T extends Part> boolean hasActive(final Class<T> partClass) {
 		return has(partClass) && get(partClass).isActive();
 	}
 	
@@ -46,7 +46,7 @@ public class Entity {
 	 * @param partClass The class of the part to check.
 	 * @return If there is a part of type T attached to the entity.
 	 */
-	public <T extends Part> boolean has(Class<T> partClass) {
+	public final <T extends Part> boolean has(final Class<T> partClass) {
 		return parts.containsKey(partClass);
 	}
 	
@@ -56,7 +56,7 @@ public class Entity {
 	 * @throws IllegalArgumentException If there is no part of type T attached to the entity.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Part> T get(Class<T> partClass) {
+	public final <T extends Part> T get(final Class<T> partClass) {
 		if (!has(partClass)) {
 			throw new IllegalArgumentException("Part of type " + partClass.getName() + " could not be found.");
 		}
@@ -66,7 +66,7 @@ public class Entity {
 	/**
 	 * @return A list of all parts the entity is composed of.
 	 */
-	public List<Part> getAll() {
+	public final List<Part> getAll() {
 		return new ArrayList<Part>(parts.values());
 	}
 	
@@ -74,7 +74,7 @@ public class Entity {
 	 * Adds a part.
 	 * @param part The part.
 	 */
-	public void attach(Part part) {
+	public final void attach(final Part part) {
 		if (has(part.getClass())) {
 			throw new IllegalArgumentException("Part of type " + part.getClass().getName() + " is already attached.");
 		}
@@ -91,7 +91,7 @@ public class Entity {
 	 * If a part of the same type already exists, removes the existing part.  Adds the passed in part.
 	 * @param part The part.
 	 */
-	public void replace(Part part) {
+	public final void replace(final Part part) {
 		if (has(part.getClass())) {
 			detach(part.getClass());
 		}
@@ -108,7 +108,7 @@ public class Entity {
 	 * Removes a part of type T if it exists.
 	 * @param partClass The class of the part to remove.
 	 */
-	public <T extends Part> void detach(Class<T> partClass) {
+	public final <T extends Part> void detach(final Class<T> partClass) {
 		if (has(partClass) && !partsToRemove.contains(partClass)) {
 			partsToRemove.add(partClass);
 		}
@@ -117,7 +117,7 @@ public class Entity {
 	/**
 	 * Makes the entity active.  Initializes attached parts.
 	 */
-	public void initialize() {
+	public final void initialize() {
 		isInitialized = true;
 		isActive = true;
 		for (Part part : parts.values()) {
@@ -128,7 +128,7 @@ public class Entity {
 	/**
 	 * Makes the entity inactive.  Cleans up attached parts.
 	 */
-	public void cleanup() {
+	public final void cleanup() {
 		isActive = false;
 		for (Part part : parts.values()) {
 			part.cleanup();
@@ -139,7 +139,7 @@ public class Entity {
 	 * Updates attached parts.  Removes detached parts and adds newly attached parts.
 	 * @param delta Time passed since the last update.
 	 */
-	public void update(float delta) {
+	public final void update(final float delta) {
 		for (Part part : parts.values()) {
 			if (part.isActive()) {
 				part.update(delta);
@@ -155,7 +155,7 @@ public class Entity {
 		}
 	}
 	
-	private <T extends Part> void remove(Class<T> partClass) {
+	private <T extends Part> void remove(final Class<T> partClass) {
 		if (!has(partClass)) {
 			throw new IllegalArgumentException("Part of type " + partClass.getName() + " could not be found.");
 		}

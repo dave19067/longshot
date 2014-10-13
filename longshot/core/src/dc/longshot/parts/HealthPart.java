@@ -2,29 +2,29 @@ package dc.longshot.parts;
 
 import dc.longshot.epf.Part;
 
-public class HealthPart extends Part {
+public final class HealthPart extends Part {
 
-	private float maxHealth;
+	private final float maxHealth;
 	private float health;
 	
-	public HealthPart(float health) {
-		this.maxHealth = health;
-		this.health = health;
+	public HealthPart(final float maxHealth) {
+		this.maxHealth = maxHealth;
+		this.health = maxHealth;
 	}
 	
-	public boolean isAlive() {
+	public final boolean isAlive() {
 		return health > 0;
 	}
 	
-	public void reset() {
+	public final void reset() {
 		health = maxHealth;
 	}
 	
-	public float getMaxHealth() {
+	public final float getMaxHealth() {
 		return maxHealth;
 	}
 	
-	public void decrease(float value) {
+	public final void decrease(final float value) {
 		health -= value;
 	}
 	

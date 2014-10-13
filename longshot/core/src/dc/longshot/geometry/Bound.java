@@ -1,15 +1,16 @@
-package dc.longshot.util;
+package dc.longshot.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
 
-import dc.longshot.models.Bound;
-
-public class BoundUtils {
+public enum Bound {
 	
-	public static boolean isOutOfBounds(Rectangle collisionBox, Rectangle boundsBox, List<Bound> bounds) {
+	TOP, LEFT, RIGHT, BOTTOM;
+	
+	public static final boolean isOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox, 
+			final List<Bound> bounds) {
 		for (Bound bound : checkOutOfBounds(collisionBox, boundsBox)) {
 			if (bounds.contains(bound)) {
 				return true;
@@ -18,9 +19,8 @@ public class BoundUtils {
 		return false;
 	}
 	
-	public static List<Bound> checkOutOfBounds(Rectangle collisionBox, Rectangle boundsBox) {
+	public static final List<Bound> checkOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox) {
 		List<Bound> bounds = new ArrayList<Bound>();
-		
 		if (collisionBox.x < boundsBox.x) {
 			bounds.add(Bound.LEFT);
 		}
@@ -33,7 +33,6 @@ public class BoundUtils {
 		else if (collisionBox.y + collisionBox.height > boundsBox.y + boundsBox.height) {
 			bounds.add(Bound.TOP);
 		}
-		
 		return bounds;
 	}
 	

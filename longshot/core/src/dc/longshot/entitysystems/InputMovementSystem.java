@@ -10,10 +10,10 @@ import dc.longshot.models.Alliance;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TranslatePart;
 
-public class InputMovementSystem implements EntitySystem {
+public final class InputMovementSystem implements EntitySystem {
 
 	@Override
-	public void update(float delta, Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		if (entity.has(AlliancePart.class) && entity.has(TranslatePart.class)) {
 			if (entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
 				Vector2 moveDirection = new Vector2(0, 0);

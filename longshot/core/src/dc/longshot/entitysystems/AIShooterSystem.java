@@ -5,23 +5,23 @@ import com.badlogic.gdx.math.MathUtils;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
-import dc.longshot.util.VectorUtils;
 
-public class AIShooterSystem implements EntitySystem {
+public final class AIShooterSystem implements EntitySystem {
 	
-	private EntityManager entityManager;
+	private final EntityManager entityManager;
 	
-	public AIShooterSystem(EntityManager entityManager) {
+	public AIShooterSystem(final EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
 	@Override
-	public void update(float delta, Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		// Shoot automatically using AI
 		if (entity.has(AIShooterPart.class)) {
 			AIShooterPart aiShooterPart = entity.get(AIShooterPart.class);

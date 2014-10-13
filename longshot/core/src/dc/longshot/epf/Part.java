@@ -17,7 +17,7 @@ public abstract class Part {
 		return isActive;
 	}
 	
-	public final void setActive(boolean isActive) {
+	public final void setActive(final boolean isActive) {
 		this.isActive = isActive;
 	}
 	
@@ -32,7 +32,7 @@ public abstract class Part {
 	 * Sets the entity the part is attached to.
 	 * @param entity The entity.
 	 */
-	public final void setEntity(Entity entity) {
+	public final void setEntity(final Entity entity) {
 		this.entity = entity;
 	}
 	

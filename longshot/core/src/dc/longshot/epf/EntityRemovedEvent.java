@@ -1,26 +1,26 @@
 package dc.longshot.epf;
 
-import dc.longshot.util.Event;
+import dc.longshot.eventmanagement.Event;
 
 /**
  * Notify that an entity is ready to be removed.
  * @author David Chen
  *
  */
-public class EntityRemovedEvent implements Event<EntityRemovedListener> {
+public final class EntityRemovedEvent implements Event<EntityRemovedListener> {
 
-	private Entity entity;
+	private final Entity entity;
 	
 	/**
 	 * Constructor.
 	 * @param entity entity to be removed
 	 */
-	public EntityRemovedEvent(Entity entity) {
+	public EntityRemovedEvent(final Entity entity) {
 		this.entity = entity;
 	}
 	
 	@Override
-	public void notify(EntityRemovedListener listener) {
+	public void notify(final EntityRemovedListener listener) {
 		listener.removed(entity);
 	}
 

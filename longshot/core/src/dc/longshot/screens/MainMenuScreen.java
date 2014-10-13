@@ -12,58 +12,59 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import dc.longshot.Skins;
 import dc.longshot.services.Input;
-import dc.longshot.ui.Skins;
-import dc.longshot.util.ScreenManager;
+import dc.longshot.services.ScreenManager;
 
-public class MainMenuScreen implements Screen {
+public final class MainMenuScreen implements Screen {
 
-	private Input input = new Input();
-	private ScreenManager screenManager;
+	private final Input input = new Input();
+	private final ScreenManager screenManager;
 	
-	private Skin skin;
-	private BitmapFont font;
+	private final Skin skin;
+	private final BitmapFont font;
 	
-	private Stage stage;
+	private final Stage stage;
 	
-	public MainMenuScreen(ScreenManager screenManager) {
+	public MainMenuScreen(final ScreenManager screenManager) {
 		this.screenManager = screenManager;
 		skin = Skins.skin;
 		font = Skins.ocrFont;
 		stage = new Stage();
+		
 		setupStage();
 		input.addProcessor(stage);
 	}
 
 	@Override
-	public void render(float delta) {
+	public final void render(final float delta) {
 		stage.act(delta);
 		stage.draw();
 	}
 
 	@Override
-	public void resize(int width, int height) {
+	public final void resize(final int width, final int height) {
 	    stage.getViewport().update(width, height, true);
 	}
 
 	@Override
-	public void show() {
+	public final void show() {
 	}
 
 	@Override
-	public void hide() {
+	public final void hide() {
 	}
 
 	@Override
-	public void pause() {
+	public final void pause() {
 	}
 
 	@Override
-	public void resume() {
+	public final void resume() {
 	}
 
 	@Override
-	public void dispose() {
+	public final void dispose() {
 		stage.dispose();
 	}
 	
@@ -71,7 +72,7 @@ public class MainMenuScreen implements Screen {
 		final Screen thisScreen = this;
 		return new ClickListener() {
 			@Override
-			public void clicked(InputEvent event, float x, float y) {
+			public final void clicked(InputEvent event, float x, float y) {
 				screenManager.add(new GameScreen());
 				screenManager.remove(thisScreen);
 			}
@@ -81,7 +82,7 @@ public class MainMenuScreen implements Screen {
 	private ClickListener quitButton_clicked() {
 		return new ClickListener() {
 			@Override
-			public void clicked(InputEvent event, float x, float y) {
+			public final void clicked(InputEvent event, float x, float y) {
 				Gdx.app.exit();
 			}
 		};
@@ -99,7 +100,7 @@ public class MainMenuScreen implements Screen {
 		stage.addActor(mainTable);
 	}
 	
-	private Button createButton(String text, EventListener listener) {
+	private Button createButton(final String text, final EventListener listener) {
 		TextButton button = new TextButton(text, skin);
 		button.getStyle().font = font;
 		// Quirk: Call to setStyle required to ensure that modified style from getStyle is updated

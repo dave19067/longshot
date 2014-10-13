@@ -8,12 +8,12 @@ public final class Input {
 
 	private final InputMultiplexer multiplexer = new InputMultiplexer();
 	
-	public void addProcessor(final InputProcessor processor) {
+	public final void addProcessor(final InputProcessor processor) {
 		multiplexer.addProcessor(processor);
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 	
-	public void addProcessor(final InputProcessor processor, int index) {
+	public final void addProcessor(final InputProcessor processor, final int index) {
 		multiplexer.addProcessor(index, processor);
 		Gdx.input.setInputProcessor(multiplexer);
 	}

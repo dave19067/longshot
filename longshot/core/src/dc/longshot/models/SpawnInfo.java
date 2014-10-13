@@ -1,20 +1,20 @@
 package dc.longshot.models;
 
-public class SpawnInfo {
+public final class SpawnInfo {
 
-	private EntityType entityType;
-	private float spawnTime;
+	private final EntityType entityType;
+	private final float spawnTime;
 	
-	public SpawnInfo(EntityType entityType, float spawnTime) {
+	public SpawnInfo(final EntityType entityType, final float spawnTime) {
 		this.entityType = entityType;
 		this.spawnTime = spawnTime;
 	}
 	
-	public EntityType getEntityType() {
+	public final EntityType getEntityType() {
 		return entityType;
 	}
 	
-	public float getSpawnTime() {
+	public final float getSpawnTime() {
 		return spawnTime;
 	}
 	

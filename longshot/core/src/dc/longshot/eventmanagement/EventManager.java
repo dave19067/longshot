@@ -1,4 +1,4 @@
-package dc.longshot.util;
+package dc.longshot.eventmanagement;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,7 @@ public final class EventManager {
 	private final Map<Class, Collection> eventListenerMap = new HashMap<Class, Collection>(10);
 
     /** Add a listener to an event class **/
-    public <T> void listen(Class<? extends Event<T>> evtClass, T listener) {
+    public final <T> void listen(final Class<? extends Event<T>> evtClass, final T listener) {
     	final Collection<T> listeners = listenersOf(evtClass);
 	    synchronized(listeners) {
 	    	if (!listeners.contains(listener)) {
@@ -27,7 +27,7 @@ public final class EventManager {
     }
 
     /** Stop sending an event class to a given listener **/
-    public <T> void mute(Class<? extends Event<T>> evtClass, T listener) {
+    public final <T> void mute(final Class<? extends Event<T>> evtClass, final T listener) {
     	final Collection<T> listeners = listenersOf(evtClass);
     	synchronized(listeners) {
     		listeners.remove(listener);
@@ -35,24 +35,22 @@ public final class EventManager {
     }
 
     /** Notify a new event to registered listeners of this event class **/
-    public <T> void notify(final Event<T> evt) {
+    public final <T> void notify(final Event<T> evt) {
     	@SuppressWarnings("unchecked")
         Class<Event<T>> evtClass = (Class<Event<T>>) evt.getClass();
-
         for (T listener : listenersOf(evtClass)) {
         	evt.notify(listener);
         }
     }
 
     /** Gets listeners for a given event class **/
-    private <T> Collection<T> listenersOf(Class<? extends Event<T>> evtClass) {
+    private final <T> Collection<T> listenersOf(final Class<? extends Event<T>> evtClass) {
     	synchronized (eventListenerMap) {
     		@SuppressWarnings("unchecked")
 	        final Collection<T> existing = eventListenerMap.get(evtClass);
 	        if (existing != null) {
 	        	return existing;
 	        }
-	
 	        final Collection<T> emptyList = new ArrayList<T>(5);
 	        eventListenerMap.put(evtClass, emptyList);
 	        return emptyList;

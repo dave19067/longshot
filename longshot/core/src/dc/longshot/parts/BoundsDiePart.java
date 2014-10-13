@@ -5,21 +5,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import dc.longshot.epf.Part;
-import dc.longshot.models.Bound;
+import dc.longshot.geometry.Bound;
 
-public class BoundsDiePart extends Part {
+public final class BoundsDiePart extends Part {
 	
-	private List<Bound> bounds;
+	private final List<Bound> bounds;
 	
 	public BoundsDiePart() {
 		this(new ArrayList<Bound>(Arrays.asList(Bound.BOTTOM, Bound.LEFT, Bound.RIGHT, Bound.TOP)));
 	}
 	
-	public BoundsDiePart(List<Bound> bounds) {
+	public BoundsDiePart(final List<Bound> bounds) {
 		this.bounds = bounds;
 	}
 	
-	public List<Bound> getBounds() {
+	public final List<Bound> getBounds() {
 		return new ArrayList<Bound>(bounds);
 	}
 	

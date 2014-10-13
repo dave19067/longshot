@@ -10,9 +10,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class TextureFactory {
+public final class TextureFactory {
 
-	public static Texture createColorBlock(Color color) {
+	public final static Texture createColorBlock(final Color color) {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.setColor(color);
 		pixmap.fill();
@@ -22,7 +22,7 @@ public class TextureFactory {
 		return texture;
 	}
 	
-	public static Texture createColorized(Texture texture, Color color) {
+	public final static Texture createColorized(final Texture texture, final Color color) {
 		TextureRegion textureRegion = new TextureRegion(texture);
 		Pixmap pixmap = toPixmap(textureRegion);
 		Pixmap colorizedPixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), Pixmap.Format.RGBA8888);
@@ -39,13 +39,13 @@ public class TextureFactory {
 		return outlineTexture;
 	}
 	
-	public static Texture createOutline(Texture texture) {
+	public final static Texture createOutline(final Texture texture) {
 		TextureRegion outlineTextureRegion = new TextureRegion(texture);
 		Texture outlineTexture = createOutline(outlineTextureRegion);
 		return outlineTexture;
 	}
 	
-	public static Texture createOutline(TextureRegion textureRegion) {
+	public final static Texture createOutline(final TextureRegion textureRegion) {
 		Pixmap pixmap = toPixmap(textureRegion);
 		Pixmap outlinePixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), Pixmap.Format.RGBA8888);
 		for (int x = 0; x < pixmap.getWidth(); x++) {
@@ -75,7 +75,7 @@ public class TextureFactory {
 		return outlineTexture;
 	}
 	
-	private static Pixmap toPixmap(TextureRegion textureRegion) {
+	private static Pixmap toPixmap(final TextureRegion textureRegion) {
 		int width = textureRegion.getRegionWidth();
 		int height = textureRegion.getRegionHeight();
 		Matrix4 projection = new Matrix4();

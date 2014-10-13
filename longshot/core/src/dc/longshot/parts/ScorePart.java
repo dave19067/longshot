@@ -2,15 +2,15 @@ package dc.longshot.parts;
 
 import dc.longshot.epf.Part;
 
-public class ScorePart extends Part {
+public final class ScorePart extends Part {
 
-	private int score;
+	private final int score;
 	
-	public ScorePart(int score) {
+	public ScorePart(final int score) {
 		this.score = score;
 	}
 	
-	public int getScore() {
+	public final int getScore() {
 		return score;
 	}
 	

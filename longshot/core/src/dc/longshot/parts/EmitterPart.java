@@ -6,27 +6,27 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.util.Cloning;
-import dc.longshot.util.VectorUtils;
 
-public class EmitterPart extends Part {
+public final class EmitterPart extends Part {
 	
-	private Entity original;
+	private final Entity original;
 	// TODO: Timer class
-	private float maxEmitTime;
+	private final float maxEmitTime;
 	private float emitTime;
 
-	public EmitterPart(Entity original, float maxEmitTime) {
+	public EmitterPart(final Entity original, final float maxEmitTime) {
 		this.original = original;
 		this.maxEmitTime = maxEmitTime;
 		this.emitTime = 0;
 	}
 	
-	public boolean canEmit() {
+	public final boolean canEmit() {
 		return emitTime >= maxEmitTime;
 	}
 	
-	public Entity emit() {
+	public final Entity emit() {
 		if (canEmit()) {
 			emitTime = 0;
 			Entity spawn = Cloning.clone(original);
@@ -45,7 +45,7 @@ public class EmitterPart extends Part {
 	}
 
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		emitTime += delta;
 	}
 	

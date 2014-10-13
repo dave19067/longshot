@@ -1,14 +1,14 @@
 package dc.longshot.models;
 
-public class LevelSession {
+public final class LevelSession {
 
 	private float health = 5;
 	
-	public float getHealth() {
+	public final float getHealth() {
 		return health;
 	}
 	
-	public void decreaseHealth(float damage) {
+	public final void decreaseHealth(final float damage) {
 		health -= damage;
 	}
 	

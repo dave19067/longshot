@@ -5,20 +5,20 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 
-public class AttachmentPart extends Part {
+public final class AttachmentPart extends Part {
 
-	private Entity parent;
+	private final Entity parent;
 	
-	public AttachmentPart(Entity parent) {
+	public AttachmentPart(final Entity parent) {
 		this.parent = parent;
 	}
 	
-	public Entity getParent() {
+	public final Entity getParent() {
 		return parent;
 	}
 	
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		if (parent.isActive()) {
 			Vector2 parentCenter = parent.get(TransformPart.class).getCenter();
 			entity.get(TransformPart.class).setPosition(parentCenter);

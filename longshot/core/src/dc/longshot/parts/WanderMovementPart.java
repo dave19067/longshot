@@ -5,34 +5,34 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
 
-public class WanderMovementPart extends Part {
+public final class WanderMovementPart extends Part {
 
-	private float decisionRate;
-	private float idleToMoveRatio;
+	private final float decisionRate;
+	private final float idleToMoveRatio;
 	
 	/**
 	 * Constructor.
 	 * @param decisionRate average number of seconds per decision
 	 * @param idleToMoveRatio how often to stay in place than move on a decision
 	 */
-	public WanderMovementPart(float decisionRate, float idleToMoveRatio) {
+	public WanderMovementPart(final float decisionRate, final float idleToMoveRatio) {
 		this.decisionRate = decisionRate;
 		this.idleToMoveRatio = idleToMoveRatio;
 	}
 	
 	@Override
-	public void initialize() {
+	public final void initialize() {
 		act();
 	}
 	
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		if (MathUtils.random(decisionRate) < delta) {
 			act();
 		}
 	}
 	
-	public void act() {
+	public final void act() {
 		TranslatePart translatePart = entity.get(TranslatePart.class);
 		Vector2 direction;
 		

@@ -25,11 +25,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import dc.longshot.BackdropManager;
 import dc.longshot.CollisionManager;
 import dc.longshot.EntityFactory;
 import dc.longshot.GameInputProcessor;
 import dc.longshot.LevelController;
-import dc.longshot.Session;
+import dc.longshot.Skins;
 import dc.longshot.entitysystems.AIShooterSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
@@ -37,6 +38,7 @@ import dc.longshot.entitysystems.CityDamageSystem;
 import dc.longshot.entitysystems.CollisionDamageSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
+import dc.longshot.entitysystems.NoHealthSystem;
 import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
@@ -47,12 +49,15 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.epf.NoHealthSystem;
+import dc.longshot.eventmanagement.EventManager;
+import dc.longshot.geometry.Bound;
+import dc.longshot.geometry.ScreenUnitConversion;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
-import dc.longshot.models.Bound;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
+import dc.longshot.models.Session;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
@@ -65,62 +70,56 @@ import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
-import dc.longshot.services.BackdropManager;
 import dc.longshot.services.Input;
-import dc.longshot.ui.Skins;
-import dc.longshot.util.BoundUtils;
+import dc.longshot.ui.UIUtils;
 import dc.longshot.util.ColorUtils;
-import dc.longshot.util.EventManager;
-import dc.longshot.util.UIUtils;
-import dc.longshot.util.UnitConversion;
-import dc.longshot.util.VectorUtils;
 import dc.longshot.util.XmlUtils;
 
-public class GameScreen implements Screen {
+public final class GameScreen implements Screen {
 	
 	private static final Color midnightBlue = ColorUtils.toGdxColor(0, 12, 36);
 	
-	private Camera camera;
-	private SpriteBatch spriteBatch;
-	private Input input = new Input();
-	private Session session = new Session();
-	private float speedMultiplier = 1f;
-	private Vector2 defaultScreenSize;
+	private final Camera camera;
+	private final SpriteBatch spriteBatch;
+	private final Input input = new Input();
+	private final Session session = new Session();
+	private final float speedMultiplier = 1f;
+	private final Vector2 defaultScreenSize;
 	
-	private Skin skin;
-	private LabelStyle labelStyle;
+	private final Skin skin;
+	private final LabelStyle labelStyle;
 
-	private Stage stage;
+	private final Stage stage;
 	private Table worldTable;
 	private Label healthLabel;
 	private Label scoreLabel;
 	
-	private EventManager eventManager = new EventManager();
-	private EntityManager entityManager = new EntityManager(eventManager);
-	private SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
-	private List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
-	private EntityFactory entityFactory = new EntityFactory(spriteCache);
-	private CollisionManager collisionManager = new CollisionManager(eventManager);
-	private BackdropManager backdropManager;
-	private LevelController levelController;
+	private final EventManager eventManager = new EventManager();
+	private final EntityManager entityManager = new EntityManager(eventManager);
+	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
+	private final List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
+	private final EntityFactory entityFactory = new EntityFactory(spriteCache);
+	private final CollisionManager collisionManager = new CollisionManager(eventManager);
+	private final BackdropManager backdropManager;
+	private final LevelController levelController;
 
-	private Texture cursorTexture;
+	private final Texture cursorTexture;
 	
-	private LevelSession levelSession = new LevelSession(); 
+	private final LevelSession levelSession = new LevelSession(); 
 	private int score = 0;
 	
-	private Level level;
+	private final Level level;
 	private Entity shooter;
 	private Entity shooterCannon;
 	
 	public GameScreen() {
 		loadSprites();
-		level = XmlUtils.read("bin/levels/level1.xml", new Class[] { Level.class });
+		level = XmlUtils.unmarshal("bin/levels/level1.xml", new Class[] { Level.class });
 		Rectangle boundsBox = level.getBoundsBox();
 		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
 		backdropManager = new BackdropManager(boundsBox, Bound.LEFT, 1, 0.5f, 0.02f, 0.1f, starTextureRegion);
-		camera = new OrthographicCamera(boundsBox.width * UnitConversion.PIXELS_PER_UNIT, 
-				boundsBox.height * UnitConversion.PIXELS_PER_UNIT);
+		camera = new OrthographicCamera(boundsBox.width * ScreenUnitConversion.PIXELS_PER_UNIT, 
+				boundsBox.height * ScreenUnitConversion.PIXELS_PER_UNIT);
 		camera.position.set(boundsBox.x + camera.viewportWidth / 2, boundsBox.y + camera.viewportHeight / 2, 0);
 		spriteBatch = new SpriteBatch();
 		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -150,7 +149,7 @@ public class GameScreen implements Screen {
 	}
 
 	@Override
-	public void render(float delta) {
+	public final void render(final float delta) {
 		handleInput();
 		stage.act(delta);
 		entityManager.update();
@@ -175,7 +174,7 @@ public class GameScreen implements Screen {
 		
 		Gdx.gl.glClearColor(midnightBlue.r, midnightBlue.g, midnightBlue.b, midnightBlue.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Rectangle worldTableRect = UIUtils.getRectangle(worldTable, defaultScreenSize);
+		Rectangle worldTableRect = UIUtils.calcResizedBounds(worldTable, defaultScreenSize);
 		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
 				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);
@@ -204,28 +203,28 @@ public class GameScreen implements Screen {
 	}
 
 	@Override
-	public void resize(int width, int height) {
+	public final void resize(final int width, final int height) {
 	    stage.getViewport().update(width, height, true);
 	}
 
 	@Override
-	public void show() {
+	public final void show() {
 	}
 
 	@Override
-	public void hide() {
+	public final void hide() {
 	}
 
 	@Override
-	public void pause() {
+	public final void pause() {
 	}
 
 	@Override
-	public void resume() {
+	public final void resume() {
 	}
 
 	@Override
-	public void dispose() {
+	public final void dispose() {
 		spriteCache.dispose();
 		stage.dispose();
 	}
@@ -233,7 +232,7 @@ public class GameScreen implements Screen {
 	private EntityAddedListener handleEntityAdded() {
 		return new EntityAddedListener() {
 			@Override
-			public void created(Entity entity) {
+			public void created(final Entity entity) {
 				if (entity.has(ExplodeOnSpawnPart.class) && entity.has(TransformPart.class)) {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
 					Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
@@ -254,7 +253,7 @@ public class GameScreen implements Screen {
 	private EntityRemovedListener handleEntityRemoved() {
 		return new EntityRemovedListener() {
 			@Override
-			public void removed(Entity entity) {
+			public void removed(final Entity entity) {
 				// Spawn on death of the entity
 				if (entity.has(SpawnOnDeathPart.class)) {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
@@ -263,7 +262,7 @@ public class GameScreen implements Screen {
 				
 				// if killed, increase score
 				if (entity.has(ScorePart.class)) {
-					if (!BoundUtils.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
+					if (!Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
 							entity.get(BoundsDiePart.class).getBounds())) {
 						score += entity.get(ScorePart.class).getScore();
 					}
@@ -338,7 +337,7 @@ public class GameScreen implements Screen {
 		entityManager.add(shooterCannon);
 	}
 	
-	private void updateWorld(float delta) {
+	private void updateWorld(final float delta) {
 		collisionManager.checkCollisions(entityManager.getAll());
 		backdropManager.update(delta);
 		levelController.update(delta);
@@ -386,7 +385,7 @@ public class GameScreen implements Screen {
 		return uiMatrix;
 	}
 	
-	private Vector2 getBulletSpawnPosition(Entity bullet) {
+	private Vector2 getBulletSpawnPosition(final Entity bullet) {
 		// Position to spawn the bullet in the middle of the cannon's mouth
 		TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
 		List<Vector2> vertices = cannonTransform.getTransformedVertices();
@@ -397,9 +396,9 @@ public class GameScreen implements Screen {
 		return spawnPosition;
 	}
 	
-	public class ZComparator implements Comparator<Entity> {
+	public final class ZComparator implements Comparator<Entity> {
 	    @Override
-	    public int compare(Entity e1, Entity e2) {
+	    public final int compare(final Entity e1, final Entity e2) {
 	    	if (e1.has(DrawablePart.class) && e2.has(DrawablePart.class)) {
 	    		return Float.compare(e1.get(DrawablePart.class).getZ(), e2.get(DrawablePart.class).getZ());
 	    	}

@@ -1,4 +1,4 @@
-package dc.longshot.util;
+package dc.longshot.eventmanagement;
 
 /**
  * Notifies that an event occured.
@@ -12,6 +12,6 @@ public interface Event<T> {
 	 * Handler for event listener.
 	 * @param listener
 	 */
-	public void notify(final T listener);
+	void notify(final T listener);
 	
 }

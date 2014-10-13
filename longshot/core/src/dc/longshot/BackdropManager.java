@@ -1,4 +1,4 @@
-package dc.longshot.services;
+package dc.longshot;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,20 +11,20 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import dc.longshot.models.Bound;
-import dc.longshot.util.PolygonFactory;
-import dc.longshot.util.UnitConversion;
+import dc.longshot.geometry.Bound;
+import dc.longshot.geometry.PolygonFactory;
+import dc.longshot.geometry.ScreenUnitConversion;
 
-public class BackdropManager {
+public final class BackdropManager {
 	
-	private Rectangle area;
-	private Bound spawnBound;
-	private float spawnRate;
-	private float scrollSpeed;
-	private float minLength;
-	private float maxLength;
-	private TextureRegion decorationTextureRegion;
-	private List<Polygon> decorations = new ArrayList<Polygon>();
+	private final Rectangle area;
+	private final Bound spawnBound;
+	private final float spawnRate;
+	private final float scrollSpeed;
+	private final float minLength;
+	private final float maxLength;
+	private final TextureRegion decorationTextureRegion;
+	private final List<Polygon> decorations = new ArrayList<Polygon>();
 	
 	/**
 	 * Constructor.
@@ -36,8 +36,9 @@ public class BackdropManager {
 	 * @param maxSize maximum length/width of decorations
 	 * @param decorationTextureRegion texture region of decoration
 	 */
-	public BackdropManager(Rectangle area, Bound spawnBound, float spawnRate, float scrollSpeed, float minSize, 
-			float maxSize, TextureRegion decorationTextureRegion) {
+	public BackdropManager(final Rectangle area, final Bound spawnBound, final float spawnRate, 
+			final float scrollSpeed, final float minSize, final float maxSize, 
+			final TextureRegion decorationTextureRegion) {
 		if (spawnBound != Bound.LEFT && spawnBound != Bound.RIGHT) {
 			throw new IllegalArgumentException("Spawn bound must be left or right");
 		}
@@ -58,21 +59,21 @@ public class BackdropManager {
 		}
 	}
 	
-	public void draw(SpriteBatch spriteBatch) {
+	public final void draw(final SpriteBatch spriteBatch) {
 		for (Polygon decoration : decorations) {
 			Rectangle boundingRectangle = decoration.getBoundingRectangle();
 			spriteBatch.draw(decorationTextureRegion, 
-					decoration.getX() * UnitConversion.PIXELS_PER_UNIT, 
-					decoration.getY() * UnitConversion.PIXELS_PER_UNIT, 
-					decoration.getOriginX() * UnitConversion.PIXELS_PER_UNIT, 
-					decoration.getOriginY() * UnitConversion.PIXELS_PER_UNIT, 
-					boundingRectangle.getWidth() * UnitConversion.PIXELS_PER_UNIT, 
-					boundingRectangle.getHeight() * UnitConversion.PIXELS_PER_UNIT, 
+					decoration.getX() * ScreenUnitConversion.PIXELS_PER_UNIT, 
+					decoration.getY() * ScreenUnitConversion.PIXELS_PER_UNIT, 
+					decoration.getOriginX() * ScreenUnitConversion.PIXELS_PER_UNIT, 
+					decoration.getOriginY() * ScreenUnitConversion.PIXELS_PER_UNIT, 
+					boundingRectangle.getWidth() * ScreenUnitConversion.PIXELS_PER_UNIT, 
+					boundingRectangle.getHeight() * ScreenUnitConversion.PIXELS_PER_UNIT, 
 					1, 1, decoration.getRotation(), true);
 		}
 	}
 	
-	public void update(float delta) {
+	public final void update(final float delta) {
 		if (MathUtils.random(spawnRate) < delta) {
 			Polygon decoration = createDecoration();
 			placeOnEdge(decoration);
@@ -88,12 +89,12 @@ public class BackdropManager {
 		return decoration;
 	}
 	
-	private void placeInSpace(Polygon decoration) {
+	private void placeInSpace(final Polygon decoration) {
 		float startX = MathUtils.random(area.x - decoration.getBoundingRectangle().width, area.x + area.width);
 		place(decoration, startX);
 	}
 
-	private void placeOnEdge(Polygon decoration) {
+	private void placeOnEdge(final Polygon decoration) {
 		float startX;
 		
 		if (spawnBound == Bound.LEFT) {
@@ -106,13 +107,13 @@ public class BackdropManager {
 		place(decoration, startX);
 	}
 	
-	private void place(Polygon decoration, float startX) {
+	private void place(final Polygon decoration, final float startX) {
 		float startY = MathUtils.random(area.y - decoration.getBoundingRectangle().height, area.y + area.height);
 		decoration.setPosition(startX, startY);
 		decorations.add(decoration);
 	}
 	
-	private void scroll(float delta) {
+	private void scroll(final float delta) {
 		Iterator<Polygon> it = decorations.iterator();
 		while (it.hasNext()) {
 			Polygon decoration = it.next();

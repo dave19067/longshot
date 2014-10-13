@@ -1,4 +1,4 @@
-package dc.longshot.utils.xmladapters;
+package dc.longshot.xmladapters;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 public final class RectangleAdapter extends XmlAdapter<RectangleAdapter.RectangleAdapted, Rectangle> {
 
 	@Override
-	public RectangleAdapter.RectangleAdapted marshal(Rectangle rectangle) throws Exception {
+	public final RectangleAdapter.RectangleAdapted marshal(final Rectangle rectangle) throws Exception {
 		RectangleAdapted rectangleAdapted = new RectangleAdapted();
 		rectangleAdapted.x = rectangle.x;
 		rectangleAdapted.y = rectangle.y;
@@ -18,20 +18,16 @@ public final class RectangleAdapter extends XmlAdapter<RectangleAdapter.Rectangl
 	}
 
 	@Override
-	public Rectangle unmarshal(RectangleAdapted rectangleAdapted) throws Exception {
-		Rectangle rectangle = new Rectangle(rectangleAdapted.x, rectangleAdapted.y, rectangleAdapted.width, 
-				rectangleAdapted.height);
-		return rectangle;
+	public final Rectangle unmarshal(final RectangleAdapted rectangleAdapted) throws Exception {
+		return new Rectangle(rectangleAdapted.x, rectangleAdapted.y, rectangleAdapted.width, rectangleAdapted.height);
 	}
 
 	@XmlRootElement
-	public static class RectangleAdapted {
-	
+	public final static class RectangleAdapted {
 		public float x;
 		public float y;
 		public float width;
 		public float height;
-		
 	}
 	
 }

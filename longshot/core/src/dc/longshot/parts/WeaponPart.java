@@ -8,26 +8,26 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 import dc.longshot.util.Cloning;
 
-public class WeaponPart extends Part {
+public final class WeaponPart extends Part {
 	
-	private Entity original;
-	private List<Entity> spawns = new ArrayList<Entity>();
-	private int maxSpawns;
-	private float maxSpawnTime;
+	private final Entity original;
+	private final List<Entity> spawns = new ArrayList<Entity>();
+	private final int maxSpawns;
+	private final float maxSpawnTime;
 	private float spawnTime;
 
-	public WeaponPart(Entity original, int maxSpawns, float maxSpawnTime) {
+	public WeaponPart(final Entity original, final int maxSpawns, final float maxSpawnTime) {
 		this.original = original;
 		this.maxSpawns = maxSpawns;
 		this.maxSpawnTime = maxSpawnTime;
 		this.spawnTime = maxSpawnTime;
 	}
 	
-	public boolean canSpawn() {
+	public final boolean canSpawn() {
 		return spawnTime >= maxSpawnTime && spawns.size() < maxSpawns;
 	}
 	
-	public Entity createSpawn() {
+	public final Entity createSpawn() {
 		if (canSpawn()) {
 			spawnTime = 0;
 			Entity newSpawn = Cloning.clone(original);
@@ -40,7 +40,7 @@ public class WeaponPart extends Part {
 	}
 	
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		spawnTime += delta;
 		Iterator<Entity> it = spawns.iterator();
 		while (it.hasNext()) {

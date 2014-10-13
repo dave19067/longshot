@@ -7,44 +7,42 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
-public class SpriteCache<T> {
+public final class SpriteCache<T> {
 
-	private Map<T, Texture> textureMap = new HashMap<T, Texture>();
+	private final Map<T, Texture> textureMap = new HashMap<T, Texture>();
 	
-	public Texture getTexture(T key) {
+	public final Texture getTexture(final T key) {
 		if (!textureMap.containsKey(key)) {
 			throw new IllegalArgumentException("There is no texture associate with key " + key.toString());
 		}
-		
 		Texture texture = textureMap.get(key);
 		return texture;
 	}
 	
-	public boolean containsKey(T key) {
+	public final boolean containsKey(final T key) {
 		return textureMap.containsKey(key);
 	}
 	
-	public SpriteDrawable getDrawable(T key) {
+	public final SpriteDrawable getDrawable(final T key) {
 		Texture texture = getTexture(key);
 		return new SpriteDrawable(new Sprite(texture));
 	}
 	
-	public void add(T key, String path) {
+	public final void add(final T key, final String path) {
 		// load the texture
 		Texture texture = new Texture(path);
 		add(key, texture);
 	}
 	
-	public void add(T key, Texture texture) {
+	public final void add(final T key, final Texture texture) {
 		if (textureMap.containsKey(key)) {
 			throw new IllegalArgumentException("Cannot add sprite because a sprite already exists for key "
 					+ key.toString());
 		}
-		
 		textureMap.put(key, texture);
 	}
 	
-	public void dispose() {
+	public final void dispose() {
 		for (Map.Entry<T, Texture> entry : textureMap.entrySet()) {
 			entry.getValue().dispose();
 		}

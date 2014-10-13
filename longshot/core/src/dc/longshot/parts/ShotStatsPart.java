@@ -4,31 +4,31 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
 
-public class ShotStatsPart extends Part {
+public final class ShotStatsPart extends Part {
 
 	private float distanceTraveled = 0;
 	private int bounceNum = 0;
 	private Vector2 oldPosition;
 	
-	public float getDistanceTraveled() {
+	public final float getDistanceTraveled() {
 		return distanceTraveled;
 	}
 	
-	public int getBounceNum() {
+	public final int getBounceNum() {
 		return bounceNum;
 	}
 	
-	public void setBounceNum(int bounceNum) {
+	public final void setBounceNum(final int bounceNum) {
 		this.bounceNum = bounceNum;
 	}
 	
 	@Override
-	public void initialize() {
+	public final void initialize() {
 		oldPosition = entity.get(TransformPart.class).getPosition();
 	}
 	
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		Vector2 newPosition = entity.get(TransformPart.class).getPosition();
 		distanceTraveled += (newPosition.cpy().sub(oldPosition).len());
 		oldPosition = newPosition.cpy();

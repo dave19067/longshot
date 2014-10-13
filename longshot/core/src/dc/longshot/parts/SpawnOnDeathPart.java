@@ -4,18 +4,18 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.util.Cloning;
-import dc.longshot.util.VectorUtils;
 
-public class SpawnOnDeathPart extends Part {
+public final class SpawnOnDeathPart extends Part {
 
-	private Entity original;
+	private final Entity original;
 	
-	public SpawnOnDeathPart(Entity original) {
+	public SpawnOnDeathPart(final Entity original) {
 		this.original = original;
 	}
 	
-	public Entity createSpawn() {
+	public final Entity createSpawn() {
 		Entity spawn = Cloning.clone(original);
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		Vector2 position = VectorUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 

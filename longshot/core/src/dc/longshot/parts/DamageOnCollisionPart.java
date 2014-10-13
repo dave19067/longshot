@@ -5,21 +5,21 @@ import java.util.List;
 import dc.longshot.epf.Part;
 import dc.longshot.models.CollisionType;
 
-public class DamageOnCollisionPart extends Part {
+public final class DamageOnCollisionPart extends Part {
 
-	private List<CollisionType> collisionTypes;
-	private float damage;
+	private final List<CollisionType> collisionTypes;
+	private final float damage;
 	
-	public DamageOnCollisionPart(List<CollisionType> collisionTypes, float damage) {
+	public DamageOnCollisionPart(final List<CollisionType> collisionTypes, final float damage) {
 		this.collisionTypes = collisionTypes;
 		this.damage = damage;
 	}
 	
-	public List<CollisionType> getCollisionTypes() {
+	public final List<CollisionType> getCollisionTypes() {
 		return collisionTypes;
 	}
 	
-	public float getDamage() {
+	public final float getDamage() {
 		return damage;
 	}
 

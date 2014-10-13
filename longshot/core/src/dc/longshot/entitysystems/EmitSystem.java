@@ -5,16 +5,16 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.parts.EmitterPart;
 
-public class EmitSystem implements EntitySystem {
+public final class EmitSystem implements EntitySystem {
 
-	private EntityManager entityManager;
+	private final EntityManager entityManager;
 	
-	public EmitSystem(EntityManager entityManager) {
+	public EmitSystem(final EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 	
 	@Override
-	public void update(float delta, Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		// Emit
 		if (entity.has(EmitterPart.class)) {
 			EmitterPart emitterPart = entity.get(EmitterPart.class);

@@ -1,20 +1,20 @@
 package dc.longshot.events;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.util.Event;
+import dc.longshot.eventmanagement.Event;
 
-public class CollidedEvent implements Event<CollidedListener> {
+public final class CollidedEvent implements Event<CollidedListener> {
 
-	private Entity e1;
-	private Entity e2;
+	private final Entity e1;
+	private final Entity e2;
 	
-	public CollidedEvent(Entity e1, Entity e2) {
+	public CollidedEvent(final Entity e1, final Entity e2) {
 		this.e1 = e1;
 		this.e2 = e2;
 	}
 	
 	@Override
-	public void notify(CollidedListener listener) {
+	public void notify(final CollidedListener listener) {
 		listener.executed(e1, e2);
 	}
 

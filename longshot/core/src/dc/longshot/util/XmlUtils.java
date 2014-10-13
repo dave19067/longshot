@@ -3,10 +3,11 @@ package dc.longshot.util;
 import java.io.File;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-public class XmlUtils {
+public final class XmlUtils {
 	
 	/**
 	 * Reads an xml file to an object.
@@ -15,20 +16,17 @@ public class XmlUtils {
 	 * @return object of type T
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T read(String path, Class<?>[] boundClasses) {
-		T object = null;
-		
+	public static final <T> T unmarshal(final String path, final Class<?>[] boundClasses) {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(boundClasses);
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 			File file = new File(path);
-			object = (T)unmarshaller.unmarshal(file);
+			T object = (T)unmarshaller.unmarshal(file);
+			return object;
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (JAXBException e) {
+			throw new IllegalArgumentException("Could not unmarshal " + path, e);
 		}
-		
-		return object;
 	}
 	
 	/**
@@ -37,8 +35,7 @@ public class XmlUtils {
 	 * @param path path of the xml file to write to
 	 * @param boundClasses used to correctly marshal base types to derived types
 	 */
-	public static <T> void write(T object, String path, Class<?>[] boundClasses) {
-		
+	public static final <T> void marshal(final T object, final String path, final Class<?>[] boundClasses) {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(boundClasses);
 			Marshaller marshaller = jaxbContext.createMarshaller();
@@ -46,8 +43,8 @@ public class XmlUtils {
 			File file = new File(path);
 			marshaller.marshal(object, file);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (JAXBException e) {
+			throw new IllegalArgumentException("Could not marshal " + object.toString(), e);
 		}
 	}
 	

@@ -7,25 +7,24 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.models.Bound;
+import dc.longshot.geometry.Bound;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.TransformPart;
-import dc.longshot.util.BoundUtils;
 
-public class BoundPositionSystem implements EntitySystem {
+public final class BoundPositionSystem implements EntitySystem {
 
-	private Rectangle boundsBox;
+	private final Rectangle boundsBox;
 
-	public BoundPositionSystem(Rectangle boundsBox) {
+	public BoundPositionSystem(final Rectangle boundsBox) {
 		this.boundsBox = boundsBox;
 	}
 	
 	@Override
-	public void update(float delta, Entity entity) {
+	public void update(final float delta, final Entity entity) {
 		// Restrict entity in bounds
 		if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
-			List<Bound> bounds = BoundUtils.checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), 
-					boundsBox);
+			List<Bound> bounds = Bound.checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			TransformPart transformPart = entity.get(TransformPart.class);
 			Rectangle boundingBox = transformPart.getBoundingBox();
 			Vector2 newPosition = transformPart.getPosition();
@@ -39,10 +38,10 @@ public class BoundPositionSystem implements EntitySystem {
 						newPosition.x -= (boundingBox.x - buffer);
 						break;
 					case RIGHT:
-						newPosition.x -= (boundingBox.x + boundingBox.width - (boundsBox.x + boundsBox.width));
+						newPosition.x -= (PolygonUtils.right(boundingBox) - PolygonUtils.right(boundsBox));
 						break;
 					case TOP:
-						newPosition.y -= (boundingBox.y + boundingBox.height - (boundsBox.y + boundsBox.height));
+						newPosition.y -= (PolygonUtils.top(boundingBox) - PolygonUtils.top(boundsBox));
 						break;
 					case BOTTOM:
 						newPosition.y -= (boundingBox.y - buffer);

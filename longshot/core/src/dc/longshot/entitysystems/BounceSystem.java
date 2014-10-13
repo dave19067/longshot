@@ -7,27 +7,25 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.models.Bound;
+import dc.longshot.geometry.Bound;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
-import dc.longshot.util.BoundUtils;
 
-public class BounceSystem implements EntitySystem {
+public final class BounceSystem implements EntitySystem {
 	
-	private Rectangle boundsBox;
+	private final Rectangle boundsBox;
 	
 	public BounceSystem(Rectangle boundsBox) {
 		this.boundsBox = boundsBox;
 	}
 	
 	@Override
-	public void update(float dt, Entity entity) {
+	public final void update(final float dt, final Entity entity) {
 		// Bounce entity off walls
 		if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
-			List<Bound> bounds = BoundUtils.checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), 
-					boundsBox);
+			List<Bound> bounds = Bound.checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
 			Vector2 newVelocity = velocity.cpy();
 			

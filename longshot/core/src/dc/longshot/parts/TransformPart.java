@@ -8,23 +8,23 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
-import dc.longshot.util.PolygonFactory;
+import dc.longshot.geometry.PolygonFactory;
 
-public class TransformPart extends Part {
+public final class TransformPart extends Part {
 
-	private Polygon polygon;
+	private final Polygon polygon;
 	
-	public TransformPart(Vector2 size) {
+	public TransformPart(final Vector2 size) {
 		this(size, new Vector2());
 	}
 	
-	public TransformPart(Vector2 size, Vector2 position) {
+	public TransformPart(final Vector2 size, final Vector2 position) {
 		polygon = PolygonFactory.createRectangle(size);
 		polygon.setPosition(position.x, position.y);
 		polygon.setOrigin(0, 0);
 	}
 	
-	public List<Vector2> getTransformedVertices() {
+	public final List<Vector2> getTransformedVertices() {
 		List<Vector2> verticesList = new ArrayList<Vector2>();
 		float[] vertices = polygon.getTransformedVertices();
 		for (int i = 0; i < vertices.length / 2; i++) {
@@ -33,7 +33,7 @@ public class TransformPart extends Part {
 		return verticesList;
 	}
 	
-	public Vector2 getSize() {
+	public final Vector2 getSize() {
 		float rotation = polygon.getRotation();
 		polygon.setRotation(0);
 		Vector2 size = polygon.getBoundingRectangle().getSize(new Vector2());
@@ -41,36 +41,36 @@ public class TransformPart extends Part {
 		return size;
 	}
 	
-	public Vector2 getBoundingSize() {
+	public final Vector2 getBoundingSize() {
 		Vector2 size = polygon.getBoundingRectangle().getSize(new Vector2());
 		return size;
 	}
 	
-	public Vector2 getPosition() {
+	public final Vector2 getPosition() {
 		return new Vector2(polygon.getX(), polygon.getY());
 	}
 	
-	public void setPosition(Vector2 position) {
+	public final void setPosition(final Vector2 position) {
 		polygon.setPosition(position.x, position.y);
 	}
 	
-	public Vector2 getOrigin() {
+	public final Vector2 getOrigin() {
 		return new Vector2(polygon.getOriginX(), polygon.getOriginY());
 	}
 	
-	public void setOrigin(Vector2 origin) {
+	public final void setOrigin(final Vector2 origin) {
 		polygon.setOrigin(origin.x, origin.y);
 	}
 	
-	public float getRotation() {
+	public final float getRotation() {
 		return polygon.getRotation();
 	}
 	
-	public void setRotation(float degrees) {
+	public final void setRotation(final float degrees) {
 		polygon.setRotation(degrees);
 	}
 	
-	public Vector2 getCenter() {
+	public final Vector2 getCenter() {
 		return polygon.getBoundingRectangle().getCenter(new Vector2());
 	}
 	

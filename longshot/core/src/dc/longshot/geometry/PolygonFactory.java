@@ -1,11 +1,11 @@
-package dc.longshot.util;
+package dc.longshot.geometry;
 
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 
-public class PolygonFactory {
+public final class PolygonFactory {
 
-	public static Polygon copy(Polygon polygon) {
+	public final static Polygon copy(final Polygon polygon) {
 		Polygon copy = new Polygon(polygon.getVertices());
 		copy.setOrigin(polygon.getOriginX(), polygon.getOriginY());
 		copy.setPosition(polygon.getX(), polygon.getY());
@@ -14,7 +14,7 @@ public class PolygonFactory {
 		return copy;
 	}
 	
-	public static Polygon createRectangle(Vector2 size) {
+	public final static Polygon createRectangle(final Vector2 size) {
 		float[] vertices = new float[] { 0, 0, size.x, 0, size.x, size.y, 0, size.y };
 		Polygon polygon = new Polygon(vertices);
 		return polygon;

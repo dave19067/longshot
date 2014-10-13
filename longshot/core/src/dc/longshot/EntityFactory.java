@@ -11,9 +11,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
+import dc.longshot.geometry.Bound;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.models.Alliance;
-import dc.longshot.models.Bound;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.SpriteKey;
@@ -44,15 +44,15 @@ import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WanderMovementPart;
 import dc.longshot.parts.WeaponPart;
 
-public class EntityFactory {
+public final class EntityFactory {
 	
-	private SpriteCache<SpriteKey> spriteCache;
+	private final SpriteCache<SpriteKey> spriteCache;
 	
-	public EntityFactory(SpriteCache<SpriteKey> spriteCache) {
+	public EntityFactory(final SpriteCache<SpriteKey> spriteCache) {
 		this.spriteCache = spriteCache;
 	}
 	
-	public Entity create(EntityType entityType) {
+	public final Entity create(final EntityType entityType) {
 		Entity entity;
 		
 		switch (entityType) {
@@ -72,7 +72,7 @@ public class EntityFactory {
 		return entity;
 	}
 
-	public Entity createShooter(Vector3 size, Vector2 position) {
+	public final Entity createShooter(final Vector3 size, final Vector2 position) {
 		Entity entity = createBaseEntity(size, position, SpriteKey.SHOOTER);
 		entity.attach(new SpeedPart(7));
 		entity.attach(new HealthPart(1));
@@ -89,7 +89,7 @@ public class EntityFactory {
 		return entity;
 	}
 
-	public Entity createShooterCannon(Entity parent) {
+	public final Entity createShooterCannon(final Entity parent) {
 		Vector3 size = new Vector3(1, 0.25f, 0.25f);
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
@@ -98,7 +98,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createShooterBullet() {
+	public final Entity createShooterBullet() {
 		Entity entity = createBaseEntity(new Vector3(0.6f, 0.1f, 0.1f), new Vector2(), SpriteKey.BULLET);
 		entity.attach(new SpeedPart(20));
 		entity.attach(new HealthPart(1));
@@ -118,20 +118,20 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createMissle() {
+	public final Entity createMissle() {
 		Entity trailParticle = createTrailParticle(new Vector3(0.1f, 0.1f, 0.1f), Color.GRAY.cpy(), Color.CLEAR.cpy());
 		Entity entity = createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 1f, SpriteKey.MISSLE, trailParticle);
 		return entity;
 	}
 	
-	public Entity createWarhead() {
+	public final Entity createWarhead() {
 		Entity trailParticle = createTrailParticle(new Vector3(0.5f, 0.5f, 0.5f), Color.GRAY.cpy(), Color.CLEAR.cpy());
 		Entity entity = createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 4, SpriteKey.NUKE, trailParticle);
 		return entity;
 	}
 	
-	public Entity createProjectile(Vector3 size, float damage, float explosionRadius, SpriteKey spriteKey, 
-			Entity trailParticle) {
+	public final Entity createProjectile(final Vector3 size, final float damage, final float explosionRadius, 
+			final SpriteKey spriteKey, final Entity trailParticle) {
 		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));
@@ -152,7 +152,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createUFOGlow() {
+	public final Entity createUFOGlow() {
 		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), SpriteKey.UFO_GLOW);
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		entity.attach(new SpawnOnDeathPart(createUFO(new Vector3(1, 0.5f, 1))));
@@ -162,7 +162,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createUFO(Vector3 size) {
+	public final Entity createUFO(final Vector3 size) {
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.UFO);
 		entity.attach(new SpeedPart(3));
 		entity.attach(new HealthPart(1));
@@ -185,7 +185,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createUFOLaser() {
+	public final Entity createUFOLaser() {
 		Entity entity = createBaseEntity(new Vector3(0.3f, 0.1f, 0.1f), new Vector2(), SpriteKey.GREEN);
 		entity.attach(new SpeedPart(10));
 		entity.attach(new HealthPart(1));
@@ -203,7 +203,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createExplosion(float radius, float maxLifeTime) {
+	public final Entity createExplosion(final float radius, final float maxLifeTime) {
 		float diameter = radius * 2;
 		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), 
 				SpriteKey.EXPLOSION);
@@ -215,7 +215,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createTrailParticle(Vector3 size, Color startColor, Color endColor) {
+	public final Entity createTrailParticle(final Vector3 size, final Color startColor, final Color endColor) {
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.WHITE);
 		float maxLifeTime = 3;
 		entity.attach(new TimedDeathPart(maxLifeTime));
@@ -223,7 +223,7 @@ public class EntityFactory {
 		return entity;
 	}
 	
-	public Entity createBaseEntity(Vector3 size, Vector2 position, SpriteKey spriteKey) {
+	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final SpriteKey spriteKey) {
 		Entity entity = new Entity();
 		entity.attach(new TransformPart(new Vector2(size.x, size.y), position));
 		Texture texture = spriteCache.getTexture(spriteKey);

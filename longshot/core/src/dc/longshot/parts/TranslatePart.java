@@ -3,22 +3,22 @@ package dc.longshot.parts;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
-import dc.longshot.util.VectorUtils;
+import dc.longshot.geometry.VectorUtils;
 
 public class TranslatePart extends Part {
 
-	private boolean autoRotate;
+	private final boolean autoRotate;
 	private Vector2 velocity = new Vector2(0, 0);
 	
-	public TranslatePart(boolean autoRotate) {
+	public TranslatePart(final boolean autoRotate) {
 		this.autoRotate = autoRotate;
 	}
 	
-	public Vector2 getVelocity() {
+	public final Vector2 getVelocity() {
 		return new Vector2(velocity);
 	}
 	
-	public void setVelocity(Vector2 direction) {
+	public final void setVelocity(final Vector2 direction) {
 		if (direction.equals(new Vector2(0, 0))) {
 			velocity = new Vector2(0, 0);
 		}
@@ -31,7 +31,7 @@ public class TranslatePart extends Part {
 	}
 	
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		TransformPart transformPart = entity.get(TransformPart.class);
 		Vector2 offset = velocity.cpy().scl(delta);
 		Vector2 newPosition = transformPart.getPosition().add(offset);

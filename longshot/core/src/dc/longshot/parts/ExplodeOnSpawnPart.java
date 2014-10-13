@@ -2,12 +2,12 @@ package dc.longshot.parts;
 
 import dc.longshot.epf.Part;
 
-public class ExplodeOnSpawnPart extends Part {
+public final class ExplodeOnSpawnPart extends Part {
 
-	private float radius;
-	private float damage;
+	private final float radius;
+	private final float damage;
 	
-	public ExplodeOnSpawnPart(float radius, float damage) {
+	public ExplodeOnSpawnPart(final float radius, final float damage) {
 		this.radius = radius;
 		this.damage = damage;
 	}

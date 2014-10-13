@@ -1,4 +1,4 @@
-package dc.longshot.util;
+package dc.longshot.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,21 +6,21 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 
-public class ScreenManager {
+public final class ScreenManager {
 	
-	private List<Screen> screens = new ArrayList<Screen>();
-	private List<Screen> screensToAdd = new ArrayList<Screen>();
-	private List<Screen> screensToRemove = new ArrayList<Screen>();
+	private final List<Screen> screens = new ArrayList<Screen>();
+	private final List<Screen> screensToAdd = new ArrayList<Screen>();
+	private final List<Screen> screensToRemove = new ArrayList<Screen>();
 	
-	public void add(Screen screen) {
+	public final void add(final Screen screen) {
 		screensToAdd.add(screen);
 	}
 	
-	public void remove(Screen screen) {
+	public final void remove(final Screen screen) {
 		screensToRemove.add(screen);
 	}
 	
-	public void update() {
+	public final void update() {
 		while (!screensToAdd.isEmpty()) {
 			Screen screen = screensToAdd.remove(0);
 			screens.add(screen);
@@ -33,19 +33,19 @@ public class ScreenManager {
 		}
 	}
 	
-	public void render() {
+	public final void render() {
 		for (Screen screen : screens) {
 			screen.render(Gdx.graphics.getDeltaTime());
 		}
 	}
 	
-	public void resize(int width, int height) {
+	public final void resize(final int width, final int height) {
 		for (Screen screen : screens) {
 			screen.resize(width, height);
 		}
 	}
 
-	public void dispose() {
+	public final void dispose() {
 		for (Screen screen : screens) {
 			screen.dispose();
 		}

@@ -2,7 +2,7 @@ package dc.longshot.parts;
 
 import dc.longshot.epf.Part;
 
-public class TimedDeathPart extends Part {
+public final class TimedDeathPart extends Part {
 
 	private float deathTime;
 	
@@ -10,12 +10,12 @@ public class TimedDeathPart extends Part {
 		this.deathTime = deathTime;
 	}
 	
-	public boolean isDead() {
+	public final boolean isDead() {
 		return deathTime <= 0;
 	}
 
 	@Override
-	public void update(float delta) {
+	public final void update(final float delta) {
 		deathTime -= delta;
 	}
 	

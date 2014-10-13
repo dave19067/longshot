@@ -3,21 +3,21 @@ package dc.longshot.parts;
 import dc.longshot.epf.Part;
 import dc.longshot.models.Alliance;
 
-public class AIShooterPart extends Part {
+public final class AIShooterPart extends Part {
 	
-	private float shootRate;
-	private Alliance targetAlliance;
+	private final float shootRate;
+	private final Alliance targetAlliance;
 	
-	public AIShooterPart(float shootRate, Alliance targetAlliance) {
+	public AIShooterPart(final float shootRate, final Alliance targetAlliance) {
 		this.shootRate = shootRate;
 		this.targetAlliance = targetAlliance;
 	}
 	
-	public float getShootRate() {
+	public final float getShootRate() {
 		return shootRate;
 	}
 	
-	public Alliance getTargetAlliance() {
+	public final Alliance getTargetAlliance() {
 		return targetAlliance;
 	}
 

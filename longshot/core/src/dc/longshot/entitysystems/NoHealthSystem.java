@@ -1,18 +1,21 @@
-package dc.longshot.epf;
+package dc.longshot.entitysystems;
 
+import dc.longshot.epf.Entity;
+import dc.longshot.epf.EntityManager;
+import dc.longshot.epf.EntitySystem;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
 
-public class NoHealthSystem implements EntitySystem {
+public final class NoHealthSystem implements EntitySystem {
 
-	private EntityManager entityManager;
+	private final EntityManager entityManager;
 	
-	public NoHealthSystem(EntityManager entityManager) {
+	public NoHealthSystem(final EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 	
 	@Override
-	public void update(float delta, Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		// Remove if no health
 		if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
 			if (entity.has(GhostPart.class)) {

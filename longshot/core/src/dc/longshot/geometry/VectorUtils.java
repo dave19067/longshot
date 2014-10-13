@@ -1,17 +1,17 @@
-package dc.longshot.util;
+package dc.longshot.geometry;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class VectorUtils {
+public final class VectorUtils {
 	
-	public static Vector2 getLengthened(Vector2 vector, float length) {
+	public final static Vector2 getLengthened(final Vector2 vector, final float length) {
 		Vector2 newVector = unit(vector);
 		newVector.scl(length);
 		return newVector;
 	}
 	
-	public static Vector2 unit(Vector2 vector) {
+	public final static Vector2 unit(final Vector2 vector) {
 		float length = vector.len();
 		if(length == 0)
 		{
@@ -21,28 +21,29 @@ public class VectorUtils {
 		return unit;
 	}
 
-	public static float angleToPoint(Vector2 from, Vector2 to) {
+	public final static float angleToPoint(final Vector2 from, final Vector2 to) {
 		Vector2 offset = to.cpy().sub(from);
 		float angle = MathUtils.atan2(offset.y, offset.x);
 		return angle;
 	}
 	
-	public static Vector2 getVectorFromAngle(float degrees) {
+	public final static Vector2 getVectorFromAngle(final float degrees) {
 		Vector2 vector = new Vector2(MathUtils.cosDeg(degrees), MathUtils.sinDeg(degrees));
 		return vector;
 	}
 	
-	public static Vector2 center(Vector2 position, Vector2 size) {
+	public final static Vector2 center(final Vector2 position, final Vector2 size) {
 		Vector2 center = new Vector2(position.x + size.x / 2, position.y + size.y / 2);
 		return center;
 	}
 	
-	public static Vector2 relativeCenter(Vector2 pivotCenter, Vector2 objectSize) {
+	public final static Vector2 relativeCenter(final Vector2 pivotCenter, final Vector2 objectSize) {
 		Vector2 relativeCenter = pivotCenter.cpy().sub(objectSize.cpy().scl(0.5f));
 		return relativeCenter;
 	}
 	
-	public static Vector2 relativeEdgeMiddle(Vector2 edgeStart, Vector2 edgeEnd, float objectLength) {
+	public final static Vector2 relativeEdgeMiddle(final Vector2 edgeStart, final Vector2 edgeEnd, 
+			final float objectLength) {
 		Vector2 difference = edgeEnd.cpy().sub(edgeStart);
 		Vector2 offset = getLengthened(difference, (difference.len() - objectLength) / 2);
 		return edgeStart.cpy().add(offset);

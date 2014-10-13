@@ -9,11 +9,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.badlogic.gdx.math.Rectangle;
 
-import dc.longshot.utils.xmladapters.RectangleAdapter;
+import dc.longshot.xmladapters.RectangleAdapter;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Level {
+public final class Level {
 	 
 	@XmlJavaTypeAdapter(RectangleAdapter.class)
 	private Rectangle boundsBox;
@@ -21,23 +21,24 @@ public class Level {
 	private Map<EntityType, Integer> spawns;
 	
 	public Level() {
+		// For serialization
 	}
 	
-	public Level(Rectangle boundsBox, float spawnDuration, Map<EntityType, Integer> spawns) {
+	public Level(final Rectangle boundsBox, final float spawnDuration, final Map<EntityType, Integer> spawns) {
 		this.boundsBox = boundsBox;
 		this.spawnDuration = spawnDuration;
 		this.spawns = spawns;
 	}
 	
-	public Rectangle getBoundsBox() {
+	public final Rectangle getBoundsBox() {
 		return new Rectangle(boundsBox);
 	}
 	
-	public float getSpawnDuration() {
+	public final float getSpawnDuration() {
 		return spawnDuration;
 	}
 	
-	public Map<EntityType, Integer> getSpawns() {
+	public final Map<EntityType, Integer> getSpawns() {
 		return spawns;
 	}
 	
