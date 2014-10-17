@@ -1,4 +1,4 @@
-package dc.longshot.events;
+package dc.longshot.collision;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.eventmanagement.Event;
@@ -14,7 +14,7 @@ public final class CollidedEvent implements Event<CollidedListener> {
 	}
 	
 	@Override
-	public void notify(final CollidedListener listener) {
+	public final void notify(final CollidedListener listener) {
 		listener.executed(e1, e2);
 	}
 

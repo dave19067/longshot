@@ -10,10 +10,8 @@ public final class ScreenUnitConversion {
 	public static final float PIXELS_PER_UNIT = 64;
 
 	public static final Vector2 getScreenToWorldCoords(final Camera camera, final int screenX, final int screenY) {
-		Vector3 worldCoords3 = new Vector3(screenX, screenY, 0);
-		camera.unproject(worldCoords3);
-		worldCoords3.scl(1 / PIXELS_PER_UNIT);
-		Vector2 worldCoords = new Vector2(worldCoords3.x, worldCoords3.y);
+		Rectangle viewPort = new Rectangle(0, 0, camera.viewportWidth, camera.viewportHeight);
+		Vector2 worldCoords = getScreenToWorldCoords(camera, screenX, screenY, viewPort);
 		return worldCoords;
 	}
 	

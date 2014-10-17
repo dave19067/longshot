@@ -25,7 +25,7 @@ public final class BounceSystem implements EntitySystem {
 	public final void update(final float dt, final Entity entity) {
 		// Bounce entity off walls
 		if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
-			List<Bound> bounds = Bound.checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
+			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
 			Vector2 newVelocity = velocity.cpy();
 			

@@ -52,7 +52,7 @@ public abstract class Part {
 	 * Update logic.
 	 * @param delta Time since last update.
 	 */
-	public void update(float delta) {
+	public void update(final float delta) {
 	}
 	
 }

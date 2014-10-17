@@ -1,4 +1,4 @@
-package dc.longshot;
+package dc.longshot.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,10 +14,10 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.Level;
-import dc.longshot.models.SpawnInfo;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
@@ -26,7 +26,7 @@ public final class LevelController {
 	
 	private final EntityManager entityManager;
 	private final EntityFactory entityFactory;
-	private Level level;
+	private final Level level;
 	private final List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
 	private float time = 0;
 
@@ -35,40 +35,17 @@ public final class LevelController {
 		this.entityFactory = entityFactory;
 		this.level = level;
 		
-		Map<EntityType, Integer> spawns = level.getSpawns();
-		for (Entry<EntityType, Integer> entry : spawns.entrySet()) {
-			for (int i = 0; i < entry.getValue(); i++) {
-				SpawnInfo spawnInfo = new SpawnInfo(entry.getKey(), MathUtils.random(0, level.getSpawnDuration()));
-				spawnInfos.add(spawnInfo);
-			}
-		}
-		
-		Collections.sort(spawnInfos, new Comparator<SpawnInfo>() {
-			@Override
-			public int compare(SpawnInfo spawnInfo1, SpawnInfo spawnInfo2) {
-				return Float.compare(spawnInfo1.getSpawnTime(), spawnInfo2.getSpawnTime());
-			}
-		});
+		createSpawnInfos();
 	}
 	
 	public final void update(final float delta) {
 		time += delta;
 		Iterator<SpawnInfo> it = spawnInfos.iterator();
 		
-		for (int i = 0; i < spawnInfos.size(); i++) {
+		while (it.hasNext()) {
 			SpawnInfo spawnInfo = it.next();
-			if (spawnInfo.getSpawnTime() <= time) {
-				Entity spawn = entityFactory.create(spawnInfo.getEntityType());
-				switch (spawnInfo.getEntityType()) {
-				case MISSLE:
-				case WARHEAD:
-					placeAbove(spawn);
-					break;
-				case UFO:
-					placeInSpace(spawn);
-					break;
-				}
-				entityManager.add(spawn);
+			if (spawnInfo.time <= time) {
+				spawn(spawnInfo);
 				it.remove();
 			}
 			else {
@@ -79,29 +56,60 @@ public final class LevelController {
 	
 	public final boolean isComplete() {
 		boolean enemiesExist = false;
-		
 		for (Entity entity : entityManager.getAll()) {
 			if (entity.has(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
 				enemiesExist = true;
 				break;
 			}
 		}
-		
 		return !enemiesExist && spawnInfos.size() <= 0;
+	}
+	
+	private void createSpawnInfos() {
+		Map<EntityType, Integer> spawns = level.getSpawns();
+		for (Entry<EntityType, Integer> entry : spawns.entrySet()) {
+			for (int i = 0; i < entry.getValue(); i++) {
+				SpawnInfo spawnInfo = new SpawnInfo();
+				spawnInfo.entityType = entry.getKey();
+				spawnInfo.time = MathUtils.random(0, level.getSpawnDuration());
+				spawnInfos.add(spawnInfo);
+			}
+		}
+		
+		Collections.sort(spawnInfos, new Comparator<SpawnInfo>() {
+			@Override
+			public int compare(SpawnInfo spawnInfo1, SpawnInfo spawnInfo2) {
+				return Float.compare(spawnInfo1.time, spawnInfo2.time);
+			}
+		});
+	}
+	
+	private void spawn(SpawnInfo spawnInfo) {
+		Entity spawn = entityFactory.create(spawnInfo.entityType);
+		switch (spawnInfo.entityType) {
+		case MISSLE:
+		case WARHEAD:
+			placeAbove(spawn);
+			break;
+		case UFO:
+			placeInSpace(spawn);
+			break;
+		}
+		entityManager.add(spawn);
 	}
 
 	private void placeAbove(final Entity entity) {
-		Rectangle boundsBox = level.getBoundsBox();
+		Rectangle levelBoundsBox = level.getBoundsBox();
 		
 		// Get the spawn position, which is a random point from the skyline
 		TransformPart transform = entity.get(TransformPart.class);
 		Vector2 size = transform.getSize();
-		float spawnX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width - size.y);
-		Vector2 spawnPosition = new Vector2(spawnX, boundsBox.y + boundsBox.height);
+		float spawnX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - size.y);
+		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(levelBoundsBox));
 		transform.setPosition(spawnPosition);
 		
 		// Get the destination, which is a random point on the ground
-		float destX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width - size.y);
+		float destX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - size.y);
 		Vector2 destPosition = new Vector2(destX, 0);
 		
 		// Find the direction to get from the entity spawn position to the destination
@@ -109,8 +117,8 @@ public final class LevelController {
 		TranslatePart translate = entity.get(TranslatePart.class);
 		translate.setVelocity(offset);
 		
-		// If the enemy is partially in bounds, move to just out of bounds using the negative velocity
-		float unboundedOverlapY = boundsBox.y + boundsBox.height - transform.getBoundingBox().y;
+		// If the spawn is partially in bounds, move to just out of bounds using the negative velocity
+		float unboundedOverlapY = PolygonUtils.top(levelBoundsBox) - transform.getBoundingBox().y;
 		Vector2 velocity = translate.getVelocity();
 		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
 		transform.setPosition(spawnPosition.cpy().add(outOfBoundsOffset));
@@ -120,12 +128,19 @@ public final class LevelController {
 		// Get the spawn position, which is a random point above the halfline
 		Rectangle boundsBox = level.getBoundsBox();
 		Vector2 size = entity.get(TransformPart.class).getSize();
-		float spawnX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width - size.x);
+		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.x);
 		float spawnY = MathUtils.random(boundsBox.y + 2 / 3f * boundsBox.height, 
-				boundsBox.y + boundsBox.height - size.y);
+				PolygonUtils.top(boundsBox) - size.y);
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);
+	}
+
+	private final class SpawnInfo {
+	
+		private EntityType entityType;
+		private float time;
+		
 	}
 	
 }

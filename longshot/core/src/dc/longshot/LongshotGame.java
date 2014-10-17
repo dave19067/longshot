@@ -2,8 +2,9 @@ package dc.longshot;
 
 import com.badlogic.gdx.Game;
 
+import dc.longshot.game.Skins;
 import dc.longshot.screens.MainMenuScreen;
-import dc.longshot.services.ScreenManager;
+import dc.longshot.system.ScreenManager;
 
 public final class LongshotGame extends Game {
 	

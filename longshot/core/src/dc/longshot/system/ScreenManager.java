@@ -1,4 +1,4 @@
-package dc.longshot.services;
+package dc.longshot.system;
 
 import java.util.ArrayList;
 import java.util.List;

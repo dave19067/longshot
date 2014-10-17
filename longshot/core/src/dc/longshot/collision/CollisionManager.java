@@ -1,4 +1,4 @@
-package dc.longshot;
+package dc.longshot.collision;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Rectangle;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.eventmanagement.EventManager;
-import dc.longshot.events.CollidedEvent;
 import dc.longshot.parts.TransformPart;
 
 public final class CollisionManager {
@@ -32,35 +31,39 @@ public final class CollisionManager {
 	}
 
 	public final void checkCollisions(final List<Entity> entities) {
-		for (Entry<Entity, List<Entity>> entry : collidedEntities.entrySet()) {
-			entry.getValue().clear();
-		}
+		clearCollisions();
 		
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity1 = entities.get(i);
-			Rectangle boundingBox1 = entity1.get(TransformPart.class).getBoundingBox();
-			
-			if (entity1.isActive() && entity1.has(TransformPart.class)) {
+			if (entity1.hasActive(TransformPart.class)) {
 				for (int j = i + 1; j < entities.size(); j++) {
 					Entity entity2 = entities.get(j);
 					Rectangle boundingBox2 = entity2.get(TransformPart.class).getBoundingBox();
 					
-					if (entity2.isActive() && entity2.has(TransformPart.class)) {
+					if (entity2.hasActive(TransformPart.class)) {
+						Rectangle boundingBox1 = entity1.get(TransformPart.class).getBoundingBox();
 						if (Intersector.overlaps(boundingBox1, boundingBox2)) {
-							if (!collidedEntities.containsKey(entity1)) {
-								collidedEntities.put(entity1, new ArrayList<Entity>());
-							}
-							if (!collidedEntities.containsKey(entity2)) {
-								collidedEntities.put(entity2, new ArrayList<Entity>());
-							}
-							collidedEntities.get(entity1).add(entity2);
-							collidedEntities.get(entity2).add(entity1);
+							addCollision(entity1, entity2);
+							addCollision(entity2, entity1);
 							eventManager.notify(new CollidedEvent(entity1, entity2));
 						}
 					}
 				}
 			}
 		}
+	}
+	
+	private void clearCollisions() {
+		for (Entry<Entity, List<Entity>> entry : collidedEntities.entrySet()) {
+			entry.getValue().clear();
+		}
+	}
+	
+	private void addCollision(final Entity e1, final Entity e2) {
+		if (!collidedEntities.containsKey(e1)) {
+			collidedEntities.put(e1, new ArrayList<Entity>());
+		}
+		collidedEntities.get(e1).add(e2);
 	}
 	
 }

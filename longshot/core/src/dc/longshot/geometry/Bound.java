@@ -7,11 +7,11 @@ import com.badlogic.gdx.math.Rectangle;
 
 public enum Bound {
 	
-	TOP, LEFT, RIGHT, BOTTOM;
+	LEFT, RIGHT, BOTTOM, TOP;
 	
 	public static final boolean isOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox, 
 			final List<Bound> bounds) {
-		for (Bound bound : checkOutOfBounds(collisionBox, boundsBox)) {
+		for (Bound bound : getViolatedBounds(collisionBox, boundsBox)) {
 			if (bounds.contains(bound)) {
 				return true;
 			}
@@ -19,18 +19,18 @@ public enum Bound {
 		return false;
 	}
 	
-	public static final List<Bound> checkOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox) {
+	public static final List<Bound> getViolatedBounds(final Rectangle collisionBox, final Rectangle boundsBox) {
 		List<Bound> bounds = new ArrayList<Bound>();
 		if (collisionBox.x < boundsBox.x) {
 			bounds.add(Bound.LEFT);
 		}
-		else if (collisionBox.x + collisionBox.width > boundsBox.x + boundsBox.width) {
+		else if (PolygonUtils.right(collisionBox) > PolygonUtils.right(boundsBox)) {
 			bounds.add(Bound.RIGHT);
 		}
 		if (collisionBox.y < boundsBox.y) {
 			bounds.add(Bound.BOTTOM);
 		}
-		else if (collisionBox.y + collisionBox.height > boundsBox.y + boundsBox.height) {
+		else if (PolygonUtils.top(collisionBox) > PolygonUtils.top(boundsBox)) {
 			bounds.add(Bound.TOP);
 		}
 		return bounds;

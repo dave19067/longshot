@@ -11,14 +11,6 @@ public final class SpriteCache<T> {
 
 	private final Map<T, Texture> textureMap = new HashMap<T, Texture>();
 	
-	public final Texture getTexture(final T key) {
-		if (!textureMap.containsKey(key)) {
-			throw new IllegalArgumentException("There is no texture associate with key " + key.toString());
-		}
-		Texture texture = textureMap.get(key);
-		return texture;
-	}
-	
 	public final boolean containsKey(final T key) {
 		return textureMap.containsKey(key);
 	}
@@ -28,16 +20,23 @@ public final class SpriteCache<T> {
 		return new SpriteDrawable(new Sprite(texture));
 	}
 	
+	public final Texture getTexture(final T key) {
+		if (!textureMap.containsKey(key)) {
+			throw new IllegalArgumentException("There is no texture associate with key " + key.toString());
+		}
+		Texture texture = textureMap.get(key);
+		return texture;
+	}
+	
 	public final void add(final T key, final String path) {
-		// load the texture
 		Texture texture = new Texture(path);
 		add(key, texture);
 	}
 	
 	public final void add(final T key, final Texture texture) {
 		if (textureMap.containsKey(key)) {
-			throw new IllegalArgumentException("Cannot add sprite because a sprite already exists for key "
-					+ key.toString());
+			throw new IllegalArgumentException("Cannot add texture because a texture already exists for key "
+				+ key.toString());
 		}
 		textureMap.put(key, texture);
 	}

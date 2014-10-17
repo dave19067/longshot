@@ -1,4 +1,4 @@
-package dc.longshot;
+package dc.longshot.game;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +83,9 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.2f));
+		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
-		entity.attach(new GhostPart(3, outlineTexture));
+		entity.attach(new GhostPart(5, outlineTexture));
 		return entity;
 	}
 

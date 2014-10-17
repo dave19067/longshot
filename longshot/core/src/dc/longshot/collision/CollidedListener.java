@@ -1,4 +1,4 @@
-package dc.longshot.events;
+package dc.longshot.collision;
 
 import dc.longshot.epf.Entity;
 

@@ -24,12 +24,6 @@ public final class Level {
 		// For serialization
 	}
 	
-	public Level(final Rectangle boundsBox, final float spawnDuration, final Map<EntityType, Integer> spawns) {
-		this.boundsBox = boundsBox;
-		this.spawnDuration = spawnDuration;
-		this.spawns = spawns;
-	}
-	
 	public final Rectangle getBoundsBox() {
 		return new Rectangle(boundsBox);
 	}

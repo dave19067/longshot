@@ -19,7 +19,7 @@ public final class EmitterPart extends Part {
 	public EmitterPart(final Entity original, final float maxEmitTime) {
 		this.original = original;
 		this.maxEmitTime = maxEmitTime;
-		this.emitTime = 0;
+		this.emitTime = maxEmitTime;
 	}
 	
 	public final boolean canEmit() {
@@ -30,13 +30,13 @@ public final class EmitterPart extends Part {
 		if (canEmit()) {
 			emitTime = 0;
 			Entity spawn = Cloning.clone(original);
-			TransformPart transform = entity.get(TransformPart.class);
-			List<Vector2> vertices = transform.getTransformedVertices();
+			TransformPart transformPart = entity.get(TransformPart.class);
+			List<Vector2> vertices = transformPart.getTransformedVertices();
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
 			Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(0), vertices.get(3), 
 					spawnTransform.getSize().y);
 			spawnTransform.setPosition(spawnPosition);
-			spawnTransform.setRotation(transform.getRotation());
+			spawnTransform.setRotation(transformPart.getRotation());
 			return spawn;
 		}
 		else {

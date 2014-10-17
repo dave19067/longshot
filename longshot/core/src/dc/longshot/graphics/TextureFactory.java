@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public final class TextureFactory {
 
-	public final static Texture createColorBlock(final Color color) {
+	public final static Texture createColorPixel(final Color color) {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.setColor(color);
 		pixmap.fill();
@@ -22,21 +22,21 @@ public final class TextureFactory {
 		return texture;
 	}
 	
-	public final static Texture createColorized(final Texture texture, final Color color) {
+	public final static Texture createShadow(final Texture texture, final Color color) {
 		TextureRegion textureRegion = new TextureRegion(texture);
 		Pixmap pixmap = toPixmap(textureRegion);
-		Pixmap colorizedPixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), Pixmap.Format.RGBA8888);
+		Pixmap shadowPixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), Pixmap.Format.RGBA8888);
 		for (int x = 0; x < pixmap.getWidth(); x++) {
 			for (int y = 0; y < pixmap.getHeight(); y++) {
 				if (pixmap.getPixel(x, y) != Color.CLEAR.toIntBits()) {
-					colorizedPixmap.drawPixel(x, y, Color.rgba8888(color));
+					shadowPixmap.drawPixel(x, y, Color.rgba8888(color));
 				}
 			}
 		}
-		Texture outlineTexture = new Texture(colorizedPixmap);
-		colorizedPixmap.dispose();
+		Texture shadowTexture = new Texture(shadowPixmap);
+		shadowPixmap.dispose();
 		pixmap.dispose();
-		return outlineTexture;
+		return shadowTexture;
 	}
 	
 	public final static Texture createOutline(final Texture texture) {
@@ -51,20 +51,11 @@ public final class TextureFactory {
 		for (int x = 0; x < pixmap.getWidth(); x++) {
 			for (int y = 0; y < pixmap.getHeight(); y++) {
 				if (pixmap.getPixel(x, y) != Color.CLEAR.toIntBits()) {
-					if (x == 0 || x == pixmap.getWidth() - 1 || y == 0 || y == pixmap.getHeight() - 1) {
+					if (isBoundingPixel(x, y, pixmap.getWidth(), pixmap.getHeight())) {
 						outlinePixmap.drawPixel(x, y, Color.rgba8888(Color.GREEN));
 					}
-					else {
-						if (pixmap.getPixel(x - 1, y - 1) == Color.CLEAR.toIntBits() || 
-								pixmap.getPixel(x, y - 1) == Color.CLEAR.toIntBits() ||
-								pixmap.getPixel(x + 1, y - 1) == Color.CLEAR.toIntBits() ||
-								pixmap.getPixel(x - 1, y) == Color.CLEAR.toIntBits() ||
-								pixmap.getPixel(x + 1, y) == Color.CLEAR.toIntBits() ||
-								pixmap.getPixel(x - 1, y + 1) == Color.CLEAR.toIntBits() ||
-								pixmap.getPixel(x, y + 1) == Color.CLEAR.toIntBits() ||
-								pixmap.getPixel(x + 1, y + 1) == Color.CLEAR.toIntBits()) {
-							outlinePixmap.drawPixel(x, y, Color.rgba8888(Color.GREEN));
-						}
+					else if (isEdgePixel(x, y, pixmap)) {
+						outlinePixmap.drawPixel(x, y, Color.rgba8888(Color.GREEN));
 					}
 				}
 			}
@@ -82,8 +73,8 @@ public final class TextureFactory {
 		projection.setToOrtho2D(0, -height, width, height).scale(1, -1, 1);
 		SpriteBatch spriteBatch = new SpriteBatch();
 		spriteBatch.setProjectionMatrix(projection);
-		FrameBuffer frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
 		
+		FrameBuffer frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
 		frameBuffer.begin();
 		spriteBatch.begin();
 		spriteBatch.draw(textureRegion, 0, 0, width, height);
@@ -94,6 +85,21 @@ public final class TextureFactory {
 		frameBuffer.dispose();
 		spriteBatch.dispose();
 		return pixmap;
+	}
+	
+	private static boolean isBoundingPixel(final int x, final int y, final int width, final int height) {
+		return x == 0 || x == width - 1 || y == 0 || y == height - 1;
+	}
+	
+	private static boolean isEdgePixel(final int x, final int y, final Pixmap pixmap) {
+		return pixmap.getPixel(x - 1, y - 1) == Color.CLEAR.toIntBits() || 
+			pixmap.getPixel(x, y - 1) == Color.CLEAR.toIntBits() ||
+			pixmap.getPixel(x + 1, y - 1) == Color.CLEAR.toIntBits() ||
+			pixmap.getPixel(x - 1, y) == Color.CLEAR.toIntBits() ||
+			pixmap.getPixel(x + 1, y) == Color.CLEAR.toIntBits() ||
+			pixmap.getPixel(x - 1, y + 1) == Color.CLEAR.toIntBits() ||
+			pixmap.getPixel(x, y + 1) == Color.CLEAR.toIntBits() ||
+			pixmap.getPixel(x + 1, y + 1) == Color.CLEAR.toIntBits();
 	}
 	
 }

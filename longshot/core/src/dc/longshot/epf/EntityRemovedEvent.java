@@ -20,7 +20,7 @@ public final class EntityRemovedEvent implements Event<EntityRemovedListener> {
 	}
 	
 	@Override
-	public void notify(final EntityRemovedListener listener) {
+	public final void notify(final EntityRemovedListener listener) {
 		listener.removed(entity);
 	}
 

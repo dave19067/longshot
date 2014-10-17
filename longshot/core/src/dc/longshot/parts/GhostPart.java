@@ -22,7 +22,6 @@ public final class GhostPart extends Part {
 		entity.get(DrawablePart.class).getSprite().setTexture(ghostTexture);
 		entity.get(CollisionTypePart.class).setActive(false);
 		entity.get(DamageOnCollisionPart.class).setActive(false);
-		// TODO: Fix this
 		entity.get(WeaponPart.class).setActive(false);
 	}
 	

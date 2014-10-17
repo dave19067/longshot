@@ -6,20 +6,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Modified from original implementation at 
- * http://stackoverflow.com/questions/937302/simple-java-message-dispatching-system
- *
+ * Event manager.
  */
 public final class EventManager {
 
 	/** mapping of class events to active listeners **/
 	@SuppressWarnings("rawtypes")
-	private final Map<Class, Collection> eventListenerMap = new HashMap<Class, Collection>(10);
+	private final Map<Class, Collection> eventListeners = new HashMap<Class, Collection>();
 
     /** Add a listener to an event class **/
-    public final <T> void listen(final Class<? extends Event<T>> evtClass, final T listener) {
-    	final Collection<T> listeners = listenersOf(evtClass);
-	    synchronized(listeners) {
+    public final <T> void listen(final Class<? extends Event<T>> eventClass, final T listener) {
+    	Collection<T> listeners = getListeners(eventClass);
+	    synchronized (listeners) {
 	    	if (!listeners.contains(listener)) {
 	    		listeners.add(listener);
 	        }
@@ -27,33 +25,35 @@ public final class EventManager {
     }
 
     /** Stop sending an event class to a given listener **/
-    public final <T> void mute(final Class<? extends Event<T>> evtClass, final T listener) {
-    	final Collection<T> listeners = listenersOf(evtClass);
+    public final <T> void mute(final Class<? extends Event<T>> eventClass, final T listener) {
+    	final Collection<T> listeners = getListeners(eventClass);
     	synchronized(listeners) {
     		listeners.remove(listener);
     	}
     }
 
     /** Notify a new event to registered listeners of this event class **/
-    public final <T> void notify(final Event<T> evt) {
+    public final <T> void notify(final Event<T> event) {
     	@SuppressWarnings("unchecked")
-        Class<Event<T>> evtClass = (Class<Event<T>>) evt.getClass();
-        for (T listener : listenersOf(evtClass)) {
-        	evt.notify(listener);
+        Class<Event<T>> eventClass = (Class<Event<T>>) event.getClass();
+        for (T listener : getListeners(eventClass)) {
+        	event.notify(listener);
         }
     }
 
     /** Gets listeners for a given event class **/
-    private final <T> Collection<T> listenersOf(final Class<? extends Event<T>> evtClass) {
-    	synchronized (eventListenerMap) {
-    		@SuppressWarnings("unchecked")
-	        final Collection<T> existing = eventListenerMap.get(evtClass);
-	        if (existing != null) {
-	        	return existing;
+    private final <T> Collection<T> getListeners(final Class<? extends Event<T>> eventClass) {
+    	synchronized (eventListeners) {
+	        if (eventListeners.containsKey(eventClass)) {
+		        @SuppressWarnings("unchecked")
+				Collection<T> existingListeners = eventListeners.get(eventClass);
+	        	return existingListeners;
 	        }
-	        final Collection<T> emptyList = new ArrayList<T>(5);
-	        eventListenerMap.put(evtClass, emptyList);
-	        return emptyList;
+	        else {
+		        Collection<T> newListenersList = new ArrayList<T>();
+		        eventListeners.put(eventClass, newListenersList);
+		        return newListenersList;
+	        }
         }
     }
 

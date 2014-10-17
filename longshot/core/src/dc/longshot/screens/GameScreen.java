@@ -25,12 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import dc.longshot.BackdropManager;
-import dc.longshot.CollisionManager;
-import dc.longshot.EntityFactory;
-import dc.longshot.GameInputProcessor;
-import dc.longshot.LevelController;
-import dc.longshot.Skins;
+import dc.longshot.collision.CollisionManager;
 import dc.longshot.entitysystems.AIShooterSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
@@ -50,18 +45,22 @@ import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.eventmanagement.EventManager;
+import dc.longshot.game.BackdropManager;
+import dc.longshot.game.EntityFactory;
+import dc.longshot.game.GameInputProcessor;
+import dc.longshot.game.LevelController;
+import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.ScreenUnitConversion;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
 import dc.longshot.models.Level;
-import dc.longshot.models.LevelSession;
 import dc.longshot.models.Session;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
-import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.HealthPart;
@@ -70,24 +69,21 @@ import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
-import dc.longshot.services.Input;
+import dc.longshot.system.ExecutionState;
+import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.XmlUtils;
 
 public final class GameScreen implements Screen {
 	
-	private static final Color midnightBlue = ColorUtils.toGdxColor(0, 12, 36);
+	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 	
-	private final Camera camera;
+	private Camera camera;
 	private final SpriteBatch spriteBatch;
 	private final Input input = new Input();
-	private final Session session = new Session();
 	private final float speedMultiplier = 1f;
 	private final Vector2 defaultScreenSize;
-	
-	private final Skin skin;
-	private final LabelStyle labelStyle;
 
 	private final Stage stage;
 	private Table worldTable;
@@ -97,15 +93,15 @@ public final class GameScreen implements Screen {
 	private final EventManager eventManager = new EventManager();
 	private final EntityManager entityManager = new EntityManager(eventManager);
 	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
-	private final List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
 	private final EntityFactory entityFactory = new EntityFactory(spriteCache);
 	private final CollisionManager collisionManager = new CollisionManager(eventManager);
 	private final BackdropManager backdropManager;
 	private final LevelController levelController;
+	private final List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
 
 	private final Texture cursorTexture;
 	
-	private final LevelSession levelSession = new LevelSession(); 
+	private final Session session = new Session(); 
 	private int score = 0;
 	
 	private final Level level;
@@ -113,38 +109,24 @@ public final class GameScreen implements Screen {
 	private Entity shooterCannon;
 	
 	public GameScreen() {
-		loadSprites();
-		level = XmlUtils.unmarshal("bin/levels/level1.xml", new Class[] { Level.class });
-		Rectangle boundsBox = level.getBoundsBox();
-		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
-		backdropManager = new BackdropManager(boundsBox, Bound.LEFT, 1, 0.5f, 0.02f, 0.1f, starTextureRegion);
-		camera = new OrthographicCamera(boundsBox.width * ScreenUnitConversion.PIXELS_PER_UNIT, 
-				boundsBox.height * ScreenUnitConversion.PIXELS_PER_UNIT);
-		camera.position.set(boundsBox.x + camera.viewportWidth / 2, boundsBox.y + camera.viewportHeight / 2, 0);
-		spriteBatch = new SpriteBatch();
 		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		skin = Skins.skin;
-		labelStyle = Skins.ocrStyle;
+		spriteBatch = new SpriteBatch();
 		stage = new Stage();
+		level = XmlUtils.unmarshal("bin/levels/level1.xml", new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
+
+		loadSprites();
+		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
+		Rectangle levelBoundsBox = level.getBoundsBox();
+		setupCamera(levelBoundsBox);
+		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
+		backdropManager = new BackdropManager(levelBoundsBox, Bound.LEFT, 1, 0.5f, 0.02f, 0.1f, starTextureRegion);
+
 		Gdx.input.setCursorCatched(true);
 		input.addProcessor(new GameInputProcessor(session));
-		
+		listenToEvents();
 		setupStage();
-		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
-		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
-		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
-		entitySystems.add(new BounceSystem(level.getBoundsBox()));
-		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
-		entitySystems.add(new CollisionDamageSystem(collisionManager));
-		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
-		entitySystems.add(new EmitSystem(entityManager));
-		entitySystems.add(new AIShooterSystem(entityManager));
-		entitySystems.add(new InputMovementSystem());
-		entitySystems.add(new RotateToCursorSystem(camera, worldTable, defaultScreenSize));
-		entitySystems.add(new NoHealthSystem(entityManager));
-		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
-		entitySystems.add(new TimedDeathSystem(entityManager));
+		initializeSystems();
 		createInitialEntities();
 	}
 
@@ -155,11 +137,9 @@ public final class GameScreen implements Screen {
 		entityManager.update();
 		camera.update();
 		boundCursor();
+		updateUI();
 		
-		healthLabel.setText("HEALTH: " + levelSession.getHealth());
-		scoreLabel.setText("SCORE: " + score);
-		
-		if (levelSession.getHealth() <= 0) {
+		if (session.getHealth() <= 0) {
 			Gdx.app.exit();
 		}
 		
@@ -168,38 +148,11 @@ public final class GameScreen implements Screen {
 			Gdx.app.exit();
 		}
 		
-		if (session.isRunning()) {
+		if (session.getExecutionState() == ExecutionState.RUNNING) {
 			updateWorld(delta * speedMultiplier);
 		}
 		
-		Gdx.gl.glClearColor(midnightBlue.r, midnightBlue.g, midnightBlue.b, midnightBlue.a);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Rectangle worldTableRect = UIUtils.calcResizedBounds(worldTable, defaultScreenSize);
-		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
-				(int)worldTableRect.getHeight());
-		spriteBatch.setProjectionMatrix(camera.combined);
-		spriteBatch.begin();
-		backdropManager.draw(spriteBatch);
-		List<Entity> entities = entityManager.getAll();
-		Collections.sort(entities, new ZComparator());
-		for (Entity entity : entities) {
-			// Draw entity
-			if (entity.has(DrawablePart.class)) {
-				DrawablePart drawablePart = entity.get(DrawablePart.class);
-				drawablePart.getSprite().draw(spriteBatch);
-			}
-		}
-		spriteBatch.end();
-
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		spriteBatch.setProjectionMatrix(getUIMatrix());
-		spriteBatch.begin();
-		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 
-				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight() / 2);
-		spriteBatch.end();
-		
-		stage.draw();
-		// Table.drawDebug(stage);
+		draw();
 	}
 
 	@Override
@@ -217,10 +170,12 @@ public final class GameScreen implements Screen {
 
 	@Override
 	public final void pause() {
+		session.setExecutionState(ExecutionState.PAUSED);
 	}
 
 	@Override
 	public final void resume() {
+		session.setExecutionState(ExecutionState.RUNNING);
 	}
 
 	@Override
@@ -235,12 +190,12 @@ public final class GameScreen implements Screen {
 			public void created(final Entity entity) {
 				if (entity.has(ExplodeOnSpawnPart.class) && entity.has(TransformPart.class)) {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
-					Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
 					for (Entity other : entityManager.getAll()) {
-						if (other != entity && other.has(HealthPart.class) && other.has(CollisionTypePart.class)
-								&& other.has(TransformPart.class)) {
+						if (other != entity && other.has(HealthPart.class) && other.has(TransformPart.class)) {
+							Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
 							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
-							if (otherCenter.cpy().sub(entityCenter).len() <= explodeOnSpawnPart.getRadius()) {
+							float distance = otherCenter.cpy().sub(entityCenter).len(); 
+							if (distance <= explodeOnSpawnPart.getRadius()) {
 								other.get(HealthPart.class).decrease(explodeOnSpawnPart.getDamage());
 							}
 						}
@@ -260,7 +215,7 @@ public final class GameScreen implements Screen {
 					entityManager.add(spawn);
 				}
 				
-				// if killed, increase score
+				// If killed, increase score
 				if (entity.has(ScorePart.class)) {
 					if (!Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
 							entity.get(BoundsDiePart.class).getBounds())) {
@@ -268,6 +223,7 @@ public final class GameScreen implements Screen {
 					}
 				}
 				
+				// Remove attached entities
 				for (Entity other : entityManager.getAll()) {
 					if (other.has(AttachmentPart.class) && other.get(AttachmentPart.class).getParent() == entity) {
 						entityManager.remove(other);
@@ -277,31 +233,52 @@ public final class GameScreen implements Screen {
 		};
 	}
 	
+	private void setupCamera(Rectangle levelBoundsBox) {
+		camera = new OrthographicCamera(levelBoundsBox.width * ScreenUnitConversion.PIXELS_PER_UNIT, 
+				levelBoundsBox.height * ScreenUnitConversion.PIXELS_PER_UNIT);
+		camera.position.set(levelBoundsBox.x + camera.viewportWidth / 2, 
+				levelBoundsBox.y + camera.viewportHeight / 2, 0);
+	}
+	
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.STAR, "images/star.png");
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
-		Texture shooterOutlineTexture = TextureFactory.createColorized(spriteCache.getTexture(SpriteKey.SHOOTER), 
-				Color.GREEN);
+		Texture shooterOutlineTexture = TextureFactory.createOutline(spriteCache.getTexture(SpriteKey.SHOOTER));
 		spriteCache.add(SpriteKey.SHOOTER_OUTLINE, shooterOutlineTexture);
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
 		spriteCache.add(SpriteKey.NUKE, "images/nuke.png");
 		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
-		Texture colorizedUFOTexture = TextureFactory.createColorized(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
+		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
 		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
 		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
 	}
 	
+	private void listenToEvents() {
+		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
+		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
+	}
+	
 	private void setupStage() {
-		// View table
-		worldTable = new Table(skin);
+		Skin skin = Skins.defaultSkin;
+		LabelStyle labelStyle = Skins.ocrStyle;
+		worldTable = createWorldTable(skin);
+		Table statusTable = createStatusTable(skin, labelStyle);
+		Table mainTable = createMainTable(skin, worldTable, statusTable);
+		stage.addActor(mainTable);
+	}
+	
+	private Table createWorldTable(Skin skin) {
+		Table worldTable = new Table(skin);
 		worldTable.debug();
-
-		// Status table
+		return worldTable;
+	}
+	
+	private Table createStatusTable(Skin skin, LabelStyle labelStyle) {
 		Table statusTable = new Table(skin);
 		healthLabel = new Label("", labelStyle);
 		statusTable.add(healthLabel).expandX().left();
@@ -309,8 +286,10 @@ public final class GameScreen implements Screen {
 		scoreLabel = new Label("", labelStyle);
 		statusTable.add(scoreLabel).left();
 		statusTable.debug();
-		
-		// Main table
+		return statusTable;
+	}
+	
+	private Table createMainTable(Skin skin, Table worldTable, Table statusTable) {
 		Table mainTable = new Table(skin).top().left();
 		mainTable.setFillParent(true);
 		mainTable.debug();
@@ -318,8 +297,21 @@ public final class GameScreen implements Screen {
 		mainTable.row();
 		mainTable.add(statusTable).expandX().fillX();
 		mainTable.row();
-		
-		stage.addActor(mainTable);
+		return mainTable;
+	}
+	
+	private void initializeSystems() {
+		entitySystems.add(new BounceSystem(level.getBoundsBox()));
+		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
+		entitySystems.add(new CollisionDamageSystem(collisionManager));
+		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), session));
+		entitySystems.add(new EmitSystem(entityManager));
+		entitySystems.add(new AIShooterSystem(entityManager));
+		entitySystems.add(new InputMovementSystem());
+		entitySystems.add(new RotateToCursorSystem(camera, worldTable, defaultScreenSize));
+		entitySystems.add(new NoHealthSystem(entityManager));
+		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
+		entitySystems.add(new TimedDeathSystem(entityManager));
 	}
 	
 	private void createInitialEntities() {
@@ -330,38 +322,11 @@ public final class GameScreen implements Screen {
 		Vector3 shooterSize = new Vector3(2, 1.5f, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
-		shooter = entityFactory.createShooter(shooterSize, new Vector2(shooterX, groundTransform.getPosition().y
-				+ groundTransform.getBoundingSize().y));
+		shooter = entityFactory.createShooter(shooterSize, 
+				new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox())));
 		entityManager.add(shooter);
 		shooterCannon = entityFactory.createShooterCannon(shooter);
 		entityManager.add(shooterCannon);
-	}
-	
-	private void updateWorld(final float delta) {
-		collisionManager.checkCollisions(entityManager.getAll());
-		backdropManager.update(delta);
-		levelController.update(delta);
-		
-		for (Entity entity : entityManager.getAll()) {
-			entity.update(delta);
-			for (EntitySystem entitySystem : entitySystems) {
-				entitySystem.update(delta, entity);
-			}
-		}
-	}
-	
-	private void handleInput() {		
-		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			WeaponPart weaponPart = shooter.get(WeaponPart.class);
-			if (weaponPart.canSpawn()) {
-				Entity bullet = weaponPart.createSpawn();
-				Vector2 spawnPosition = getBulletSpawnPosition(bullet);
-				bullet.get(TransformPart.class).setPosition(spawnPosition);
-				Vector2 velocity = VectorUtils.getVectorFromAngle(shooterCannon.get(TransformPart.class).getRotation());
-				bullet.get(TranslatePart.class).setVelocity(velocity);
-				entityManager.add(bullet);
-			}
-		}
 	}
 	
 	private void boundCursor() {
@@ -379,24 +344,94 @@ public final class GameScreen implements Screen {
 		}
 	}
 	
+	private void updateUI() {
+		healthLabel.setText("HEALTH: " + session.getHealth());
+		scoreLabel.setText("SCORE: " + score);
+	}
+	
+	private void handleInput() {		
+		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
+			if (shooter.hasActive(WeaponPart.class)) {
+				WeaponPart weaponPart = shooter.get(WeaponPart.class);
+				if (weaponPart.canSpawn()) {
+					Entity bullet = weaponPart.createSpawn();
+					Vector2 spawnPosition = getMiddleOfCannonMouth(bullet);
+					bullet.get(TransformPart.class).setPosition(spawnPosition);
+					Vector2 velocity = VectorUtils.createVectorFromAngle(shooterCannon.get(TransformPart.class).getRotation());
+					bullet.get(TranslatePart.class).setVelocity(velocity);
+					entityManager.add(bullet);
+				}
+			}
+		}
+	}
+	
+	private void updateWorld(final float delta) {
+		collisionManager.checkCollisions(entityManager.getAll());
+		backdropManager.update(delta);
+		levelController.update(delta);
+		updateEntities(delta);
+	}
+	
+	private void updateEntities(final float delta) {
+		for (Entity entity : entityManager.getAll()) {
+			entity.update(delta);
+			for (EntitySystem entitySystem : entitySystems) {
+				entitySystem.update(delta, entity);
+			}
+		}
+	}
+	
+	private void draw() {
+		drawWorld();
+		drawCursor();
+		stage.draw();
+	}
+	
+	private void drawWorld() {
+		Gdx.gl.glClearColor(MIDNIGHT_BLUE.r, MIDNIGHT_BLUE.g, MIDNIGHT_BLUE.b, MIDNIGHT_BLUE.a);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Rectangle worldTableRect = UIUtils.calcBounds(worldTable, defaultScreenSize);
+		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
+				(int)worldTableRect.getHeight());
+		spriteBatch.setProjectionMatrix(camera.combined);
+		spriteBatch.begin();
+		backdropManager.draw(spriteBatch);
+		List<Entity> entities = entityManager.getAll();
+		Collections.sort(entities, new ZComparator());
+		for (Entity entity : entities) {
+			if (entity.has(DrawablePart.class)) {
+				DrawablePart drawablePart = entity.get(DrawablePart.class);
+				drawablePart.getSprite().draw(spriteBatch);
+			}
+		}
+		spriteBatch.end();
+	}
+	
+	private void drawCursor() {
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		spriteBatch.setProjectionMatrix(getUIMatrix());
+		spriteBatch.begin();
+		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 
+				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight() / 2);
+		spriteBatch.end();
+	}
+	
 	private Matrix4 getUIMatrix() {
 		Matrix4 uiMatrix = camera.combined.cpy();
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		return uiMatrix;
 	}
 	
-	private Vector2 getBulletSpawnPosition(final Entity bullet) {
-		// Position to spawn the bullet in the middle of the cannon's mouth
+	private Vector2 getMiddleOfCannonMouth(final Entity spawn) {
 		TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
 		List<Vector2> vertices = cannonTransform.getTransformedVertices();
-		TransformPart bulletTransform = bullet.get(TransformPart.class);
-		// TODO: Find a better way to get the edge
+		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(1), vertices.get(2), 
-				bulletTransform.getSize().y);
+				spawnTransform.getSize().y);
 		return spawnPosition;
 	}
 	
-	public final class ZComparator implements Comparator<Entity> {
+	private final class ZComparator implements Comparator<Entity> {
 	    @Override
 	    public final int compare(final Entity e1, final Entity e2) {
 	    	if (e1.has(DrawablePart.class) && e2.has(DrawablePart.class)) {

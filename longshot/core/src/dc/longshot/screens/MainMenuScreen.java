@@ -12,9 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import dc.longshot.Skins;
-import dc.longshot.services.Input;
-import dc.longshot.services.ScreenManager;
+import dc.longshot.game.Skins;
+import dc.longshot.system.Input;
+import dc.longshot.system.ScreenManager;
 
 public final class MainMenuScreen implements Screen {
 
@@ -28,7 +28,7 @@ public final class MainMenuScreen implements Screen {
 	
 	public MainMenuScreen(final ScreenManager screenManager) {
 		this.screenManager = screenManager;
-		skin = Skins.skin;
+		skin = Skins.defaultSkin;
 		font = Skins.ocrFont;
 		stage = new Stage();
 		
@@ -89,6 +89,11 @@ public final class MainMenuScreen implements Screen {
 	}
 
 	private void setupStage() {
+		Table mainTable = createMainTable();
+		stage.addActor(mainTable);
+	}
+	
+	private Table createMainTable() {
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
 		mainTable.add(createButton("New Game", newGameButton_clicked()));
@@ -96,8 +101,7 @@ public final class MainMenuScreen implements Screen {
 		mainTable.add(createButton("Quit", quitButton_clicked()));
 		mainTable.row();
 		mainTable.debug();
-
-		stage.addActor(mainTable);
+		return mainTable;
 	}
 	
 	private Button createButton(final String text, final EventListener listener) {

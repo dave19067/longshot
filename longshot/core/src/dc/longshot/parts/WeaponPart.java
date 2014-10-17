@@ -47,7 +47,6 @@ public final class WeaponPart extends Part {
 			Entity spawn = it.next();
 			if (!spawn.isActive()) {
 				it.remove();
-				break;
 			}
 		}
 	}

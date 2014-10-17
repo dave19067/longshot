@@ -32,7 +32,7 @@ public final class WanderMovementPart extends Part {
 		}
 	}
 	
-	public final void act() {
+	private void act() {
 		TranslatePart translatePart = entity.get(TranslatePart.class);
 		Vector2 direction;
 		

@@ -24,7 +24,7 @@ public final class BoundPositionSystem implements EntitySystem {
 	public void update(final float delta, final Entity entity) {
 		// Restrict entity in bounds
 		if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
-			List<Bound> bounds = Bound.checkOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
+			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			TransformPart transformPart = entity.get(TransformPart.class);
 			Rectangle boundingBox = transformPart.getBoundingBox();
 			Vector2 newPosition = transformPart.getPosition();

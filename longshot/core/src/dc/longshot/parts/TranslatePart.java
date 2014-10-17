@@ -23,7 +23,7 @@ public class TranslatePart extends Part {
 			velocity = new Vector2(0, 0);
 		}
 		else {
-			velocity = VectorUtils.getLengthened(direction, entity.get(SpeedPart.class).getSpeed());
+			velocity = VectorUtils.lengthened(direction, entity.get(SpeedPart.class).getSpeed());
 			if (autoRotate) {
 				entity.get(TransformPart.class).setRotation(velocity.angle());
 			}

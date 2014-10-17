@@ -1,4 +1,4 @@
-package dc.longshot;
+package dc.longshot.game;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -22,7 +22,7 @@ public final class GameInputProcessor implements InputProcessor {
 	public final boolean keyUp(final int keycode) {
 		switch (keycode) {
 		case Keys.ESCAPE:
-			session.setRunning(!session.isRunning());
+			session.toggleExecutionState();
 			break;
 		};
 		

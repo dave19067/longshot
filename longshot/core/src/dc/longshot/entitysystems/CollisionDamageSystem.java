@@ -1,6 +1,6 @@
 package dc.longshot.entitysystems;
 
-import dc.longshot.CollisionManager;
+import dc.longshot.collision.CollisionManager;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.parts.CollisionTypePart;

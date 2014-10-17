@@ -1,4 +1,4 @@
-package dc.longshot.services;
+package dc.longshot.system;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;

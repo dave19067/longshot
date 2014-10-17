@@ -35,18 +35,24 @@ public class Entity {
 	}
 	
 	/**
-	 * @param partClass The class of the part to check.
-	 * @return If there is an active part of type T attached to the entity.
+	 * @param partClass The classes of the parts to check.
+	 * @return If there are active parts of the specified classes attached to the entity.
 	 */
-	public final <T extends Part> boolean hasActive(final Class<T> partClass) {
-		return has(partClass) && get(partClass).isActive();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public final boolean hasActive(final Class ... partClasses) {
+		for (Class partClass : partClasses) {
+			if (!has(partClass) || !get(partClass).isActive()) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
 	 * @param partClass The class of the part to check.
 	 * @return If there is a part of type T attached to the entity.
 	 */
-	public final <T extends Part> boolean has(final Class<T> partClass) {
+	public final boolean has(final Class<? extends Part> partClass) {
 		return parts.containsKey(partClass);
 	}
 	

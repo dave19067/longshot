@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.geometry.VectorUtils;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TransformPart;
@@ -34,7 +34,7 @@ public final class AIShooterSystem implements EntitySystem {
 							Entity spawn = weaponPart.createSpawn();
 							TransformPart spawnTransform = spawn.get(TransformPart.class);
 							TransformPart transform = entity.get(TransformPart.class);
-							spawnTransform.setPosition(VectorUtils.relativeCenter(transform.getCenter(), 
+							spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
 									spawnTransform.getBoundingSize()));
 							TransformPart otherTransform = other.get(TransformPart.class);
 							spawn.get(TranslatePart.class).setVelocity(otherTransform.getCenter().sub(

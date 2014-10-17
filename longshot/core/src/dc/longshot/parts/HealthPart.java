@@ -20,10 +20,6 @@ public final class HealthPart extends Part {
 		health = maxHealth;
 	}
 	
-	public final float getMaxHealth() {
-		return maxHealth;
-	}
-	
 	public final void decrease(final float value) {
 		health -= value;
 	}

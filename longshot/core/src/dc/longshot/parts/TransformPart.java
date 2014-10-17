@@ -42,8 +42,7 @@ public final class TransformPart extends Part {
 	}
 	
 	public final Vector2 getBoundingSize() {
-		Vector2 size = polygon.getBoundingRectangle().getSize(new Vector2());
-		return size;
+		return polygon.getBoundingRectangle().getSize(new Vector2());
 	}
 	
 	public final Vector2 getPosition() {
