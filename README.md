@@ -3,4 +3,7 @@ longshot
 
 Arcade Game for Learning Purposes
 
-Point and shoot game.
+A - Left
+S - Right
+Left-Click - Fire
+Aim with mouse.
