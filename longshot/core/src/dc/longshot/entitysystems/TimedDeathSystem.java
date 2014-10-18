@@ -15,9 +15,10 @@ public final class TimedDeathSystem implements EntitySystem {
 	
 	@Override
 	public void update(final float delta, final Entity entity) {
-		// Remove if timed death
-		if (entity.has(TimedDeathPart.class) && entity.get(TimedDeathPart.class).isDead()) {
-			entityManager.remove(entity);
+		if (entity.has(TimedDeathPart.class)) {
+			if (entity.get(TimedDeathPart.class).isDead()) {
+				entityManager.remove(entity);
+			}
 		}
 	}
 

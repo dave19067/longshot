@@ -10,9 +10,9 @@ public enum Bound {
 	LEFT, RIGHT, BOTTOM, TOP;
 	
 	public static final boolean isOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox, 
-			final List<Bound> bounds) {
+			final List<Bound> checkedBounds) {
 		for (Bound bound : getViolatedBounds(collisionBox, boundsBox)) {
-			if (bounds.contains(bound)) {
+			if (checkedBounds.contains(bound)) {
 				return true;
 			}
 		}

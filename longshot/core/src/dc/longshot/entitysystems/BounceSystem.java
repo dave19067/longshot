@@ -23,7 +23,6 @@ public final class BounceSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float dt, final Entity entity) {
-		// Bounce entity off walls
 		if (entity.has(TransformPart.class) && entity.has(TranslatePart.class) && entity.has(BouncePart.class)) {
 			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
@@ -57,13 +56,15 @@ public final class BounceSystem implements EntitySystem {
 			}
 			
 			entity.get(TranslatePart.class).setVelocity(newVelocity);
-			
-			// Increase bounce stat
-			if (entity.has(ShotStatsPart.class)) {
-				if (bounds.contains(Bound.RIGHT) || bounds.contains(Bound.LEFT)) {
-					ShotStatsPart shotStatsPart = entity.get(ShotStatsPart.class);
-					shotStatsPart.setBounceNum(shotStatsPart.getBounceNum() + 1);
-				}
+			increaseBounceStat(entity, bounds);
+		}
+	}
+	
+	private void increaseBounceStat(Entity entity, List<Bound> bounds) {
+		if (entity.has(ShotStatsPart.class)) {
+			if (bounds.contains(Bound.RIGHT) || bounds.contains(Bound.LEFT)) {
+				ShotStatsPart shotStatsPart = entity.get(ShotStatsPart.class);
+				shotStatsPart.setBounceNum(shotStatsPart.getBounceNum() + 1);
 			}
 		}
 	}

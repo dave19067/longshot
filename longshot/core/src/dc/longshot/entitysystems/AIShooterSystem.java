@@ -22,7 +22,6 @@ public final class AIShooterSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		// Shoot automatically using AI
 		if (entity.has(AIShooterPart.class)) {
 			AIShooterPart aiShooterPart = entity.get(AIShooterPart.class);
 			if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
@@ -31,20 +30,24 @@ public final class AIShooterSystem implements EntitySystem {
 					for (Entity other : entityManager.getAll()) {
 						if (other != entity && other.has(AlliancePart.class) && other.get(AlliancePart.class).getAlliance()
 								== aiShooterPart.getTargetAlliance()) {
-							Entity spawn = weaponPart.createSpawn();
-							TransformPart spawnTransform = spawn.get(TransformPart.class);
-							TransformPart transform = entity.get(TransformPart.class);
-							spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
-									spawnTransform.getBoundingSize()));
-							TransformPart otherTransform = other.get(TransformPart.class);
-							spawn.get(TranslatePart.class).setVelocity(otherTransform.getCenter().sub(
-									spawnTransform.getCenter()));
-							entityManager.add(spawn);
+							spawn(entity, other);
 						}
 					}
 				}
 			}
 		}
+	}
+	
+	private void spawn(Entity entity, Entity other) {
+		Entity spawn = entity.get(WeaponPart.class).createSpawn();
+		TransformPart spawnTransform = spawn.get(TransformPart.class);
+		TransformPart transform = entity.get(TransformPart.class);
+		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
+				spawnTransform.getBoundingSize()));
+		TransformPart otherTransform = other.get(TransformPart.class);
+		spawn.get(TranslatePart.class).setVelocity(otherTransform.getCenter().sub(
+				spawnTransform.getCenter()));
+		entityManager.add(spawn);
 	}
 
 }

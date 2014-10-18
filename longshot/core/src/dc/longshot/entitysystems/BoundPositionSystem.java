@@ -14,6 +14,11 @@ import dc.longshot.parts.TransformPart;
 
 public final class BoundPositionSystem implements EntitySystem {
 
+	/**
+	 * Buffer required for floating point calculations to make sure object is completely in bounds
+	 */
+	private final static float BOUNDS_BUFFER = 1e-5f;
+	
 	private final Rectangle boundsBox;
 
 	public BoundPositionSystem(final Rectangle boundsBox) {
@@ -22,20 +27,17 @@ public final class BoundPositionSystem implements EntitySystem {
 	
 	@Override
 	public void update(final float delta, final Entity entity) {
-		// Restrict entity in bounds
 		if (entity.has(TransformPart.class) && entity.has(BoundsPart.class)) {
-			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			TransformPart transformPart = entity.get(TransformPart.class);
 			Rectangle boundingBox = transformPart.getBoundingBox();
+			List<Bound> bounds = Bound.getViolatedBounds(boundingBox, boundsBox);
 			Vector2 newPosition = transformPart.getPosition();
-			// Buffer required for floating point calculations to make sure object is completely in bounds
-			float buffer = 0.00001f;
 			
 			for (Bound checkedBound : entity.get(BoundsPart.class).getBounds()) {
 				if (bounds.contains(checkedBound)) {
 					switch (checkedBound) {
 					case LEFT:
-						newPosition.x -= (boundingBox.x - buffer);
+						newPosition.x -= (boundingBox.x - BOUNDS_BUFFER);
 						break;
 					case RIGHT:
 						newPosition.x -= (PolygonUtils.right(boundingBox) - PolygonUtils.right(boundsBox));
@@ -44,7 +46,7 @@ public final class BoundPositionSystem implements EntitySystem {
 						newPosition.y -= (PolygonUtils.top(boundingBox) - PolygonUtils.top(boundsBox));
 						break;
 					case BOTTOM:
-						newPosition.y -= (boundingBox.y - buffer);
+						newPosition.y -= (boundingBox.y - BOUNDS_BUFFER);
 						break;
 					}
 				}

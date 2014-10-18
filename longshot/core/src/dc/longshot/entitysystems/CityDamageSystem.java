@@ -26,7 +26,6 @@ public final class CityDamageSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		// Decrease city health if missile hits it
 		if (entity.has(CityDamagePart.class) && entity.has(CollisionTypePart.class)
 				&& entity.has(DamageOnCollisionPart.class)) {
 			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);

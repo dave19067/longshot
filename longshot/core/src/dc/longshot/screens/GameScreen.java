@@ -390,7 +390,7 @@ public final class GameScreen implements Screen {
 	private void drawWorld() {
 		Gdx.gl.glClearColor(MIDNIGHT_BLUE.r, MIDNIGHT_BLUE.g, MIDNIGHT_BLUE.b, MIDNIGHT_BLUE.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Rectangle worldTableRect = UIUtils.calcBounds(worldTable, defaultScreenSize);
+		Rectangle worldTableRect = UIUtils.boundingBox(worldTable, defaultScreenSize);
 		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
 				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);

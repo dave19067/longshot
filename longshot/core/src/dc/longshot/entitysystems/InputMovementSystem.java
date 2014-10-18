@@ -14,10 +14,9 @@ public final class InputMovementSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(AlliancePart.class) && entity.has(TranslatePart.class)) {
+		if (entity.hasActive(AlliancePart.class, TranslatePart.class)) {
 			if (entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
 				Vector2 moveDirection = new Vector2(0, 0);
-				
 				if (Gdx.input.isKeyPressed(Keys.A)) {
 					moveDirection.x -= 1;
 				}
