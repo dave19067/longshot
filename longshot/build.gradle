@@ -14,7 +14,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = 'longshot'
-        gdxVersion = '1.1.0'
+        gdxVersion = '1.4.1'
         roboVMVersion = '0.0.13'
     }
 
@@ -45,6 +45,9 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        compile files("lib/cloning-1.9.0-sources.jar")
+        compile files("lib/cloning-1.9.0.jar")
+        compile files("lib/objenesis-1.2.jar")
     }
 }
 

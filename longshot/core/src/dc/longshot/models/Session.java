@@ -15,17 +15,6 @@ public final class Session {
 		this.executionState = executionState;
 	}
 	
-	public final void toggleExecutionState() {
-		switch (executionState) {
-		case RUNNING:
-			executionState = ExecutionState.PAUSED;
-			break;
-		case PAUSED:
-			executionState = ExecutionState.RUNNING;
-			break;
-		}
-	}
-	
 	public final float getHealth() {
 		return health;
 	}

@@ -72,6 +72,7 @@ import dc.longshot.parts.WeaponPart;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
+import dc.longshot.ui.factories.EscapeMenuFactory;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.XmlUtils;
 
@@ -123,7 +124,7 @@ public final class GameScreen implements Screen {
 		backdropManager = new BackdropManager(levelBoundsBox, Bound.LEFT, 1, 0.5f, 0.02f, 0.1f, starTextureRegion);
 
 		Gdx.input.setCursorCatched(true);
-		input.addProcessor(new GameInputProcessor(session));
+		addInputProcessors();
 		listenToEvents();
 		setupStage();
 		initializeSystems();
@@ -258,6 +259,12 @@ public final class GameScreen implements Screen {
 		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
 	}
 	
+	private void addInputProcessors() {
+		EscapeMenuFactory escapeMenuFactory = new EscapeMenuFactory(Skins.defaultSkin, Skins.ocrFont, stage, session);
+		input.addProcessor(stage);
+		input.addProcessor(new GameInputProcessor(escapeMenuFactory));
+	}
+	
 	private void listenToEvents() {
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
@@ -274,7 +281,6 @@ public final class GameScreen implements Screen {
 	
 	private Table createWorldTable(Skin skin) {
 		Table worldTable = new Table(skin);
-		worldTable.debug();
 		return worldTable;
 	}
 	
@@ -285,14 +291,12 @@ public final class GameScreen implements Screen {
 		statusTable.row();
 		scoreLabel = new Label("", labelStyle);
 		statusTable.add(scoreLabel).left();
-		statusTable.debug();
 		return statusTable;
 	}
 	
 	private Table createMainTable(Skin skin, Table worldTable, Table statusTable) {
 		Table mainTable = new Table(skin).top().left();
 		mainTable.setFillParent(true);
-		mainTable.debug();
 		mainTable.add(worldTable).expand().fill();
 		mainTable.row();
 		mainTable.add(statusTable).expandX().fillX();
@@ -382,17 +386,22 @@ public final class GameScreen implements Screen {
 	}
 	
 	private void draw() {
+		setWorldViewport();
 		drawWorld();
-		drawCursor();
+		setUIViewPort();
 		stage.draw();
+		drawCursor();
+	}
+	
+	private void setWorldViewport() {
+		Rectangle worldTableRect = UIUtils.boundingBox(worldTable, defaultScreenSize);
+		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
+				(int)worldTableRect.getHeight());
 	}
 	
 	private void drawWorld() {
 		Gdx.gl.glClearColor(MIDNIGHT_BLUE.r, MIDNIGHT_BLUE.g, MIDNIGHT_BLUE.b, MIDNIGHT_BLUE.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Rectangle worldTableRect = UIUtils.boundingBox(worldTable, defaultScreenSize);
-		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
-				(int)worldTableRect.getHeight());
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
 		backdropManager.draw(spriteBatch);
@@ -407,8 +416,11 @@ public final class GameScreen implements Screen {
 		spriteBatch.end();
 	}
 	
-	private void drawCursor() {
+	private void setUIViewPort() {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	}
+	
+	private void drawCursor() {
 		spriteBatch.setProjectionMatrix(getUIMatrix());
 		spriteBatch.begin();
 		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 

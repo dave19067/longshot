@@ -3,18 +3,17 @@ package dc.longshot.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import dc.longshot.game.Skins;
 import dc.longshot.system.Input;
 import dc.longshot.system.ScreenManager;
+import dc.longshot.ui.UIFactory;
 
 public final class MainMenuScreen implements Screen {
 
@@ -96,21 +95,13 @@ public final class MainMenuScreen implements Screen {
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
-		mainTable.add(createButton("New Game", newGameButton_clicked()));
+		Button newGameButton = UIFactory.createTextButton(skin, font, "New Game", newGameButton_clicked());
+		mainTable.add(newGameButton);
 		mainTable.row();
-		mainTable.add(createButton("Quit", quitButton_clicked()));
+		Button quitButton = UIFactory.createTextButton(skin, font, "Quit", quitButton_clicked());
+		mainTable.add(quitButton);
 		mainTable.row();
-		mainTable.debug();
 		return mainTable;
-	}
-	
-	private Button createButton(final String text, final EventListener listener) {
-		TextButton button = new TextButton(text, skin);
-		button.getStyle().font = font;
-		// Quirk: Call to setStyle required to ensure that modified style from getStyle is updated
-		button.setStyle(button.getStyle());
-		button.addListener(listener);
-		return button;
 	}
 	
 }
