@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
 public final class UIFactory {
 	
-	public final static Button createTextButton(final Skin skin, final BitmapFont font, final String text, 
+	public static final Button createTextButton(final Skin skin, final BitmapFont font, final String text, 
 			final EventListener listener) {
 		TextButton button = new TextButton(text, skin);
 		button.getStyle().font = font;

@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public final class PolygonFactory {
 
-	public final static Polygon copy(final Polygon polygon) {
+	public static final Polygon copy(final Polygon polygon) {
 		Polygon copy = new Polygon(polygon.getVertices());
 		copy.setOrigin(polygon.getOriginX(), polygon.getOriginY());
 		copy.setPosition(polygon.getX(), polygon.getY());
@@ -14,7 +14,7 @@ public final class PolygonFactory {
 		return copy;
 	}
 	
-	public final static Polygon createRectangle(final Vector2 size) {
+	public static final Polygon createRectangle(final Vector2 size) {
 		float[] vertices = new float[] { 0, 0, size.x, 0, size.x, size.y, 0, size.y };
 		Polygon polygon = new Polygon(vertices);
 		return polygon;

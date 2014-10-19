@@ -17,7 +17,7 @@ public final class BoundPositionSystem implements EntitySystem {
 	/**
 	 * Buffer required for floating point calculations to make sure object is completely in bounds
 	 */
-	private final static float BOUNDS_BUFFER = 1e-5f;
+	private static final float BOUNDS_BUFFER = 1e-5f;
 	
 	private final Rectangle boundsBox;
 

@@ -13,7 +13,7 @@ public final class PolygonUtils {
 		return rectangle.x + rectangle.width;
 	}
 
-	public final static Vector2 relativeCenter(final Vector2 pivotCenter, final Vector2 objectSize) {
+	public static final Vector2 relativeCenter(final Vector2 pivotCenter, final Vector2 objectSize) {
 		Vector2 halfObjectSize = objectSize.cpy().scl(0.5f);
 		return pivotCenter.cpy().sub(halfObjectSize);
 	}

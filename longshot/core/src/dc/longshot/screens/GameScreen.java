@@ -71,6 +71,7 @@ import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
+import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.factories.EscapeMenuFactory;
 import dc.longshot.util.ColorUtils;
@@ -80,11 +81,12 @@ public final class GameScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 	
+	private final ScreenManager screenManager;
 	private Camera camera;
+	private final Vector2 defaultScreenSize;
 	private final SpriteBatch spriteBatch;
 	private final Input input = new Input();
 	private final float speedMultiplier = 1f;
-	private final Vector2 defaultScreenSize;
 
 	private final Stage stage;
 	private Table worldTable;
@@ -109,7 +111,8 @@ public final class GameScreen implements Screen {
 	private Entity shooter;
 	private Entity shooterCannon;
 	
-	public GameScreen() {
+	public GameScreen(ScreenManager screenManager) {
+		this.screenManager = screenManager;
 		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		spriteBatch = new SpriteBatch();
 		stage = new Stage();
@@ -260,7 +263,8 @@ public final class GameScreen implements Screen {
 	}
 	
 	private void addInputProcessors() {
-		EscapeMenuFactory escapeMenuFactory = new EscapeMenuFactory(Skins.defaultSkin, Skins.ocrFont, stage, session);
+		EscapeMenuFactory escapeMenuFactory = new EscapeMenuFactory(Skins.defaultSkin, Skins.ocrFont, stage, 
+				screenManager, session, this);
 		input.addProcessor(stage);
 		input.addProcessor(new GameInputProcessor(escapeMenuFactory));
 	}

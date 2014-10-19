@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public final class TextureFactory {
 
-	public final static Texture createColorPixel(final Color color) {
+	public static final Texture createColorPixel(final Color color) {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.setColor(color);
 		pixmap.fill();
@@ -22,7 +22,7 @@ public final class TextureFactory {
 		return texture;
 	}
 	
-	public final static Texture createShadow(final Texture texture, final Color color) {
+	public static final Texture createShadow(final Texture texture, final Color color) {
 		TextureRegion textureRegion = new TextureRegion(texture);
 		Pixmap pixmap = toPixmap(textureRegion);
 		Pixmap shadowPixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), Pixmap.Format.RGBA8888);
@@ -39,13 +39,13 @@ public final class TextureFactory {
 		return shadowTexture;
 	}
 	
-	public final static Texture createOutline(final Texture texture) {
+	public static final Texture createOutline(final Texture texture) {
 		TextureRegion outlineTextureRegion = new TextureRegion(texture);
 		Texture outlineTexture = createOutline(outlineTextureRegion);
 		return outlineTexture;
 	}
 	
-	public final static Texture createOutline(final TextureRegion textureRegion) {
+	public static final Texture createOutline(final TextureRegion textureRegion) {
 		Pixmap pixmap = toPixmap(textureRegion);
 		Pixmap outlinePixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), Pixmap.Format.RGBA8888);
 		for (int x = 0; x < pixmap.getWidth(); x++) {

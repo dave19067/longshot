@@ -23,7 +23,7 @@ public final class RectangleAdapter extends XmlAdapter<RectangleAdapter.Rectangl
 	}
 
 	@XmlRootElement
-	public final static class RectangleAdapted {
+	public static final class RectangleAdapted {
 		public float x;
 		public float y;
 		public float width;
