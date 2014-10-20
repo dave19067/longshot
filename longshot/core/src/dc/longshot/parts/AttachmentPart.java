@@ -7,21 +7,21 @@ import dc.longshot.epf.Part;
 
 public final class AttachmentPart extends Part {
 
-	private final Entity parent;
+	private final Entity child;
 	
-	public AttachmentPart(final Entity parent) {
-		this.parent = parent;
+	public AttachmentPart(final Entity child) {
+		this.child = child;
 	}
 	
-	public final Entity getParent() {
-		return parent;
+	public final Entity getChild() {
+		return child;
 	}
 	
 	@Override
 	public final void update(final float delta) {
-		if (parent.isActive()) {
-			Vector2 parentCenter = parent.get(TransformPart.class).getCenter();
-			entity.get(TransformPart.class).setPosition(parentCenter);
+		if (child.isActive()) {
+			Vector2 parentCenter = entity.get(TransformPart.class).getCenter();
+			child.get(TransformPart.class).setPosition(parentCenter);
 		}
 	}
 	

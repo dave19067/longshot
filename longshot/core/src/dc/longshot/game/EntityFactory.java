@@ -72,7 +72,7 @@ public final class EntityFactory {
 		return entity;
 	}
 
-	public final Entity createShooter(final Vector3 size, final Vector2 position) {
+	public final Entity createShooter(final Vector3 size, final Vector2 position, final Entity cannon) {
 		Entity entity = createBaseEntity(size, position, SpriteKey.SHOOTER);
 		entity.attach(new SpeedPart(7));
 		entity.attach(new HealthPart(1));
@@ -86,14 +86,14 @@ public final class EntityFactory {
 		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
 		entity.attach(new GhostPart(5, outlineTexture));
+		entity.attach(new AttachmentPart(cannon));
 		return entity;
 	}
 
-	public final Entity createShooterCannon(final Entity parent) {
+	public final Entity createShooterCannon() {
 		Vector3 size = new Vector3(1, 0.25f, 0.25f);
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
-		entity.attach(new AttachmentPart(parent));
 		entity.attach(new RotateToCursorPart());
 		return entity;
 	}
@@ -206,7 +206,7 @@ public final class EntityFactory {
 	public final Entity createExplosion(final float radius, final float maxLifeTime) {
 		float diameter = radius * 2;
 		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), 
-				SpriteKey.EXPLOSION);
+				SpriteKey.CIRCLE);
 		entity.attach(new ExplodeOnSpawnPart(radius, 1));
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		Color endColor = Color.ORANGE.cpy();

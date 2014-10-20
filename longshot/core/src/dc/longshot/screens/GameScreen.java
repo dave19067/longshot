@@ -46,6 +46,7 @@ import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.game.BackdropManager;
+import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
 import dc.longshot.game.GameInputProcessor;
 import dc.longshot.game.LevelController;
@@ -98,7 +99,7 @@ public final class GameScreen implements Screen {
 	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
 	private final EntityFactory entityFactory = new EntityFactory(spriteCache);
 	private final CollisionManager collisionManager = new CollisionManager(eventManager);
-	private final BackdropManager backdropManager;
+	private BackdropManager backdropManager;
 	private final LevelController levelController;
 	private final List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
 
@@ -109,7 +110,6 @@ public final class GameScreen implements Screen {
 	
 	private final Level level;
 	private Entity shooter;
-	private Entity shooterCannon;
 	
 	public GameScreen(ScreenManager screenManager) {
 		this.screenManager = screenManager;
@@ -121,10 +121,8 @@ public final class GameScreen implements Screen {
 
 		loadSprites();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
-		Rectangle levelBoundsBox = level.getBoundsBox();
-		setupCamera(levelBoundsBox);
-		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
-		backdropManager = new BackdropManager(levelBoundsBox, Bound.LEFT, 1, 0.5f, 0.02f, 0.1f, starTextureRegion);
+		setupCamera();
+		setupBackdropManager();
 
 		Gdx.input.setCursorCatched(true);
 		addInputProcessors();
@@ -144,7 +142,8 @@ public final class GameScreen implements Screen {
 		updateUI();
 		
 		if (session.getHealth() <= 0) {
-			Gdx.app.exit();
+			screenManager.add(new MainMenuScreen(screenManager));
+			screenManager.remove(this);
 		}
 		
 		if (levelController.isComplete()) {
@@ -227,21 +226,41 @@ public final class GameScreen implements Screen {
 					}
 				}
 				
-				// Remove attached entities
-				for (Entity other : entityManager.getAll()) {
-					if (other.has(AttachmentPart.class) && other.get(AttachmentPart.class).getParent() == entity) {
-						entityManager.remove(other);
-					}
+				if (entity.has(AttachmentPart.class)) {
+					Entity child = entity.get(AttachmentPart.class).getChild();
+					entityManager.remove(child);
 				}
 			}
 		};
 	}
 	
-	private void setupCamera(Rectangle levelBoundsBox) {
+	private void setupCamera() {
+		Rectangle levelBoundsBox = level.getBoundsBox();
 		camera = new OrthographicCamera(levelBoundsBox.width * ScreenUnitConversion.PIXELS_PER_UNIT, 
 				levelBoundsBox.height * ScreenUnitConversion.PIXELS_PER_UNIT);
 		camera.position.set(levelBoundsBox.x + camera.viewportWidth / 2, 
 				levelBoundsBox.y + camera.viewportHeight / 2, 0);
+	}
+	
+	private void setupBackdropManager() {
+		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
+		
+		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
+		DecorationProfile starProfile = new DecorationProfile(level.getBoundsBox(), true, 1, 0.5f, 0.02f, 0.1f, 
+				starTextureRegion);
+		decorationProfiles.add(starProfile);
+		
+		TextureRegion cloudTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.CLOUD));
+		Rectangle cloudBoundsBox = level.getBoundsBox();
+		// TODO: clean this calculation up
+		float offsetY = cloudBoundsBox.height / 2;
+		cloudBoundsBox.setY(cloudBoundsBox.y + offsetY);
+		cloudBoundsBox.setHeight(cloudBoundsBox.height - offsetY);
+		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 1, 0.75f, 3, 6, 1f, 2, 
+				cloudTextureRegion);
+		decorationProfiles.add(cloudProfile);
+		
+		backdropManager = new BackdropManager(Bound.LEFT, decorationProfiles);
 	}
 	
 	private void loadSprites() {
@@ -259,7 +278,10 @@ public final class GameScreen implements Screen {
 		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
 		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
 		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
-		spriteCache.add(SpriteKey.EXPLOSION, "images/explosion.png");
+		spriteCache.add(SpriteKey.CIRCLE, "images/circle.png");
+		Color cloudColor = ColorUtils.toGdxColor(64, 64, 64, 223);
+		Texture cloudTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.CIRCLE), cloudColor);
+		spriteCache.add(SpriteKey.CLOUD, cloudTexture);
 	}
 	
 	private void addInputProcessors() {
@@ -329,12 +351,12 @@ public final class GameScreen implements Screen {
 		entityManager.add(ground);
 		Vector3 shooterSize = new Vector3(2, 1.5f, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
-		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
-		shooter = entityFactory.createShooter(shooterSize, 
-				new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox())));
-		entityManager.add(shooter);
-		shooterCannon = entityFactory.createShooterCannon(shooter);
+		Entity shooterCannon = entityFactory.createShooterCannon();
 		entityManager.add(shooterCannon);
+		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
+		Vector2 shooterPosition = new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox()));
+		shooter = entityFactory.createShooter(shooterSize, shooterPosition, shooterCannon);
+		entityManager.add(shooter);
 	}
 	
 	private void boundCursor() {
@@ -357,7 +379,7 @@ public final class GameScreen implements Screen {
 		scoreLabel.setText("SCORE: " + score);
 	}
 	
-	private void handleInput() {		
+	private void handleInput() {
 		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			if (shooter.hasActive(WeaponPart.class)) {
 				WeaponPart weaponPart = shooter.get(WeaponPart.class);
@@ -365,6 +387,7 @@ public final class GameScreen implements Screen {
 					Entity bullet = weaponPart.createSpawn();
 					Vector2 spawnPosition = getMiddleOfCannonMouth(bullet);
 					bullet.get(TransformPart.class).setPosition(spawnPosition);
+					Entity shooterCannon = shooter.get(AttachmentPart.class).getChild();
 					Vector2 velocity = VectorUtils.createVectorFromAngle(shooterCannon.get(TransformPart.class).getRotation());
 					bullet.get(TranslatePart.class).setVelocity(velocity);
 					entityManager.add(bullet);
@@ -439,6 +462,7 @@ public final class GameScreen implements Screen {
 	}
 	
 	private Vector2 getMiddleOfCannonMouth(final Entity spawn) {
+		Entity shooterCannon = shooter.get(AttachmentPart.class).getChild();
 		TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
 		List<Vector2> vertices = cannonTransform.getTransformedVertices();
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
