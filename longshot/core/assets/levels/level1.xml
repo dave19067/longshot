@@ -9,11 +9,11 @@
     <spawnDuration>60.0</spawnDuration>
     <spawns>
         <entry>
-            <key>MISSLE</key>
+            <key>MISSILE</key>
             <value>30</value>
         </entry>
         <entry>
-            <key>WARHEAD</key>
+            <key>NUKE</key>
             <value>10</value>
         </entry>
         <entry>

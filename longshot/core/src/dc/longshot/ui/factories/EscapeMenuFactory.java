@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import dc.longshot.models.Session;
-import dc.longshot.screens.MainMenuScreen;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIFactory;
@@ -27,15 +26,18 @@ public final class EscapeMenuFactory {
 	private final ScreenManager screenManager;
 	private final Session session;
 	private final Screen currentScreen;
+	private final Screen mainMenuScreen;
 
 	public EscapeMenuFactory(final Skin skin, final BitmapFont font, final Stage stage, 
-			final ScreenManager screenManager, final Session session, final Screen currentScreen) {
+			final ScreenManager screenManager, final Session session, final Screen currentScreen, 
+			final Screen mainMenuScreen) {
 		this.skin = skin;
 		this.font = font;
 		this.stage = stage;
 		this.screenManager = screenManager;
 		this.session = session;
 		this.currentScreen = currentScreen;
+		this.mainMenuScreen = mainMenuScreen;
 	}
 	
 	public final void showDialog() {
@@ -75,7 +77,7 @@ public final class EscapeMenuFactory {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
-				screenManager.add(new MainMenuScreen(screenManager));
+				screenManager.add(mainMenuScreen);
 				screenManager.remove(currentScreen);
 			}
 		};

@@ -22,15 +22,16 @@ public final class AIShooterSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(AIShooterPart.class)) {
+		if (entity.hasActive(AIShooterPart.class, WeaponPart.class)) {
 			AIShooterPart aiShooterPart = entity.get(AIShooterPart.class);
 			if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
 					for (Entity other : entityManager.getAll()) {
-						if (other != entity && other.has(AlliancePart.class) && other.get(AlliancePart.class).getAlliance()
-								== aiShooterPart.getTargetAlliance()) {
-							spawn(entity, other);
+						if (other != entity && other.hasActive(AlliancePart.class)) {
+							if (other.get(AlliancePart.class).getAlliance() == aiShooterPart.getTargetAlliance()) {
+								spawn(entity, other);
+							}
 						}
 					}
 				}

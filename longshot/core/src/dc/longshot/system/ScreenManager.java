@@ -14,10 +14,17 @@ public final class ScreenManager {
 	
 	public final void add(final Screen screen) {
 		screensToAdd.add(screen);
+		screen.show();
 	}
 	
 	public final void remove(final Screen screen) {
 		screensToRemove.add(screen);
+		screen.hide();
+	}
+	
+	public final void swap(final Screen currentScreen, final Screen newScreen) {
+		remove(currentScreen);
+		add(newScreen);
 	}
 	
 	public final void update() {

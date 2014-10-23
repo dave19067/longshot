@@ -57,7 +57,7 @@ public final class LevelController {
 	public final boolean isComplete() {
 		boolean enemiesExist = false;
 		for (Entity entity : entityManager.getAll()) {
-			if (entity.has(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
+			if (entity.hasActive(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
 				enemiesExist = true;
 				break;
 			}
@@ -87,8 +87,8 @@ public final class LevelController {
 	private void spawn(SpawnInfo spawnInfo) {
 		Entity spawn = entityFactory.create(spawnInfo.entityType);
 		switch (spawnInfo.entityType) {
-		case MISSLE:
-		case WARHEAD:
+		case MISSILE:
+		case NUKE:
 			placeAbove(spawn);
 			break;
 		case UFO:

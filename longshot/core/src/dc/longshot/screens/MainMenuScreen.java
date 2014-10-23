@@ -3,7 +3,9 @@ package dc.longshot.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -12,36 +14,47 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import dc.longshot.game.Skins;
+import dc.longshot.graphics.SpriteCache;
+import dc.longshot.models.SpriteKey;
 import dc.longshot.system.Input;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIFactory;
 
 public final class MainMenuScreen implements Screen {
 
-	private final Input input = new Input();
 	private final ScreenManager screenManager;
+	private final SpriteBatch spriteBatch;
+	private Screen newGameScreen;
 	
-	private final Skin skin;
-	private final BitmapFont font;
+	private Skin skin;
+	private BitmapFont font;
 	
-	private final Stage stage;
+	private Stage stage;
+
+	private final Texture cursorTexture;
 	
-	public MainMenuScreen(final ScreenManager screenManager) {
+	public MainMenuScreen(final ScreenManager screenManager, final SpriteCache<SpriteKey> spriteCache, 
+			final SpriteBatch spriteBatch) {
 		this.screenManager = screenManager;
-		skin = Skins.defaultSkin;
-		font = Skins.ocrFont;
-		stage = new Stage();
-		
-		setupStage();
-		input.addProcessor(stage);
+		this.spriteBatch = new SpriteBatch();
+		cursorTexture = spriteCache.getTexture(SpriteKey.CURSOR);
+	}
+	
+	public final void setNewGameScreen(final Screen newGameScreen) {
+		this.newGameScreen = newGameScreen;
 	}
 
 	@Override
 	public final void render(final float delta) {
+		stage.act(delta);
+		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		stage.act(delta);
 		stage.draw();
+		spriteBatch.begin();
+		spriteBatch.draw(cursorTexture, Gdx.input.getX(), 
+				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight());
+		spriteBatch.end();
 	}
 
 	@Override
@@ -51,10 +64,17 @@ public final class MainMenuScreen implements Screen {
 
 	@Override
 	public final void show() {
+		skin = Skins.defaultSkin;
+		font = Skins.ocrFont;
+		stage = new Stage();
+		setupStage();
+		Input.addProcessor(stage);
 	}
 
 	@Override
 	public final void hide() {
+		Input.removeProcessor(stage);
+		stage.dispose();
 	}
 
 	@Override
@@ -67,7 +87,6 @@ public final class MainMenuScreen implements Screen {
 
 	@Override
 	public final void dispose() {
-		stage.dispose();
 	}
 	
 	private ClickListener newGameButton_clicked() {
@@ -75,8 +94,7 @@ public final class MainMenuScreen implements Screen {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
-				screenManager.add(new GameScreen(screenManager));
-				screenManager.remove(thisScreen);
+				screenManager.swap(thisScreen, newGameScreen);
 			}
 		};
 	}
@@ -89,7 +107,7 @@ public final class MainMenuScreen implements Screen {
 			}
 		};
 	}
-
+		
 	private void setupStage() {
 		Table mainTable = createMainTable();
 		stage.addActor(mainTable);

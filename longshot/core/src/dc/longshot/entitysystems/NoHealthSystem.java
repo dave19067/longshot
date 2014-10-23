@@ -16,8 +16,8 @@ public final class NoHealthSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
-			if (entity.has(GhostPart.class)) {
+		if (entity.hasActive(HealthPart.class) && !entity.get(HealthPart.class).isAlive()) {
+			if (entity.hasActive(GhostPart.class)) {
 				entity.get(GhostPart.class).activate();
 			}
 			else {

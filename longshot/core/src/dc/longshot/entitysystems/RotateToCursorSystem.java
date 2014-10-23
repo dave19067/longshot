@@ -26,7 +26,7 @@ public final class RotateToCursorSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(RotateToCursorPart.class)) {
+		if (entity.hasActive(RotateToCursorPart.class)) {
 			Vector2 mouseCoords = ScreenUnitConversion.getScreenToWorldCoords(camera, Gdx.input.getX(), Gdx.input.getY(), 
 					UIUtils.boundingBox(worldTable, defaultScreenSize));
 			TransformPart transform = entity.get(TransformPart.class);

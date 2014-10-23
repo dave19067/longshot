@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -56,7 +57,6 @@ import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.ScreenUnitConversion;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
-import dc.longshot.graphics.TextureFactory;
 import dc.longshot.models.Level;
 import dc.longshot.models.Session;
 import dc.longshot.models.SpriteKey;
@@ -83,53 +83,50 @@ public final class GameScreen implements Screen {
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 	
 	private final ScreenManager screenManager;
+	private final SpriteCache<SpriteKey> spriteCache;
+	private Screen loseScreen;
+	private Screen mainMenuScreen;
 	private Camera camera;
-	private final Vector2 defaultScreenSize;
+	private Vector2 defaultScreenSize;
 	private final SpriteBatch spriteBatch;
-	private final Input input = new Input();
 	private final float speedMultiplier = 1f;
 
-	private final Stage stage;
+	private Stage stage;
 	private Table worldTable;
 	private Label healthLabel;
 	private Label scoreLabel;
 	
-	private final EventManager eventManager = new EventManager();
-	private final EntityManager entityManager = new EntityManager(eventManager);
-	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
-	private final EntityFactory entityFactory = new EntityFactory(spriteCache);
-	private final CollisionManager collisionManager = new CollisionManager(eventManager);
+	private EventManager eventManager;
+	private EntityManager entityManager;
+	private EntityFactory entityFactory;
+	private CollisionManager collisionManager;
 	private BackdropManager backdropManager;
-	private final LevelController levelController;
-	private final List<EntitySystem> entitySystems = new ArrayList<EntitySystem>();
+	private LevelController levelController;
+	private List<EntitySystem> entitySystems;
+	private InputProcessor gameInputProcessor;
 
 	private final Texture cursorTexture;
 	
-	private final Session session = new Session(); 
-	private int score = 0;
+	private Session session; 
+	private int score;
 	
-	private final Level level;
+	private Level level;
 	private Entity shooter;
 	
-	public GameScreen(ScreenManager screenManager) {
+	public GameScreen(final ScreenManager screenManager, final SpriteCache<SpriteKey> spriteCache, 
+			final SpriteBatch spriteBatch) {
 		this.screenManager = screenManager;
-		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		spriteBatch = new SpriteBatch();
-		stage = new Stage();
-		level = XmlUtils.unmarshal("bin/levels/level1.xml", new Class[] { Level.class });
-		levelController = new LevelController(entityManager, entityFactory, level);
-
-		loadSprites();
+		this.spriteCache = spriteCache;
+		this.spriteBatch = spriteBatch;
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
-		setupCamera();
-		setupBackdropManager();
-
-		Gdx.input.setCursorCatched(true);
-		addInputProcessors();
-		listenToEvents();
-		setupStage();
-		initializeSystems();
-		createInitialEntities();
+	}
+	
+	public final void setMainMenuScreen(Screen mainMenuScreen) {
+		this.mainMenuScreen = mainMenuScreen;
+	}
+	
+	public final void setLoseScreen(Screen loseScreen) {
+		this.loseScreen = loseScreen;
 	}
 
 	@Override
@@ -142,8 +139,7 @@ public final class GameScreen implements Screen {
 		updateUI();
 		
 		if (session.getHealth() <= 0) {
-			screenManager.add(new MainMenuScreen(screenManager));
-			screenManager.remove(this);
+			screenManager.swap(this, loseScreen);
 		}
 		
 		if (levelController.isComplete()) {
@@ -165,10 +161,31 @@ public final class GameScreen implements Screen {
 
 	@Override
 	public final void show() {
+		entityFactory = new EntityFactory(spriteCache);
+		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		eventManager = new EventManager();
+		entityManager = new EntityManager(eventManager);
+		collisionManager = new CollisionManager(eventManager);
+		stage = new Stage();
+		session = new Session();
+		score = 0;
+		level = XmlUtils.unmarshal("bin/levels/level1.xml", new Class[] { Level.class });
+		levelController = new LevelController(entityManager, entityFactory, level);
+		
+		setupCamera();
+		setupBackdropManager();
+		addInputProcessors();
+		setupStage();
+		createSystems();
+		createInitialEntities();
+		listenToGameEvents();
 	}
 
 	@Override
 	public final void hide() {
+		Input.removeProcessor(gameInputProcessor);
+		Input.removeProcessor(stage);
+		stage.dispose();
 	}
 
 	@Override
@@ -183,18 +200,16 @@ public final class GameScreen implements Screen {
 
 	@Override
 	public final void dispose() {
-		spriteCache.dispose();
-		stage.dispose();
 	}
 	
 	private EntityAddedListener handleEntityAdded() {
 		return new EntityAddedListener() {
 			@Override
 			public void created(final Entity entity) {
-				if (entity.has(ExplodeOnSpawnPart.class) && entity.has(TransformPart.class)) {
+				if (entity.hasActive(ExplodeOnSpawnPart.class, TransformPart.class)) {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
 					for (Entity other : entityManager.getAll()) {
-						if (other != entity && other.has(HealthPart.class) && other.has(TransformPart.class)) {
+						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
 							Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
 							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
 							float distance = otherCenter.cpy().sub(entityCenter).len(); 
@@ -213,20 +228,20 @@ public final class GameScreen implements Screen {
 			@Override
 			public void removed(final Entity entity) {
 				// Spawn on death of the entity
-				if (entity.has(SpawnOnDeathPart.class)) {
+				if (entity.hasActive(SpawnOnDeathPart.class)) {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					entityManager.add(spawn);
 				}
 				
 				// If killed, increase score
-				if (entity.has(ScorePart.class)) {
+				if (entity.hasActive(ScorePart.class)) {
 					if (!Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
 							entity.get(BoundsDiePart.class).getBounds())) {
 						score += entity.get(ScorePart.class).getScore();
 					}
 				}
 				
-				if (entity.has(AttachmentPart.class)) {
+				if (entity.hasActive(AttachmentPart.class)) {
 					Entity child = entity.get(AttachmentPart.class).getChild();
 					entityManager.remove(child);
 				}
@@ -256,42 +271,22 @@ public final class GameScreen implements Screen {
 		float offsetY = cloudBoundsBox.height / 2;
 		cloudBoundsBox.setY(cloudBoundsBox.y + offsetY);
 		cloudBoundsBox.setHeight(cloudBoundsBox.height - offsetY);
-		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 1, 0.75f, 3, 6, 1f, 2, 
+		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 4, 0.75f, 3, 6, 1f, 2, 
 				cloudTextureRegion);
 		decorationProfiles.add(cloudProfile);
 		
 		backdropManager = new BackdropManager(Bound.LEFT, decorationProfiles);
 	}
 	
-	private void loadSprites() {
-		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
-		spriteCache.add(SpriteKey.STAR, "images/star.png");
-		spriteCache.add(SpriteKey.WHITE, "images/white.png");
-		spriteCache.add(SpriteKey.GREEN, "images/green.png");
-		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
-		Texture shooterOutlineTexture = TextureFactory.createOutline(spriteCache.getTexture(SpriteKey.SHOOTER));
-		spriteCache.add(SpriteKey.SHOOTER_OUTLINE, shooterOutlineTexture);
-		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
-		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
-		spriteCache.add(SpriteKey.MISSLE, "images/missle.png");
-		spriteCache.add(SpriteKey.NUKE, "images/nuke.png");
-		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
-		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
-		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
-		spriteCache.add(SpriteKey.CIRCLE, "images/circle.png");
-		Color cloudColor = ColorUtils.toGdxColor(64, 64, 64, 223);
-		Texture cloudTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.CIRCLE), cloudColor);
-		spriteCache.add(SpriteKey.CLOUD, cloudTexture);
-	}
-	
 	private void addInputProcessors() {
 		EscapeMenuFactory escapeMenuFactory = new EscapeMenuFactory(Skins.defaultSkin, Skins.ocrFont, stage, 
-				screenManager, session, this);
-		input.addProcessor(stage);
-		input.addProcessor(new GameInputProcessor(escapeMenuFactory));
+				screenManager, session, this, mainMenuScreen);
+		Input.addProcessor(stage);
+		gameInputProcessor = new GameInputProcessor(escapeMenuFactory);
+		Input.addProcessor(gameInputProcessor);
 	}
 	
-	private void listenToEvents() {
+	private void listenToGameEvents() {
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
 	}
@@ -330,7 +325,8 @@ public final class GameScreen implements Screen {
 		return mainTable;
 	}
 	
-	private void initializeSystems() {
+	private void createSystems() {
+		entitySystems = new ArrayList<EntitySystem>();
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
@@ -381,7 +377,7 @@ public final class GameScreen implements Screen {
 	
 	private void handleInput() {
 		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			if (shooter.hasActive(WeaponPart.class)) {
+			if (shooter.hasActive(WeaponPart.class, AttachmentPart.class)) {
 				WeaponPart weaponPart = shooter.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
 					Entity bullet = weaponPart.createSpawn();
@@ -435,7 +431,7 @@ public final class GameScreen implements Screen {
 		List<Entity> entities = entityManager.getAll();
 		Collections.sort(entities, new ZComparator());
 		for (Entity entity : entities) {
-			if (entity.has(DrawablePart.class)) {
+			if (entity.hasActive(DrawablePart.class)) {
 				DrawablePart drawablePart = entity.get(DrawablePart.class);
 				drawablePart.getSprite().draw(spriteBatch);
 			}
@@ -474,7 +470,7 @@ public final class GameScreen implements Screen {
 	private final class ZComparator implements Comparator<Entity> {
 	    @Override
 	    public final int compare(final Entity e1, final Entity e2) {
-	    	if (e1.has(DrawablePart.class) && e2.has(DrawablePart.class)) {
+	    	if (e1.hasActive(DrawablePart.class) && e2.hasActive(DrawablePart.class)) {
 	    		return Float.compare(e1.get(DrawablePart.class).getZ(), e2.get(DrawablePart.class).getZ());
 	    	}
 	    	else {

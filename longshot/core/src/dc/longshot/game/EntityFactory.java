@@ -56,11 +56,11 @@ public final class EntityFactory {
 		Entity entity;
 		
 		switch (entityType) {
-			case MISSLE:
-				entity = createMissle();
+			case MISSILE:
+				entity = createMissile();
 				break;
-			case WARHEAD:
-				entity = createWarhead();
+			case NUKE:
+				entity = createNuke();
 				break;
 			case UFO:
 				entity = createUFOGlow();
@@ -118,13 +118,13 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	public final Entity createMissle() {
+	public final Entity createMissile() {
 		Entity trailParticle = createTrailParticle(new Vector3(0.1f, 0.1f, 0.1f), Color.GRAY.cpy(), Color.CLEAR.cpy());
-		Entity entity = createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 1f, SpriteKey.MISSLE, trailParticle);
+		Entity entity = createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 1f, SpriteKey.MISSILE, trailParticle);
 		return entity;
 	}
 	
-	public final Entity createWarhead() {
+	public final Entity createNuke() {
 		Entity trailParticle = createTrailParticle(new Vector3(0.5f, 0.5f, 0.5f), Color.GRAY.cpy(), Color.CLEAR.cpy());
 		Entity entity = createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 4, SpriteKey.NUKE, trailParticle);
 		return entity;

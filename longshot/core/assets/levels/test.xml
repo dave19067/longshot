@@ -7,11 +7,11 @@
     <spawnDuration>1.0</spawnDuration>
     <spawns>
         <entry>
-            <key>WARHEAD</key>
+            <key>NUKE</key>
             <value>50</value>
         </entry>
         <entry>
-            <key>MISSLE</key>
+            <key>MISSILE</key>
             <value>50</value>
         </entry>
     </spawns>

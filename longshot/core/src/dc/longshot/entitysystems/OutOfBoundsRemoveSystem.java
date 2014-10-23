@@ -21,7 +21,7 @@ public final class OutOfBoundsRemoveSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(BoundsDiePart.class)) {
+		if (entity.hasActive(BoundsDiePart.class)) {
 			if (Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox,  
 					entity.get(BoundsDiePart.class).getBounds())) {
 				entityManager.remove(entity);

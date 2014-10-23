@@ -15,7 +15,7 @@ public final class EmitSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(EmitterPart.class)) {
+		if (entity.hasActive(EmitterPart.class)) {
 			EmitterPart emitterPart = entity.get(EmitterPart.class);
 			if (emitterPart.canEmit()) {
 				Entity spawn = emitterPart.emit();

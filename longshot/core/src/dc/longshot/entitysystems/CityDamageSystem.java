@@ -26,8 +26,7 @@ public final class CityDamageSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.has(CityDamagePart.class) && entity.has(CollisionTypePart.class)
-				&& entity.has(DamageOnCollisionPart.class)) {
+		if (entity.hasActive(CityDamagePart.class, CollisionTypePart.class, DamageOnCollisionPart.class)) {
 			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			if (entity.get(CollisionTypePart.class).getCollisionType() == CollisionType.ENEMY
 					&& bounds.contains(Bound.BOTTOM)) {
