@@ -1,1 +1,17 @@
-<gameSession/>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gameSession>
+    <highScores>
+        <highScores>
+            <name>dd</name>
+            <score>0</score>
+        </highScores>
+        <highScores>
+            <name>f</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>David</name>
+            <score>100</score>
+        </highScores>
+    </highScores>
+</gameSession>

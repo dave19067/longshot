@@ -11,6 +11,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public final class TextureFactory {
+	
+	private TextureFactory() {
+	}
 
 	public static final Texture createColorPixel(final Color color) {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);

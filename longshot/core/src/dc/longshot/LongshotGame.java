@@ -15,8 +15,13 @@ import dc.longshot.models.GameSession;
 import dc.longshot.models.Paths;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.screens.LevelScreen;
+import dc.longshot.screens.LevelScreen.GameOverListener;
+import dc.longshot.screens.LevelScreen.GamePausedListener;
 import dc.longshot.screens.MainMenuScreen;
+import dc.longshot.screens.MainMenuScreen.NewGameListener;
 import dc.longshot.system.ScreenManager;
+import dc.longshot.ui.controls.PauseMenu;
+import dc.longshot.ui.controls.ScoreEntryDialog;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.XmlUtils;
 
@@ -33,7 +38,7 @@ public final class LongshotGame extends Game {
 		Gdx.input.setCursorCatched(true);
 		loadGameSession();
 		loadSprites();
-		createScreens();
+		setupScreens();
 	}
 
 	@Override
@@ -81,14 +86,43 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.CLOUD, cloudTexture);
 	}
 	
-	private void createScreens() {
-		MainMenuScreen mainMenuScreen = new MainMenuScreen(screenManager, spriteCache, spriteBatch);
-		LevelScreen levelScreen = new LevelScreen(screenManager, spriteCache, spriteBatch, gameSession);
-		
-		mainMenuScreen.setNewGameScreen(levelScreen);
-
-		levelScreen.setMainMenuScreen(mainMenuScreen);
+	private void setupScreens() {
+		MainMenuScreen mainMenuScreen = new MainMenuScreen(spriteCache, spriteBatch);
+		LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch);
+		setupMainMenuScreen(mainMenuScreen, levelScreen);
+		setupLevelScreen(levelScreen, mainMenuScreen);
 		screenManager.add(mainMenuScreen);
+	}
+	
+	private void setupMainMenuScreen(final MainMenuScreen mainMenuScreen, final LevelScreen levelScreen) {
+		mainMenuScreen.addListener(new NewGameListener() {
+			@Override
+			public void requested() {
+				screenManager.swap(mainMenuScreen, levelScreen);
+			}
+		});
+	}
+	
+	private void setupLevelScreen(final LevelScreen levelScreen, final MainMenuScreen mainMenuScreen) {
+		levelScreen.addEventListener(new GamePausedListener() {
+			@Override
+			public void paused() {
+				PauseMenu pauseMenu = new PauseMenu(Skins.defaultSkin, Skins.ocrFont, levelScreen.getStage(), 
+						screenManager, levelScreen.getLevelSession(), levelScreen, mainMenuScreen);
+				pauseMenu.showDialog();
+			}
+		});
+		
+		levelScreen.addEventListener(new GameOverListener() {
+			@Override
+			public void gameOver(int score) {
+				if (gameSession.canAddHighScore(score)) {
+					ScoreEntryDialog scoreEntryDialogFactory = new ScoreEntryDialog(Skins.defaultSkin, Skins.ocrFont, 
+							levelScreen.getStage(), screenManager, levelScreen, mainMenuScreen, gameSession, score);
+					scoreEntryDialogFactory.showDialog();
+				}
+			}
+		});
 	}
 	
 }

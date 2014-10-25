@@ -10,6 +10,9 @@ import javax.xml.bind.Unmarshaller;
 
 public final class XmlUtils {
 	
+	private XmlUtils() {
+	}
+	
 	/**
 	 * Reads an xml file to an object.
 	 * @param path path to the xml file

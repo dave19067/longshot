@@ -8,6 +8,9 @@ public final class Input {
 
 	private static final InputMultiplexer multiplexer = new InputMultiplexer();
 	
+	private Input() {
+	}
+	
 	public static final void addProcessor(final InputProcessor processor) {
 		multiplexer.addProcessor(processor);
 		Gdx.input.setInputProcessor(multiplexer);

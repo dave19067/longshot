@@ -35,7 +35,7 @@ public final class LevelController {
 		this.entityFactory = entityFactory;
 		this.level = level;
 		
-		createSpawnInfos();
+		generateSpawnInfos();
 	}
 	
 	public final void update(final float delta) {
@@ -65,7 +65,7 @@ public final class LevelController {
 		return !enemiesExist && spawnInfos.size() <= 0;
 	}
 	
-	private void createSpawnInfos() {
+	private void generateSpawnInfos() {
 		Map<EntityType, Integer> spawns = level.getSpawns();
 		for (Entry<EntityType, Integer> entry : spawns.entrySet()) {
 			for (int i = 0; i < entry.getValue(); i++) {

@@ -4,6 +4,9 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 
 public final class PolygonFactory {
+	
+	private PolygonFactory() {
+	}
 
 	public static final Polygon copy(final Polygon polygon) {
 		Polygon copy = new Polygon(polygon.getVertices());

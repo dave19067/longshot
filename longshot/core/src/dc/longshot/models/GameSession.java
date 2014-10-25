@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -13,7 +13,7 @@ public final class GameSession {
 	
 	private final int MAX_HIGH_SCORES = 10;
 	
-	@XmlElement(name="scoreEntry")
+	@XmlElementWrapper
 	private List<ScoreEntry> highScores;
 	private final Comparator<ScoreEntry> highScoreComparator = new HighScoreComparator();
 	

@@ -13,18 +13,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import dc.longshot.eventmanagement.Event;
+import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.game.Skins;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.system.Input;
-import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIFactory;
 
 public final class MainMenuScreen implements Screen {
 
-	private final ScreenManager screenManager;
+	private final EventDelegate<NewGameListener> newGameDelegate = new EventDelegate<NewGameListener>();
+	
 	private final SpriteBatch spriteBatch;
-	private Screen newGameScreen;
 	
 	private Skin skin;
 	private BitmapFont font;
@@ -33,15 +34,13 @@ public final class MainMenuScreen implements Screen {
 
 	private final Texture cursorTexture;
 	
-	public MainMenuScreen(final ScreenManager screenManager, final SpriteCache<SpriteKey> spriteCache, 
-			final SpriteBatch spriteBatch) {
-		this.screenManager = screenManager;
+	public MainMenuScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch) {
 		this.spriteBatch = new SpriteBatch();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CURSOR);
 	}
 	
-	public final void setNewGameScreen(final Screen newGameScreen) {
-		this.newGameScreen = newGameScreen;
+	public final void addListener(NewGameListener listener) {
+		newGameDelegate.listen(listener);
 	}
 
 	@Override
@@ -90,11 +89,10 @@ public final class MainMenuScreen implements Screen {
 	}
 	
 	private ClickListener newGameButton_clicked() {
-		final Screen thisScreen = this;
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
-				screenManager.swap(thisScreen, newGameScreen);
+				newGameDelegate.notify(new NewGameEvent());
 			}
 		};
 	}
@@ -124,5 +122,21 @@ public final class MainMenuScreen implements Screen {
 		mainTable.row();
 		return mainTable;
 	}
+	
+	public interface NewGameListener {
+		
+		void requested();
+		
+	}
+	
+	private final class NewGameEvent implements Event<NewGameListener> {
+
+		@Override
+		public void notify(NewGameListener listener) {
+			listener.requested();
+		}
+		
+	}
+
 	
 }

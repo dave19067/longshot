@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
@@ -46,11 +47,12 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.eventmanagement.Event;
+import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
-import dc.longshot.game.GameInputProcessor;
 import dc.longshot.game.LevelController;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
@@ -58,7 +60,6 @@ import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.ScreenUnitConversion;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
-import dc.longshot.models.GameSession;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
 import dc.longshot.models.SpriteKey;
@@ -74,24 +75,21 @@ import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
-import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIUtils;
-import dc.longshot.ui.controls.EscapeMenu;
-import dc.longshot.ui.controls.ScoreEntryDialog;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.XmlUtils;
 
 public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
+
+	private final EventDelegate<GamePausedListener> gamePausedDelegate = new EventDelegate<GamePausedListener>();
+	private final EventDelegate<GameOverListener> gameOverDelegate = new EventDelegate<GameOverListener>();
 	
-	private final ScreenManager screenManager;
 	private final SpriteCache<SpriteKey> spriteCache;
-	private Screen mainMenuScreen;
 	private Camera camera;
 	private Vector2 defaultScreenSize;
 	private final SpriteBatch spriteBatch;
-	private final GameSession gameSession;
 	private final float speedMultiplier = 1f;
 
 	private Stage stage;
@@ -106,7 +104,7 @@ public final class LevelScreen implements Screen {
 	private BackdropManager backdropManager;
 	private LevelController levelController;
 	private List<EntitySystem> entitySystems;
-	private InputProcessor gameInputProcessor;
+	private InputProcessor levelInputProcessor;
 
 	private final Texture cursorTexture;
 	
@@ -116,17 +114,26 @@ public final class LevelScreen implements Screen {
 	private Level level;
 	private Entity shooter;
 	
-	public LevelScreen(final ScreenManager screenManager, final SpriteCache<SpriteKey> spriteCache, 
-			final SpriteBatch spriteBatch, GameSession gameSession) {
-		this.screenManager = screenManager;
+	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch) {
 		this.spriteCache = spriteCache;
 		this.spriteBatch = spriteBatch;
-		this.gameSession = gameSession;
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
+
+	public final void addEventListener(GamePausedListener listener) {
+		gamePausedDelegate.listen(listener);
+	}
+
+	public final void addEventListener(GameOverListener listener) {
+		gameOverDelegate.listen(listener);
+	}
 	
-	public final void setMainMenuScreen(Screen mainMenuScreen) {
-		this.mainMenuScreen = mainMenuScreen;
+	public final Stage getStage() {
+		return stage;
+	}
+	
+	public final LevelSession getLevelSession() {
+		return levelSession;
 	}
 
 	// TODO: temp
@@ -144,11 +151,7 @@ public final class LevelScreen implements Screen {
 		if (levelSession.getHealth() <= 0) {
 			if (!justDied) {
 				justDied = true;
-				if (gameSession.canAddHighScore(score)) {
-					ScoreEntryDialog scoreEntryDialogFactory = new ScoreEntryDialog(Skins.defaultSkin, 
-							Skins.ocrFont, stage, screenManager, this, mainMenuScreen, gameSession, score);
-					scoreEntryDialogFactory.showDialog();
-				}
+				gameOverDelegate.notify(new GameOverEvent(score));
 			}
 		}
 		
@@ -187,14 +190,14 @@ public final class LevelScreen implements Screen {
 		setupBackdropManager();
 		addInputProcessors();
 		setupStage();
-		createSystems();
-		createInitialEntities();
+		setupSystems();
+		setupInitialEntities();
 		listenToGameEvents();
 	}
 
 	@Override
 	public final void hide() {
-		Input.removeProcessor(gameInputProcessor);
+		Input.removeProcessor(levelInputProcessor);
 		Input.removeProcessor(stage);
 		stage.dispose();
 	}
@@ -290,11 +293,9 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void addInputProcessors() {
-		EscapeMenu escapeMenu = new EscapeMenu(Skins.defaultSkin, Skins.ocrFont, stage, screenManager, levelSession, 
-				this, mainMenuScreen);
-		gameInputProcessor = new GameInputProcessor(escapeMenu);
+		levelInputProcessor = new LevelInputProcessor();
 		Input.addProcessor(stage);
-		Input.addProcessor(gameInputProcessor);
+		Input.addProcessor(levelInputProcessor);
 	}
 	
 	private void listenToGameEvents() {
@@ -336,7 +337,7 @@ public final class LevelScreen implements Screen {
 		return mainTable;
 	}
 	
-	private void createSystems() {
+	private void setupSystems() {
 		entitySystems = new ArrayList<EntitySystem>();
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
@@ -351,7 +352,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new TimedDeathSystem(entityManager));
 	}
 	
-	private void createInitialEntities() {
+	private void setupInitialEntities() {
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
 				new Vector2(boundsBox.x, boundsBox.y), SpriteKey.GREEN);
@@ -490,6 +491,91 @@ public final class LevelScreen implements Screen {
 	    	}
 	    }
 	    
+	}
+	
+	public interface GamePausedListener {
+		
+		void paused();
+		
+	}
+	
+	private final class GamePausedEvent implements Event<GamePausedListener> {
+
+		@Override
+		public void notify(GamePausedListener listener) {
+			listener.paused();
+		}
+		
+	}
+	
+	public interface GameOverListener {
+		
+		void gameOver(int score);
+		
+	}
+	
+	private final class GameOverEvent implements Event<GameOverListener> {
+
+		private final int score;
+		
+		private GameOverEvent(int score) {
+			this.score = score;
+		}
+		
+		@Override
+		public final void notify(GameOverListener listener) {
+			listener.gameOver(score);
+		}
+		
+	}
+	
+	private final class LevelInputProcessor implements InputProcessor {
+		
+		@Override
+		public final boolean keyDown(final int keycode) {
+			return false;
+		}
+
+		@Override
+		public final boolean keyUp(final int keycode) {
+			switch (keycode) {
+			case Keys.ESCAPE:
+				gamePausedDelegate.notify(new GamePausedEvent());
+				return true;
+			};
+			return false;
+		}
+
+		@Override
+		public final boolean keyTyped(final char character) {
+			return false;
+		}
+
+		@Override
+		public final boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
+			return false;
+		}
+
+		@Override
+		public final boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
+			return false;
+		}
+
+		@Override
+		public final boolean touchDragged(final int screenX, final int screenY, final int pointer) {
+			return false;
+		}
+
+		@Override
+		public final boolean mouseMoved(final int screenX, final int screenY) {
+			return false;
+		}
+
+		@Override
+		public final boolean scrolled(final int amount) {
+			return false;
+		}
+
 	}
 
 }

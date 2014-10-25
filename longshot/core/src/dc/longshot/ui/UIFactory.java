@@ -10,6 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 
 public final class UIFactory {
 	
+	private UIFactory() {
+	}
+	
 	public static final Label createLabel(final Skin skin, final BitmapFont font, final String text) {
 		Label label = new Label(text, skin);
 		label.getStyle().font = font;

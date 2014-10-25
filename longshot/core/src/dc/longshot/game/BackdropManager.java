@@ -36,7 +36,7 @@ public final class BackdropManager {
 		
 		for (DecorationProfile decorationProfile : decorationProfiles) {
 			decorations.put(decorationProfile, new ArrayList<Polygon>());
-			createInitialDecorations(decorationProfile);
+			generateInitialDecorations(decorationProfile);
 		}
 	}
 	
@@ -66,7 +66,7 @@ public final class BackdropManager {
 		}
 	}
 	
-	private void createInitialDecorations(DecorationProfile decorationProfile) {
+	private void generateInitialDecorations(DecorationProfile decorationProfile) {
 		int decorationNum = (int)(decorationProfile.area.width / decorationProfile.scrollSpeed
 				/ decorationProfile.spawnRate);
 		for (int i = 0; i < decorationNum; i++) {

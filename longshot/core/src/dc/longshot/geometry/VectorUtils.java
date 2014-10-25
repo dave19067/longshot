@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 
 public final class VectorUtils {
 	
+	private VectorUtils() {
+	}
+	
 	public static final Vector2 unit(final Vector2 vector) {
 		float length = vector.len();
 		return vector.cpy().scl(1 / length);

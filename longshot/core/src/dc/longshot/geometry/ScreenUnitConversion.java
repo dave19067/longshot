@@ -8,6 +8,9 @@ import com.badlogic.gdx.math.Vector3;
 public final class ScreenUnitConversion {
 	
 	public static final float PIXELS_PER_UNIT = 64;
+	
+	private ScreenUnitConversion() {
+	}
 
 	public static final Vector2 getScreenToWorldCoords(final Camera camera, final int screenX, final int screenY) {
 		Rectangle viewPort = new Rectangle(0, 0, camera.viewportWidth, camera.viewportHeight);

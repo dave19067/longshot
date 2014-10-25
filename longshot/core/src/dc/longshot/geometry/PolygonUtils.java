@@ -4,6 +4,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public final class PolygonUtils {
+	
+	private PolygonUtils() {
+	}
 
 	public static final float top(final Rectangle rectangle) {
 		return rectangle.y + rectangle.height;

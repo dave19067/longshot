@@ -17,7 +17,7 @@ import dc.longshot.system.ExecutionState;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIFactory;
 
-public final class EscapeMenu {
+public final class PauseMenu {
 	
 	private final Skin skin;
 	private final BitmapFont font;
@@ -28,7 +28,7 @@ public final class EscapeMenu {
 	private final Screen mainMenuScreen;
 	private Dialog dialog;
 
-	public EscapeMenu(final Skin skin, final BitmapFont font, final Stage stage, 
+	public PauseMenu(final Skin skin, final BitmapFont font, final Stage stage, 
 			final ScreenManager screenManager, final LevelSession levelSession, final Screen currentScreen, 
 			final Screen mainMenuScreen) {
 		this.skin = skin;

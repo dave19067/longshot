@@ -6,6 +6,9 @@ public final class ColorUtils {
 
 	private static final float rgbMax = 255;
 	
+	private ColorUtils() {
+	}
+	
 	public static final Color toGdxColor(final float r, final float g, final float b) {
 		return toGdxColor(r, g, b, 1);
 	}
