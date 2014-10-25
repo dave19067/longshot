@@ -2,7 +2,7 @@ package dc.longshot.models;
 
 import dc.longshot.system.ExecutionState;
 
-public final class Session {
+public final class LevelSession {
 
 	private ExecutionState executionState = ExecutionState.RUNNING;
 	private float health = 5;

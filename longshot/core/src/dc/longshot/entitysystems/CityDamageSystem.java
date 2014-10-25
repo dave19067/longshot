@@ -8,7 +8,7 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.Bound;
 import dc.longshot.models.CollisionType;
-import dc.longshot.models.Session;
+import dc.longshot.models.LevelSession;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
@@ -17,11 +17,11 @@ import dc.longshot.parts.TransformPart;
 public final class CityDamageSystem implements EntitySystem {
 
 	private final Rectangle boundsBox;
-	private final Session session;
+	private final LevelSession levelSession;
 	
-	public CityDamageSystem(final Rectangle boundsBox, final Session session) {
+	public CityDamageSystem(final Rectangle boundsBox, final LevelSession levelSession) {
 		this.boundsBox = boundsBox;
-		this.session = session;
+		this.levelSession = levelSession;
 	}
 	
 	@Override
@@ -31,7 +31,7 @@ public final class CityDamageSystem implements EntitySystem {
 			if (entity.get(CollisionTypePart.class).getCollisionType() == CollisionType.ENEMY
 					&& bounds.contains(Bound.BOTTOM)) {
 				float damage = entity.get(DamageOnCollisionPart.class).getDamage();
-				session.decreaseHealth(damage);
+				levelSession.decreaseHealth(damage);
 			}
 		}
 	}

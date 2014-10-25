@@ -1,5 +1,6 @@
 package dc.longshot.screens;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,8 +58,9 @@ import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.ScreenUnitConversion;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
+import dc.longshot.models.GameSession;
 import dc.longshot.models.Level;
-import dc.longshot.models.Session;
+import dc.longshot.models.LevelSession;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
@@ -74,21 +76,22 @@ import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIUtils;
-import dc.longshot.ui.factories.EscapeMenuFactory;
+import dc.longshot.ui.controls.EscapeMenu;
+import dc.longshot.ui.controls.ScoreEntryDialog;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.XmlUtils;
 
-public final class GameScreen implements Screen {
+public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 	
 	private final ScreenManager screenManager;
 	private final SpriteCache<SpriteKey> spriteCache;
-	private Screen loseScreen;
 	private Screen mainMenuScreen;
 	private Camera camera;
 	private Vector2 defaultScreenSize;
 	private final SpriteBatch spriteBatch;
+	private final GameSession gameSession;
 	private final float speedMultiplier = 1f;
 
 	private Stage stage;
@@ -107,28 +110,28 @@ public final class GameScreen implements Screen {
 
 	private final Texture cursorTexture;
 	
-	private Session session; 
+	private LevelSession levelSession; 
 	private int score;
 	
 	private Level level;
 	private Entity shooter;
 	
-	public GameScreen(final ScreenManager screenManager, final SpriteCache<SpriteKey> spriteCache, 
-			final SpriteBatch spriteBatch) {
+	public LevelScreen(final ScreenManager screenManager, final SpriteCache<SpriteKey> spriteCache, 
+			final SpriteBatch spriteBatch, GameSession gameSession) {
 		this.screenManager = screenManager;
 		this.spriteCache = spriteCache;
 		this.spriteBatch = spriteBatch;
+		this.gameSession = gameSession;
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
 	
 	public final void setMainMenuScreen(Screen mainMenuScreen) {
 		this.mainMenuScreen = mainMenuScreen;
 	}
-	
-	public final void setLoseScreen(Screen loseScreen) {
-		this.loseScreen = loseScreen;
-	}
 
+	// TODO: temp
+	boolean justDied = false;
+	
 	@Override
 	public final void render(final float delta) {
 		handleInput();
@@ -138,8 +141,15 @@ public final class GameScreen implements Screen {
 		boundCursor();
 		updateUI();
 		
-		if (session.getHealth() <= 0) {
-			screenManager.swap(this, loseScreen);
+		if (levelSession.getHealth() <= 0) {
+			if (!justDied) {
+				justDied = true;
+				if (gameSession.canAddHighScore(score)) {
+					ScoreEntryDialog scoreEntryDialogFactory = new ScoreEntryDialog(Skins.defaultSkin, 
+							Skins.ocrFont, stage, screenManager, this, mainMenuScreen, gameSession, score);
+					scoreEntryDialogFactory.showDialog();
+				}
+			}
 		}
 		
 		if (levelController.isComplete()) {
@@ -147,7 +157,7 @@ public final class GameScreen implements Screen {
 			Gdx.app.exit();
 		}
 		
-		if (session.getExecutionState() == ExecutionState.RUNNING) {
+		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
 			updateWorld(delta * speedMultiplier);
 		}
 		
@@ -167,9 +177,10 @@ public final class GameScreen implements Screen {
 		entityManager = new EntityManager(eventManager);
 		collisionManager = new CollisionManager(eventManager);
 		stage = new Stage();
-		session = new Session();
+		levelSession = new LevelSession();
 		score = 0;
-		level = XmlUtils.unmarshal("bin/levels/level1.xml", new Class[] { Level.class });
+		InputStream levelInputStream = Gdx.files.internal("levels/level1.xml").read();
+		level = XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
 		
 		setupCamera();
@@ -190,12 +201,12 @@ public final class GameScreen implements Screen {
 
 	@Override
 	public final void pause() {
-		session.setExecutionState(ExecutionState.PAUSED);
+		levelSession.setExecutionState(ExecutionState.PAUSED);
 	}
 
 	@Override
 	public final void resume() {
-		session.setExecutionState(ExecutionState.RUNNING);
+		levelSession.setExecutionState(ExecutionState.RUNNING);
 	}
 
 	@Override
@@ -279,10 +290,10 @@ public final class GameScreen implements Screen {
 	}
 	
 	private void addInputProcessors() {
-		EscapeMenuFactory escapeMenuFactory = new EscapeMenuFactory(Skins.defaultSkin, Skins.ocrFont, stage, 
-				screenManager, session, this, mainMenuScreen);
+		EscapeMenu escapeMenu = new EscapeMenu(Skins.defaultSkin, Skins.ocrFont, stage, screenManager, levelSession, 
+				this, mainMenuScreen);
+		gameInputProcessor = new GameInputProcessor(escapeMenu);
 		Input.addProcessor(stage);
-		gameInputProcessor = new GameInputProcessor(escapeMenuFactory);
 		Input.addProcessor(gameInputProcessor);
 	}
 	
@@ -330,7 +341,7 @@ public final class GameScreen implements Screen {
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
-		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), session));
+		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
 		entitySystems.add(new EmitSystem(entityManager));
 		entitySystems.add(new AIShooterSystem(entityManager));
 		entitySystems.add(new InputMovementSystem());
@@ -371,7 +382,7 @@ public final class GameScreen implements Screen {
 	}
 	
 	private void updateUI() {
-		healthLabel.setText("HEALTH: " + session.getHealth());
+		healthLabel.setText("HEALTH: " + levelSession.getHealth());
 		scoreLabel.setText("SCORE: " + score);
 	}
 	
@@ -467,7 +478,8 @@ public final class GameScreen implements Screen {
 		return spawnPosition;
 	}
 	
-	private final class ZComparator implements Comparator<Entity> {
+	private class ZComparator implements Comparator<Entity> {
+		
 	    @Override
 	    public final int compare(final Entity e1, final Entity e2) {
 	    	if (e1.hasActive(DrawablePart.class) && e2.hasActive(DrawablePart.class)) {
@@ -477,6 +489,7 @@ public final class GameScreen implements Screen {
 	    		return 0;
 	    	}
 	    }
+	    
 	}
 
 }

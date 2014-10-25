@@ -1,4 +1,4 @@
-package dc.longshot.ui.factories;
+package dc.longshot.ui.controls;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,58 +7,59 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import dc.longshot.models.Session;
+import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIFactory;
 
-public final class EscapeMenuFactory {
+public final class EscapeMenu {
 	
 	private final Skin skin;
 	private final BitmapFont font;
 	private final Stage stage;
 	private final ScreenManager screenManager;
-	private final Session session;
+	private final LevelSession levelSession;
 	private final Screen currentScreen;
 	private final Screen mainMenuScreen;
+	private Dialog dialog;
 
-	public EscapeMenuFactory(final Skin skin, final BitmapFont font, final Stage stage, 
-			final ScreenManager screenManager, final Session session, final Screen currentScreen, 
+	public EscapeMenu(final Skin skin, final BitmapFont font, final Stage stage, 
+			final ScreenManager screenManager, final LevelSession levelSession, final Screen currentScreen, 
 			final Screen mainMenuScreen) {
 		this.skin = skin;
 		this.font = font;
 		this.stage = stage;
 		this.screenManager = screenManager;
-		this.session = session;
+		this.levelSession = levelSession;
 		this.currentScreen = currentScreen;
 		this.mainMenuScreen = mainMenuScreen;
+		
+		setupDialog();
 	}
 	
 	public final void showDialog() {
-		Dialog dialog = new Dialog("Menu", skin);
-		Table table = createTable(dialog);
-		dialog.add(table);
-		dialog.addListener(dialog_input(dialog));
+		levelSession.setExecutionState(ExecutionState.PAUSED);
 		dialog.show(stage);
-		session.setExecutionState(ExecutionState.PAUSED);
+	}
+	
+	private void setupDialog() {
+		dialog = new Dialog("Menu", skin);
+		dialog.add(createTable(dialog));
+		dialog.addListener(dialog_input(dialog));
 	}
 	
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
-		Button resumeButton = UIFactory.createTextButton(skin, font, "Resume", resumeButton_clicked(dialog));
-		table.add(resumeButton);
+		table.add(UIFactory.createButton(skin, font, "Resume", resumeButton_clicked(dialog)));
 		table.row();
-		Button mainMenuButton = UIFactory.createTextButton(skin, font, "Main Menu", mainMenuButton_clicked());
-		table.add(mainMenuButton);
+		table.add(UIFactory.createButton(skin, font, "Main Menu", mainMenuButton_clicked()));
 		table.row();
-		Button quitButton = UIFactory.createTextButton(skin, font, "Quit", quitButton_clicked());
-		table.add(quitButton);
+		table.add(UIFactory.createButton(skin, font, "Quit", quitButton_clicked()));
 		return table;
 	}
 	
@@ -66,7 +67,7 @@ public final class EscapeMenuFactory {
 		return new ClickListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				session.setExecutionState(ExecutionState.RUNNING);
+				levelSession.setExecutionState(ExecutionState.RUNNING);
 				dialog.hide();
 				return true;
 			}
@@ -77,8 +78,7 @@ public final class EscapeMenuFactory {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
-				screenManager.add(mainMenuScreen);
-				screenManager.remove(currentScreen);
+				screenManager.swap(currentScreen, mainMenuScreen);
 			}
 		};
 	}
@@ -97,7 +97,7 @@ public final class EscapeMenuFactory {
 			@Override
 			public boolean keyUp(InputEvent event, int keycode) {
 				if (keycode == Input.Keys.ESCAPE) {
-					session.setExecutionState(ExecutionState.RUNNING);
+					levelSession.setExecutionState(ExecutionState.RUNNING);
 					dialog.hide();
 					return true;
 				}

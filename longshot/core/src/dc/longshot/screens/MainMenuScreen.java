@@ -116,10 +116,10 @@ public final class MainMenuScreen implements Screen {
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
-		Button newGameButton = UIFactory.createTextButton(skin, font, "New Game", newGameButton_clicked());
+		Button newGameButton = UIFactory.createButton(skin, font, "New Game", newGameButton_clicked());
 		mainTable.add(newGameButton);
 		mainTable.row();
-		Button quitButton = UIFactory.createTextButton(skin, font, "Quit", quitButton_clicked());
+		Button quitButton = UIFactory.createButton(skin, font, "Quit", quitButton_clicked());
 		mainTable.add(quitButton);
 		mainTable.row();
 		return mainTable;

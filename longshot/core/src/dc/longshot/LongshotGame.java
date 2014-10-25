@@ -1,5 +1,7 @@
 package dc.longshot;
 
+import java.io.InputStream;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -9,22 +11,27 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dc.longshot.game.Skins;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
+import dc.longshot.models.GameSession;
+import dc.longshot.models.Paths;
 import dc.longshot.models.SpriteKey;
-import dc.longshot.screens.GameScreen;
+import dc.longshot.screens.LevelScreen;
 import dc.longshot.screens.MainMenuScreen;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.util.ColorUtils;
+import dc.longshot.util.XmlUtils;
 
 public final class LongshotGame extends Game {
 	
 	private final ScreenManager screenManager = new ScreenManager();
 	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
 	private SpriteBatch spriteBatch;
+	private GameSession gameSession;
 	
 	@Override
 	public final void create() {
 		spriteBatch = new SpriteBatch();
 		Gdx.input.setCursorCatched(true);
+		loadGameSession();
 		loadSprites();
 		createScreens();
 	}
@@ -45,6 +52,11 @@ public final class LongshotGame extends Game {
 		spriteCache.dispose();
 		screenManager.dispose();
 		Skins.dispose();
+	}
+	
+	private void loadGameSession() {
+		InputStream gameSessionInputStream = Gdx.files.local(Paths.HIGH_SCORES_PATH).read();
+		gameSession = XmlUtils.unmarshal(gameSessionInputStream, new Class[] { GameSession.class });
 	}
 	
 	private void loadSprites() {
@@ -71,10 +83,11 @@ public final class LongshotGame extends Game {
 	
 	private void createScreens() {
 		MainMenuScreen mainMenuScreen = new MainMenuScreen(screenManager, spriteCache, spriteBatch);
-		GameScreen gameScreen = new GameScreen(screenManager, spriteCache, spriteBatch);
-		mainMenuScreen.setNewGameScreen(gameScreen);
-		gameScreen.setMainMenuScreen(mainMenuScreen);
-		gameScreen.setLoseScreen(mainMenuScreen);
+		LevelScreen levelScreen = new LevelScreen(screenManager, spriteCache, spriteBatch, gameSession);
+		
+		mainMenuScreen.setNewGameScreen(levelScreen);
+
+		levelScreen.setMainMenuScreen(mainMenuScreen);
 		screenManager.add(mainMenuScreen);
 	}
 	

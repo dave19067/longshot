@@ -3,14 +3,14 @@ package dc.longshot.game;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 
-import dc.longshot.ui.factories.EscapeMenuFactory;
+import dc.longshot.ui.controls.EscapeMenu;
 
 public final class GameInputProcessor implements InputProcessor {
 	
-	private final EscapeMenuFactory escapeMenuFactory;
+	private final EscapeMenu escapeMenu;
 	
-	public GameInputProcessor(EscapeMenuFactory escapeMenuFactory) {
-		this.escapeMenuFactory = escapeMenuFactory;
+	public GameInputProcessor(final EscapeMenu escapeMenu) {
+		this.escapeMenu = escapeMenu;
 	}
 	
 	@Override
@@ -22,7 +22,7 @@ public final class GameInputProcessor implements InputProcessor {
 	public final boolean keyUp(final int keycode) {
 		switch (keycode) {
 		case Keys.ESCAPE:
-			escapeMenuFactory.showDialog();
+			escapeMenu.showDialog();
 			return true;
 		};
 		return false;

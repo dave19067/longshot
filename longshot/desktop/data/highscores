@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gameSession>
+    <scoreEntry>
+        <name>coocoo</name>
+        <score>10</score>
+    </scoreEntry>
+    <scoreEntry>
+        <score>0</score>
+    </scoreEntry>
+    <scoreEntry>
+        <score>0</score>
+    </scoreEntry>
+    <scoreEntry>
+        <name>fucky</name>
+        <score>100</score>
+    </scoreEntry>
+    <scoreEntry>
+        <name>dave</name>
+        <score>100</score>
+    </scoreEntry>
+</gameSession>

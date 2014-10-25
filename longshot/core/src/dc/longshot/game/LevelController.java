@@ -136,7 +136,7 @@ public final class LevelController {
 		transform.setPosition(spawnPosition);
 	}
 
-	private final class SpawnInfo {
+	private class SpawnInfo {
 	
 		private EntityType entityType;
 		private float time;
