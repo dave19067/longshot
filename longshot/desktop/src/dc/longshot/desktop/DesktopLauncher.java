@@ -10,7 +10,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration configuration = new LwjglApplicationConfiguration();
 		configuration.title = "Longshot";
-//		configuration.fullscreen = true;
+		configuration.fullscreen = false;
 		configuration.width = 1024;
 		configuration.height = 768;
 		

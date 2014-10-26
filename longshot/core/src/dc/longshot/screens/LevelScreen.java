@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import dc.longshot.collision.CollisionManager;
 import dc.longshot.entitysystems.AIShooterSystem;
@@ -88,9 +89,8 @@ public final class LevelScreen implements Screen {
 	
 	private final SpriteCache<SpriteKey> spriteCache;
 	private Camera camera;
-	private Vector2 defaultScreenSize;
 	private final SpriteBatch spriteBatch;
-	private final float speedMultiplier = 10f;
+	private final float speedMultiplier = 1f;
 
 	private Stage stage;
 	private Table worldTable;
@@ -174,17 +174,17 @@ public final class LevelScreen implements Screen {
 	@Override
 	public final void show() {
 		entityFactory = new EntityFactory(spriteCache);
-		defaultScreenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		eventManager = new EventManager();
 		entityManager = new EntityManager(eventManager);
 		collisionManager = new CollisionManager(eventManager);
-		stage = new Stage();
+		stage = new Stage(new ScreenViewport());
 		levelSession = new LevelSession();
 		score = 0;
 		InputStream levelInputStream = Gdx.files.internal("levels/level1.xml").read();
 		level = XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
-		
+
+		Gdx.input.setCursorCatched(true);
 		setupCamera();
 		setupBackdropManager();
 		addInputProcessors();
@@ -346,7 +346,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new EmitSystem(entityManager));
 		entitySystems.add(new AIShooterSystem(entityManager));
 		entitySystems.add(new InputMovementSystem());
-		entitySystems.add(new RotateToCursorSystem(camera, worldTable, defaultScreenSize));
+		entitySystems.add(new RotateToCursorSystem(camera, worldTable));
 		entitySystems.add(new NoHealthSystem(entityManager));
 		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
@@ -414,7 +414,7 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void setWorldViewport() {
-		Rectangle worldTableRect = UIUtils.boundingBox(worldTable, defaultScreenSize);
+		Rectangle worldTableRect = UIUtils.boundingBox(worldTable);
 		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
 				(int)worldTableRect.getHeight());
 	}

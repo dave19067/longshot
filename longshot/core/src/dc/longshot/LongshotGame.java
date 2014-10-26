@@ -39,7 +39,6 @@ public final class LongshotGame extends Game {
 	@Override
 	public final void create() {
 		spriteBatch = new SpriteBatch();
-		Gdx.input.setCursorCatched(true);
 		loadGameSession();
 		loadSprites();
 		setupScreens();
@@ -70,7 +69,6 @@ public final class LongshotGame extends Game {
 	}
 	
 	private void loadSprites() {
-		spriteCache.add(SpriteKey.CURSOR, "images/cursor.png");
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.STAR, "images/star.png");
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
@@ -92,9 +90,9 @@ public final class LongshotGame extends Game {
 	}
 	
 	private void setupScreens() {
-		MainMenuScreen mainMenuScreen = new MainMenuScreen(spriteCache, spriteBatch);
+		MainMenuScreen mainMenuScreen = new MainMenuScreen();
 		LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch);
-		HighScoresScreen highScoresScreen = new HighScoresScreen(spriteCache, spriteBatch, gameSession);
+		HighScoresScreen highScoresScreen = new HighScoresScreen(gameSession);
 		setupMainMenuScreen(mainMenuScreen, levelScreen, highScoresScreen);
 		setupLevelScreen(levelScreen, mainMenuScreen, highScoresScreen);
 		setupHighScoresScreen(highScoresScreen, mainMenuScreen);

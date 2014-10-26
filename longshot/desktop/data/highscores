@@ -26,10 +26,6 @@
             <score>0</score>
         </highScores>
         <highScores>
-            <name>dc</name>
-            <score>0</score>
-        </highScores>
-        <highScores>
             <name>f</name>
             <score>0</score>
         </highScores>
@@ -44,6 +40,10 @@
         <highScores>
             <name>f</name>
             <score>100</score>
+        </highScores>
+        <highScores>
+            <name>fu</name>
+            <score>1800</score>
         </highScores>
     </highScores>
 </gameSession>
