@@ -54,7 +54,11 @@ public final class GameSession {
 		
 	    @Override
 	    public final int compare(final ScoreEntry s1, final ScoreEntry s2) {
-	    	return Integer.compare(s1.getScore(), s2.getScore());
+	    	int compareValue = Integer.compare(s1.getScore(), s2.getScore());
+	    	if (compareValue == 0) {
+	    		compareValue = s1.getName().compareTo(s2.getName());
+	    	}
+	    	return compareValue;
 	    }
 	    
 	}

@@ -27,21 +27,21 @@ public final class ScoreEntryDialog {
 	private final Stage stage;
 	private final ScreenManager screenManager;
 	private final Screen currentScreen;
-	private final Screen highScoresScreen;
+	private final Screen nextScreen;
 	private final GameSession gameSession;
 	private final int score;
 	private Dialog dialog;
 	private TextField nameTextField;
 
 	public ScoreEntryDialog(final Skin skin, final BitmapFont font, final Stage stage, 
-			final ScreenManager screenManager, final Screen currentScreen, final Screen highScoresScreen, 
+			final ScreenManager screenManager, final Screen currentScreen, final Screen nextScreen, 
 			GameSession gameSession, int score) {
 		this.skin = skin;
 		this.font = font;
 		this.stage = stage;
 		this.screenManager = screenManager;
 		this.currentScreen = currentScreen;
-		this.highScoresScreen = highScoresScreen;
+		this.nextScreen = nextScreen;
 		this.gameSession = gameSession;
 		this.score = score;
 		
@@ -82,7 +82,7 @@ public final class ScoreEntryDialog {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				saveHighScore();
-				screenManager.swap(currentScreen, highScoresScreen);
+				screenManager.swap(currentScreen, nextScreen);
 				dialog.hide();
 				return true;
 			}

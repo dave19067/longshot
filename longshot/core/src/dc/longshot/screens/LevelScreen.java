@@ -83,14 +83,14 @@ public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 
-	private final EventDelegate<GamePausedListener> gamePausedDelegate = new EventDelegate<GamePausedListener>();
+	private final EventDelegate<PausedListener> pausedDelegate = new EventDelegate<PausedListener>();
 	private final EventDelegate<GameOverListener> gameOverDelegate = new EventDelegate<GameOverListener>();
 	
 	private final SpriteCache<SpriteKey> spriteCache;
 	private Camera camera;
 	private Vector2 defaultScreenSize;
 	private final SpriteBatch spriteBatch;
-	private final float speedMultiplier = 1f;
+	private final float speedMultiplier = 10f;
 
 	private Stage stage;
 	private Table worldTable;
@@ -120,8 +120,8 @@ public final class LevelScreen implements Screen {
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
 
-	public final void addEventListener(GamePausedListener listener) {
-		gamePausedDelegate.listen(listener);
+	public final void addEventListener(PausedListener listener) {
+		pausedDelegate.listen(listener);
 	}
 
 	public final void addEventListener(GameOverListener listener) {
@@ -145,7 +145,6 @@ public final class LevelScreen implements Screen {
 		stage.act(delta);
 		entityManager.update();
 		camera.update();
-		boundCursor();
 		updateUI();
 		
 		if (levelSession.getHealth() <= 0) {
@@ -197,9 +196,6 @@ public final class LevelScreen implements Screen {
 
 	@Override
 	public final void hide() {
-		Input.removeProcessor(levelInputProcessor);
-		Input.removeProcessor(stage);
-		stage.dispose();
 	}
 
 	@Override
@@ -214,6 +210,10 @@ public final class LevelScreen implements Screen {
 
 	@Override
 	public final void dispose() {
+		Input.removeProcessor(levelInputProcessor);
+		Input.removeProcessor(stage);
+		stage.dispose();
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
 	private EntityAddedListener handleEntityAdded() {
@@ -367,21 +367,6 @@ public final class LevelScreen implements Screen {
 		entityManager.add(shooter);
 	}
 	
-	private void boundCursor() {
-		if (Gdx.input.getX() > Gdx.graphics.getWidth()) {
-			Gdx.input.setCursorPosition(Gdx.graphics.getWidth(), Gdx.input.getY());
-		}
-		if (Gdx.input.getX() < 0) {
-			Gdx.input.setCursorPosition(0, Gdx.input.getY());
-		}
-		if (Gdx.input.getY() > Gdx.graphics.getHeight()) {
-			Gdx.input.setCursorPosition(Gdx.input.getX(), Gdx.graphics.getHeight());
-		}
-		if (Gdx.input.getY() < 0) {
-			Gdx.input.setCursorPosition(Gdx.input.getX(), 0);
-		}
-	}
-	
 	private void updateUI() {
 		healthLabel.setText("HEALTH: " + levelSession.getHealth());
 		scoreLabel.setText("SCORE: " + score);
@@ -493,16 +478,16 @@ public final class LevelScreen implements Screen {
 	    
 	}
 	
-	public interface GamePausedListener {
+	public interface PausedListener {
 		
 		void paused();
 		
 	}
 	
-	private final class GamePausedEvent implements Event<GamePausedListener> {
+	private final class PausedEvent implements Event<PausedListener> {
 
 		@Override
-		public void notify(GamePausedListener listener) {
+		public void notify(PausedListener listener) {
 			listener.paused();
 		}
 		
@@ -540,7 +525,7 @@ public final class LevelScreen implements Screen {
 		public final boolean keyUp(final int keycode) {
 			switch (keycode) {
 			case Keys.ESCAPE:
-				gamePausedDelegate.notify(new GamePausedEvent());
+				pausedDelegate.notify(new PausedEvent());
 				return true;
 			};
 			return false;

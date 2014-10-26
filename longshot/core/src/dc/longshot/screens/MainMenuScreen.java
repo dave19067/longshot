@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -24,23 +23,30 @@ import dc.longshot.ui.UIFactory;
 public final class MainMenuScreen implements Screen {
 
 	private final EventDelegate<NewGameListener> newGameDelegate = new EventDelegate<NewGameListener>();
+	private final EventDelegate<HighScoresListener> highScoresDelegate = new EventDelegate<HighScoresListener>();
 	
 	private final SpriteBatch spriteBatch;
 	
-	private Skin skin;
-	private BitmapFont font;
+	private final Skin skin;
+	private final BitmapFont font;
 	
 	private Stage stage;
 
 	private final Texture cursorTexture;
 	
 	public MainMenuScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch) {
-		this.spriteBatch = new SpriteBatch();
+		this.spriteBatch = spriteBatch;
+		skin = Skins.defaultSkin;
+		font = Skins.ocrFont;
 		cursorTexture = spriteCache.getTexture(SpriteKey.CURSOR);
 	}
 	
 	public final void addListener(NewGameListener listener) {
 		newGameDelegate.listen(listener);
+	}
+	
+	public final void addListener(HighScoresListener listener) {
+		highScoresDelegate.listen(listener);
 	}
 
 	@Override
@@ -63,8 +69,6 @@ public final class MainMenuScreen implements Screen {
 
 	@Override
 	public final void show() {
-		skin = Skins.defaultSkin;
-		font = Skins.ocrFont;
 		stage = new Stage();
 		setupStage();
 		Input.addProcessor(stage);
@@ -72,8 +76,6 @@ public final class MainMenuScreen implements Screen {
 
 	@Override
 	public final void hide() {
-		Input.removeProcessor(stage);
-		stage.dispose();
 	}
 
 	@Override
@@ -86,6 +88,8 @@ public final class MainMenuScreen implements Screen {
 
 	@Override
 	public final void dispose() {
+		Input.removeProcessor(stage);
+		stage.dispose();
 	}
 	
 	private ClickListener newGameButton_clicked() {
@@ -93,6 +97,15 @@ public final class MainMenuScreen implements Screen {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
 				newGameDelegate.notify(new NewGameEvent());
+			}
+		};
+	}
+	
+	private ClickListener highScoresButton_clicked() {
+		return new ClickListener() {
+			@Override
+			public final void clicked(InputEvent event, float x, float y) {
+				highScoresDelegate.notify(new HighScoresEvent());
 			}
 		};
 	}
@@ -114,11 +127,11 @@ public final class MainMenuScreen implements Screen {
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
-		Button newGameButton = UIFactory.createButton(skin, font, "New Game", newGameButton_clicked());
-		mainTable.add(newGameButton);
+		mainTable.add(UIFactory.createButton(skin, font, "New Game", newGameButton_clicked()));
 		mainTable.row();
-		Button quitButton = UIFactory.createButton(skin, font, "Quit", quitButton_clicked());
-		mainTable.add(quitButton);
+		mainTable.add(UIFactory.createButton(skin, font, "High Scores", highScoresButton_clicked()));
+		mainTable.row();
+		mainTable.add(UIFactory.createButton(skin, font, "Quit", quitButton_clicked()));
 		mainTable.row();
 		return mainTable;
 	}
@@ -133,6 +146,21 @@ public final class MainMenuScreen implements Screen {
 
 		@Override
 		public void notify(NewGameListener listener) {
+			listener.requested();
+		}
+		
+	}
+	
+	public interface HighScoresListener {
+		
+		void requested();
+		
+	}
+	
+	private final class HighScoresEvent implements Event<HighScoresListener> {
+
+		@Override
+		public void notify(HighScoresListener listener) {
 			listener.requested();
 		}
 		
