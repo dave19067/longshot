@@ -1,5 +1,6 @@
 package dc.longshot.graphics;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,10 @@ public final class SpriteCache<T> {
 	
 	public final boolean containsKey(final T key) {
 		return textureMap.containsKey(key);
+	}
+	
+	public final Collection<T> getKeys() {
+		return textureMap.keySet();
 	}
 	
 	public final SpriteDrawable getDrawable(final T key) {

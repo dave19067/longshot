@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Polygon;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.eventmanagement.EventManager;
@@ -36,13 +36,13 @@ public final class CollisionManager {
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity1 = entities.get(i);
 			if (entity1.hasActive(TransformPart.class)) {
+				Polygon polygon1 = entity1.get(TransformPart.class).getPolygon();
 				for (int j = i + 1; j < entities.size(); j++) {
 					Entity entity2 = entities.get(j);
-					Rectangle boundingBox2 = entity2.get(TransformPart.class).getBoundingBox();
 					
 					if (entity2.hasActive(TransformPart.class)) {
-						Rectangle boundingBox1 = entity1.get(TransformPart.class).getBoundingBox();
-						if (Intersector.overlaps(boundingBox1, boundingBox2)) {
+						Polygon polygon2 = entity2.get(TransformPart.class).getPolygon();
+						if (Intersector.overlapConvexPolygons(polygon1, polygon2)) {
 							addCollision(entity1, entity2);
 							addCollision(entity2, entity1);
 							eventManager.notify(new CollidedEvent(entity1, entity2));

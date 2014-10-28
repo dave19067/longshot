@@ -1,18 +1,24 @@
 package dc.longshot.game;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.geometry.Bound;
 import dc.longshot.graphics.SpriteCache;
+import dc.longshot.graphics.TextureGeometry;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
@@ -47,9 +53,11 @@ import dc.longshot.parts.WeaponPart;
 public final class EntityFactory {
 	
 	private final SpriteCache<SpriteKey> spriteCache;
+	private final Map<SpriteKey, float[]> convexHullCache = new HashMap<SpriteKey, float[]>(); 
 	
 	public EntityFactory(final SpriteCache<SpriteKey> spriteCache) {
 		this.spriteCache = spriteCache;
+		generateConvexHulls(spriteCache);
 	}
 	
 	public final Entity create(final EntityType entityType) {
@@ -225,11 +233,27 @@ public final class EntityFactory {
 	
 	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final SpriteKey spriteKey) {
 		Entity entity = new Entity();
-		entity.attach(new TransformPart(new Vector2(size.x, size.y), position));
+		Polygon convexHull = createConvexHull(spriteKey, size);
+		entity.attach(new TransformPart(convexHull, position));
 		Texture texture = spriteCache.getTexture(spriteKey);
 		entity.attach(new DrawablePart(new Sprite(texture), size.z));
 		entity.attach(new DrawableUpdaterPart());
 		return entity;
+	}
+	
+	private void generateConvexHulls(final SpriteCache<SpriteKey> spriteCache) {
+		for (SpriteKey spriteKey : spriteCache.getKeys()) {
+			TextureRegion textureRegion = new TextureRegion(spriteCache.getTexture(spriteKey));
+			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
+			convexHullCache.put(spriteKey, convexHull);
+		}
+	}
+	
+	private Polygon createConvexHull(final SpriteKey spriteKey, final Vector3 size) {
+		Polygon polygon = new Polygon(convexHullCache.get(spriteKey));
+		Rectangle boundingRectangle = polygon.getBoundingRectangle();
+		polygon.setScale(size.x / boundingRectangle.width, size.y / boundingRectangle.height);
+		return polygon;
 	}
 	
 }

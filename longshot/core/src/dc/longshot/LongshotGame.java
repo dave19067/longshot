@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import dc.longshot.game.Skins;
 import dc.longshot.graphics.SpriteCache;
@@ -74,7 +75,8 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
-		Texture shooterOutlineTexture = TextureFactory.createOutline(spriteCache.getTexture(SpriteKey.SHOOTER));
+		Texture shooterOutlineTexture = TextureFactory.createOutline(
+				new TextureRegion(spriteCache.getTexture(SpriteKey.SHOOTER)));
 		spriteCache.add(SpriteKey.SHOOTER_OUTLINE, shooterOutlineTexture);
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");

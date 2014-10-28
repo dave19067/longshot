@@ -147,16 +147,11 @@ public final class LevelScreen implements Screen {
 		camera.update();
 		updateUI();
 		
-		if (levelSession.getHealth() <= 0) {
+		if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
 			if (!justDied) {
 				justDied = true;
 				gameOverDelegate.notify(new GameOverEvent(score));
 			}
-		}
-		
-		if (levelController.isComplete()) {
-			// TODO: win case
-			Gdx.app.exit();
 		}
 		
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {

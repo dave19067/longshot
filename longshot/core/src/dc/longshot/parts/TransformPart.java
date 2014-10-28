@@ -14,14 +14,14 @@ public final class TransformPart extends Part {
 
 	private final Polygon polygon;
 	
-	public TransformPart(final Vector2 size) {
-		this(size, new Vector2());
+	public TransformPart(final Polygon polygon, final Vector2 position) {
+		this.polygon = polygon;
+		this.polygon.setPosition(position.x, position.y);
+		this.polygon.setOrigin(0, 0);
 	}
 	
-	public TransformPart(final Vector2 size, final Vector2 position) {
-		polygon = PolygonFactory.createRectangle(size);
-		polygon.setPosition(position.x, position.y);
-		polygon.setOrigin(0, 0);
+	public final Polygon getPolygon() {
+		return PolygonFactory.copy(polygon);
 	}
 	
 	public final List<Vector2> getTransformedVertices() {
