@@ -24,6 +24,7 @@ public final class TextureGeometry {
 		FloatArray hullPoints = hull.computePolygon(points, true);
 		// Remove the last two extra points added by the computation
 		hullPoints.removeRange(hullPoints.size - 2, hullPoints.size - 1);
+		// Add points to convert single points hulls to polygon
 		if (hullPoints.size <= 0) {
 			hullPoints.addAll(0, 0, 1, 0, 1, 1, 0, 1);
 		}

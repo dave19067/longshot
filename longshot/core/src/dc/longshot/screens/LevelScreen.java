@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -34,12 +33,14 @@ import dc.longshot.entitysystems.AIShooterSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
 import dc.longshot.entitysystems.CityDamageSystem;
+import dc.longshot.entitysystems.CityDamageSystem.CityDestroyedListener;
 import dc.longshot.entitysystems.CollisionDamageSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.NoHealthSystem;
 import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
+import dc.longshot.entitysystems.ShooterInputSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityAddedEvent;
@@ -55,6 +56,7 @@ import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
 import dc.longshot.game.LevelController;
+import dc.longshot.game.LevelController.WonListener;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
@@ -72,8 +74,6 @@ import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
-import dc.longshot.parts.TranslatePart;
-import dc.longshot.parts.WeaponPart;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
@@ -135,24 +135,13 @@ public final class LevelScreen implements Screen {
 	public final LevelSession getLevelSession() {
 		return levelSession;
 	}
-
-	// TODO: temp
-	boolean justDied = false;
 	
 	@Override
 	public final void render(final float delta) {
-		handleInput();
 		stage.act(delta);
 		entityManager.update();
 		camera.update();
 		updateUI();
-		
-		if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
-			if (!justDied) {
-				justDied = true;
-				gameOverDelegate.notify(new GameOverEvent(score));
-			}
-		}
 		
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
 			updateWorld(delta * speedMultiplier);
@@ -178,6 +167,7 @@ public final class LevelScreen implements Screen {
 		InputStream levelInputStream = Gdx.files.internal("levels/level1.xml").read();
 		level = XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
+		levelController.addListener(handleWon());
 
 		Gdx.input.setCursorCatched(true);
 		setupCamera();
@@ -258,6 +248,15 @@ public final class LevelScreen implements Screen {
 		};
 	}
 	
+	private WonListener handleWon() {
+		return new WonListener() {
+			@Override
+			public void won() {
+				gameOverDelegate.notify(new GameOverEvent(score));
+			}
+		};
+	}
+	
 	private void setupCamera() {
 		Rectangle levelBoundsBox = level.getBoundsBox();
 		camera = new OrthographicCamera(levelBoundsBox.width * ScreenUnitConversion.PIXELS_PER_UNIT, 
@@ -294,6 +293,7 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void listenToGameEvents() {
+		// TODO: Remove method and move logic to appropriate cases
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
 	}
@@ -337,7 +337,9 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
-		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
+		CityDamageSystem cityDamageSystem = new CityDamageSystem(level.getBoundsBox(), levelSession);
+		cityDamageSystem.addListener(handleCityDestroyed());
+		entitySystems.add(cityDamageSystem);
 		entitySystems.add(new EmitSystem(entityManager));
 		entitySystems.add(new AIShooterSystem(entityManager));
 		entitySystems.add(new InputMovementSystem());
@@ -345,6 +347,16 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new NoHealthSystem(entityManager));
 		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
+		entitySystems.add(new ShooterInputSystem(entityManager));
+	}
+	
+	private CityDestroyedListener handleCityDestroyed() {
+		return new CityDestroyedListener() {
+			@Override
+			public void destroyed() {
+				gameOverDelegate.notify(new GameOverEvent(score));
+			}
+		};
 	}
 	
 	private void setupInitialEntities() {
@@ -365,23 +377,6 @@ public final class LevelScreen implements Screen {
 	private void updateUI() {
 		healthLabel.setText("HEALTH: " + levelSession.getHealth());
 		scoreLabel.setText("SCORE: " + score);
-	}
-	
-	private void handleInput() {
-		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			if (shooter.hasActive(WeaponPart.class, AttachmentPart.class)) {
-				WeaponPart weaponPart = shooter.get(WeaponPart.class);
-				if (weaponPart.canSpawn()) {
-					Entity bullet = weaponPart.createSpawn();
-					Vector2 spawnPosition = getMiddleOfCannonMouth(bullet);
-					bullet.get(TransformPart.class).setPosition(spawnPosition);
-					Entity shooterCannon = shooter.get(AttachmentPart.class).getChild();
-					Vector2 velocity = VectorUtils.createVectorFromAngle(shooterCannon.get(TransformPart.class).getRotation());
-					bullet.get(TranslatePart.class).setVelocity(velocity);
-					entityManager.add(bullet);
-				}
-			}
-		}
 	}
 	
 	private void updateWorld(final float delta) {
@@ -447,16 +442,6 @@ public final class LevelScreen implements Screen {
 		Matrix4 uiMatrix = camera.combined.cpy();
 		uiMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		return uiMatrix;
-	}
-	
-	private Vector2 getMiddleOfCannonMouth(final Entity spawn) {
-		Entity shooterCannon = shooter.get(AttachmentPart.class).getChild();
-		TransformPart cannonTransform = shooterCannon.get(TransformPart.class);
-		List<Vector2> vertices = cannonTransform.getTransformedVertices();
-		TransformPart spawnTransform = spawn.get(TransformPart.class);
-		Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(1), vertices.get(2), 
-				spawnTransform.getSize().y);
-		return spawnPosition;
 	}
 	
 	private class ZComparator implements Comparator<Entity> {

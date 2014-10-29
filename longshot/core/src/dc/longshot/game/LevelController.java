@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
+import dc.longshot.eventmanagement.Event;
+import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
@@ -23,6 +25,8 @@ import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
 public final class LevelController {
+
+	private final EventDelegate<WonListener> wonDelegate = new EventDelegate<WonListener>();
 	
 	private final EntityManager entityManager;
 	private final EntityFactory entityFactory;
@@ -36,6 +40,10 @@ public final class LevelController {
 		this.level = level;
 		
 		generateSpawnInfos();
+	}
+
+	public final void addListener(WonListener listener) {
+		wonDelegate.listen(listener);
 	}
 	
 	public final void update(final float delta) {
@@ -52,9 +60,13 @@ public final class LevelController {
 				break;
 			}
 		}
+		
+		if (isComplete()) {
+			wonDelegate.notify(new WonEvent());
+		}
 	}
 	
-	public final boolean isComplete() {
+	private final boolean isComplete() {
 		boolean enemiesExist = false;
 		for (Entity entity : entityManager.getAll()) {
 			if (entity.hasActive(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
@@ -134,6 +146,21 @@ public final class LevelController {
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);
+	}
+	
+	public interface WonListener {
+		
+		void won();
+		
+	}
+	
+	private final class WonEvent implements Event<WonListener> {
+		
+		@Override
+		public final void notify(WonListener listener) {
+			listener.won();
+		}
+		
 	}
 
 	private class SpawnInfo {
