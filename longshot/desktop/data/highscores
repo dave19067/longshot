@@ -6,32 +6,12 @@
             <score>100</score>
         </highScores>
         <highScores>
-            <name>David</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
             <name>f</name>
             <score>300</score>
         </highScores>
         <highScores>
             <name>h</name>
             <score>100</score>
-        </highScores>
-        <highScores>
-            <name>f</name>
-            <score>0</score>
-        </highScores>
-        <highScores>
-            <name>f</name>
-            <score>0</score>
-        </highScores>
-        <highScores>
-            <name>f</name>
-            <score>0</score>
-        </highScores>
-        <highScores>
-            <name>f</name>
-            <score>0</score>
         </highScores>
         <highScores>
             <name>f</name>
@@ -44,6 +24,26 @@
         <highScores>
             <name>fd</name>
             <score>600</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>2200</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>ds</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>ds</name>
+            <score>200</score>
+        </highScores>
+        <highScores>
+            <name>fds</name>
+            <score>800</score>
         </highScores>
     </highScores>
 </gameSession>

@@ -33,8 +33,8 @@ import dc.longshot.entitysystems.AIShooterSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
 import dc.longshot.entitysystems.CityDamageSystem;
-import dc.longshot.entitysystems.CityDamageSystem.CityDestroyedListener;
 import dc.longshot.entitysystems.CollisionDamageSystem;
+import dc.longshot.entitysystems.CurvedMovementSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.NoHealthSystem;
@@ -42,6 +42,7 @@ import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
 import dc.longshot.entitysystems.ShooterInputSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
+import dc.longshot.entitysystems.WaypointsSystem;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityAddedEvent;
 import dc.longshot.epf.EntityAddedListener;
@@ -56,7 +57,6 @@ import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
 import dc.longshot.game.LevelController;
-import dc.longshot.game.LevelController.WonListener;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
@@ -113,6 +113,7 @@ public final class LevelScreen implements Screen {
 	
 	private Level level;
 	private Entity shooter;
+	private boolean gameOver = false;
 	
 	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch) {
 		this.spriteCache = spriteCache;
@@ -147,6 +148,13 @@ public final class LevelScreen implements Screen {
 			updateWorld(delta * speedMultiplier);
 		}
 		
+		if (!gameOver) {
+			if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
+				gameOver = true;
+				gameOverDelegate.notify(new GameOverEvent(score));
+			}
+		}
+		
 		draw();
 	}
 
@@ -167,7 +175,6 @@ public final class LevelScreen implements Screen {
 		InputStream levelInputStream = Gdx.files.internal("levels/level1.xml").read();
 		level = XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
-		levelController.addListener(handleWon());
 
 		Gdx.input.setCursorCatched(true);
 		setupCamera();
@@ -244,15 +251,6 @@ public final class LevelScreen implements Screen {
 					Entity child = entity.get(AttachmentPart.class).getChild();
 					entityManager.remove(child);
 				}
-			}
-		};
-	}
-	
-	private WonListener handleWon() {
-		return new WonListener() {
-			@Override
-			public void won() {
-				gameOverDelegate.notify(new GameOverEvent(score));
 			}
 		};
 	}
@@ -337,9 +335,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
-		CityDamageSystem cityDamageSystem = new CityDamageSystem(level.getBoundsBox(), levelSession);
-		cityDamageSystem.addListener(handleCityDestroyed());
-		entitySystems.add(cityDamageSystem);
+		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
 		entitySystems.add(new EmitSystem(entityManager));
 		entitySystems.add(new AIShooterSystem(entityManager));
 		entitySystems.add(new InputMovementSystem());
@@ -348,15 +344,8 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
 		entitySystems.add(new ShooterInputSystem(entityManager));
-	}
-	
-	private CityDestroyedListener handleCityDestroyed() {
-		return new CityDestroyedListener() {
-			@Override
-			public void destroyed() {
-				gameOverDelegate.notify(new GameOverEvent(score));
-			}
-		};
+		entitySystems.add(new CurvedMovementSystem(level.getBoundsBox()));
+		entitySystems.add(new WaypointsSystem());
 	}
 	
 	private void setupInitialEntities() {

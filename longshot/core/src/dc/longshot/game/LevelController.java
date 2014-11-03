@@ -14,8 +14,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
-import dc.longshot.eventmanagement.Event;
-import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
@@ -25,8 +23,6 @@ import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
 public final class LevelController {
-
-	private final EventDelegate<WonListener> wonDelegate = new EventDelegate<WonListener>();
 	
 	private final EntityManager entityManager;
 	private final EntityFactory entityFactory;
@@ -41,9 +37,16 @@ public final class LevelController {
 		
 		generateSpawnInfos();
 	}
-
-	public final void addListener(WonListener listener) {
-		wonDelegate.listen(listener);
+	
+	public final boolean isComplete() {
+		boolean enemiesExist = false;
+		for (Entity entity : entityManager.getAll()) {
+			if (entity.hasActive(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
+				enemiesExist = true;
+				break;
+			}
+		}
+		return !enemiesExist && spawnInfos.size() <= 0;
 	}
 	
 	public final void update(final float delta) {
@@ -60,21 +63,6 @@ public final class LevelController {
 				break;
 			}
 		}
-		
-		if (isComplete()) {
-			wonDelegate.notify(new WonEvent());
-		}
-	}
-	
-	private final boolean isComplete() {
-		boolean enemiesExist = false;
-		for (Entity entity : entityManager.getAll()) {
-			if (entity.hasActive(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
-				enemiesExist = true;
-				break;
-			}
-		}
-		return !enemiesExist && spawnInfos.size() <= 0;
 	}
 	
 	private void generateSpawnInfos() {
@@ -146,21 +134,6 @@ public final class LevelController {
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);
-	}
-	
-	public interface WonListener {
-		
-		void won();
-		
-	}
-	
-	private final class WonEvent implements Event<WonListener> {
-		
-		@Override
-		public final void notify(WonListener listener) {
-			listener.won();
-		}
-		
 	}
 
 	private class SpawnInfo {
