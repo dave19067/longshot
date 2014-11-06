@@ -92,6 +92,7 @@ public final class LevelController {
 			placeAbove(spawn);
 			break;
 		case UFO:
+		case CATERPILLAR:
 			placeInSpace(spawn);
 			break;
 		}

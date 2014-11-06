@@ -72,6 +72,10 @@ public final class LongshotGame extends Game {
 	private void loadSprites() {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.STAR, "images/star.png");
+		spriteCache.add(SpriteKey.CIRCLE, "images/circle.png");
+		Color cloudColor = ColorUtils.toGdxColor(64, 64, 64, 223);
+		Texture cloudTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.CIRCLE), cloudColor);
+		spriteCache.add(SpriteKey.CLOUD, cloudTexture);
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
@@ -85,10 +89,7 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
 		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
 		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
-		spriteCache.add(SpriteKey.CIRCLE, "images/circle.png");
-		Color cloudColor = ColorUtils.toGdxColor(64, 64, 64, 223);
-		Texture cloudTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.CIRCLE), cloudColor);
-		spriteCache.add(SpriteKey.CLOUD, cloudTexture);
+		spriteCache.add(SpriteKey.BUG_HEAD, "images/bug_head.png");
 	}
 	
 	private void setupScreens() {

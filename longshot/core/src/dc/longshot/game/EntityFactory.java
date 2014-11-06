@@ -26,12 +26,14 @@ import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
+import dc.longshot.parts.AutoRotatePart;
 import dc.longshot.parts.BouncePart;
 import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.ColorChangePart;
+import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.DrawableUpdaterPart;
@@ -48,6 +50,7 @@ import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WanderMovementPart;
+import dc.longshot.parts.WaypointsPart;
 import dc.longshot.parts.WeaponPart;
 
 public final class EntityFactory {
@@ -73,6 +76,9 @@ public final class EntityFactory {
 			case UFO:
 				entity = createUFOGlow();
 				break;
+			case CATERPILLAR:
+				entity = createCaterpillar();
+				break;
 			default:
 				throw new IllegalArgumentException(entityType + " is not a valid entity type to create");
 		}
@@ -87,7 +93,7 @@ public final class EntityFactory {
 		entity.attach(new AlliancePart(Alliance.PLAYER));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
 		entity.attach(new BoundsPart());
-		entity.attach(new TranslatePart(false));
+		entity.attach(new TranslatePart());
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -111,7 +117,8 @@ public final class EntityFactory {
 		entity.attach(new SpeedPart(20));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
-		entity.attach(new TranslatePart(true));
+		entity.attach(new TranslatePart());
+		entity.attach(new AutoRotatePart());
 		List<Bound> bounds = new ArrayList<Bound>();
 		bounds.add(Bound.LEFT);
 		bounds.add(Bound.RIGHT);
@@ -145,7 +152,8 @@ public final class EntityFactory {
 		entity.attach(new SpeedPart(speed));
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(100));
-		entity.attach(new TranslatePart(true));
+		entity.attach(new TranslatePart());
+		entity.attach(new AutoRotatePart());
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
@@ -175,7 +183,7 @@ public final class EntityFactory {
 		entity.attach(new SpeedPart(3));
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(300));
-		entity.attach(new TranslatePart(false));
+		entity.attach(new TranslatePart());
 		entity.attach(new BouncePart());
 		entity.attach(new BoundsPart());
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
@@ -198,7 +206,8 @@ public final class EntityFactory {
 		entity.attach(new SpeedPart(10));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
-		entity.attach(new TranslatePart(true));
+		entity.attach(new TranslatePart());
+		entity.attach(new AutoRotatePart());
 		List<Bound> bounds = new ArrayList<Bound>();
 		bounds.add(Bound.LEFT);
 		bounds.add(Bound.RIGHT);
@@ -208,6 +217,28 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
+		return entity;
+	}
+	
+	public final Entity createCaterpillar() {
+		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_HEAD);
+		entity.attach(new SpeedPart(5));
+		entity.attach(new HealthPart(1));
+		entity.attach(new ScorePart(100));
+		entity.attach(new AutoRotatePart());
+		entity.attach(new BouncePart());
+		entity.attach(new BoundsPart());
+		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
+		entity.attach(new AlliancePart(Alliance.ENEMY));
+		List<Bound> deathBounds = new ArrayList<Bound>();
+		deathBounds.add(Bound.BOTTOM);
+		entity.attach(new BoundsDiePart(deathBounds));
+		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
+		collisionTypes.add(CollisionType.PLAYER);
+		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
+		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
+		entity.attach(new WaypointsPart());
+		entity.attach(new CurvedMovementPart(3));
 		return entity;
 	}
 	

@@ -74,7 +74,7 @@ public final class TransformPart extends Part {
 	}
 	
 	public Rectangle getBoundingBox() {
-		return polygon.getBoundingRectangle();
+		return new Rectangle(polygon.getBoundingRectangle());
 	}
 	
 }
