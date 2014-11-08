@@ -17,6 +17,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -90,6 +92,7 @@ public final class LevelScreen implements Screen {
 	private final SpriteCache<SpriteKey> spriteCache;
 	private Camera camera;
 	private final SpriteBatch spriteBatch;
+	private final ShapeRenderer shapeRenderer;
 	private final float speedMultiplier = 1f;
 
 	private Stage stage;
@@ -118,6 +121,7 @@ public final class LevelScreen implements Screen {
 	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch) {
 		this.spriteCache = spriteCache;
 		this.spriteBatch = spriteBatch;
+		shapeRenderer = new ShapeRenderer();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
 
@@ -385,11 +389,18 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void draw() {
+		clearScreen();
 		setWorldViewport();
 		drawWorld();
+		drawWorldPolygons();
 		setUIViewPort();
 		stage.draw();
 		drawCursor();
+	}
+	
+	private void clearScreen() {
+		Gdx.gl.glClearColor(MIDNIGHT_BLUE.r, MIDNIGHT_BLUE.g, MIDNIGHT_BLUE.b, MIDNIGHT_BLUE.a);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	}
 	
 	private void setWorldViewport() {
@@ -399,8 +410,6 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void drawWorld() {
-		Gdx.gl.glClearColor(MIDNIGHT_BLUE.r, MIDNIGHT_BLUE.g, MIDNIGHT_BLUE.b, MIDNIGHT_BLUE.a);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
 		backdropManager.draw(spriteBatch);
@@ -413,6 +422,24 @@ public final class LevelScreen implements Screen {
 			}
 		}
 		spriteBatch.end();
+	}
+	
+	private void drawWorldPolygons() {
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeType.Line);
+		for (Entity entity : entityManager.getAll()) {
+			if (entity.hasActive(TransformPart.class)) {
+				TransformPart transformPart = entity.get(TransformPart.class);
+				List<Vector2> transformedVertices = transformPart.getTransformedVertices();
+				float[] vertices = new float[transformedVertices.size() * 2];
+				for (int i = 0; i < transformedVertices.size(); i++) {
+					vertices[i * 2] = transformedVertices.get(i).x * ScreenUnitConversion.PIXELS_PER_UNIT;
+					vertices[i * 2 + 1] = transformedVertices.get(i).y * ScreenUnitConversion.PIXELS_PER_UNIT;
+				}
+				shapeRenderer.polygon(vertices);
+			}
+		}
+		shapeRenderer.end();
 	}
 	
 	private void setUIViewPort() {

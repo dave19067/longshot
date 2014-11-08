@@ -28,7 +28,8 @@ public final class TransformPart extends Part {
 		List<Vector2> verticesList = new ArrayList<Vector2>();
 		float[] vertices = polygon.getTransformedVertices();
 		for (int i = 0; i < vertices.length / 2; i++) {
-			verticesList.add(new Vector2(vertices[i * 2], vertices[i * 2 + 1]));
+			Vector2 vertex = new Vector2(vertices[i * 2], vertices[i * 2 + 1]);
+			verticesList.add(vertex);
 		}
 		return verticesList;
 	}
