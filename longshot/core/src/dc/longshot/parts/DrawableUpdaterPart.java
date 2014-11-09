@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
-import dc.longshot.geometry.ScreenUnitConversion;
+import dc.longshot.geometry.UnitConversion;
 
 public final class DrawableUpdaterPart extends Part {
 
@@ -13,11 +13,11 @@ public final class DrawableUpdaterPart extends Part {
 		TransformPart transformPart = entity.get(TransformPart.class);
 		DrawablePart drawablePart = entity.get(DrawablePart.class);
 		Sprite sprite = drawablePart.getSprite();
-		Vector2 size = transformPart.getSize().scl(ScreenUnitConversion.PIXELS_PER_UNIT);
+		Vector2 size = UnitConversion.worldToScreen(transformPart.getSize());
 		sprite.setSize(size.x, size.y);
-		Vector2 position = transformPart.getPosition().scl(ScreenUnitConversion.PIXELS_PER_UNIT);
+		Vector2 position = UnitConversion.worldToScreen(transformPart.getPosition());
 		sprite.setPosition(position.x, position.y);
-		Vector2 origin = transformPart.getOrigin().scl(ScreenUnitConversion.PIXELS_PER_UNIT);
+		Vector2 origin = UnitConversion.worldToScreen(transformPart.getOrigin());
 		sprite.setOrigin(origin.x, origin.y);
 		sprite.setRotation(transformPart.getRotation());
 	}

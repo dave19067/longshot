@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.geometry.ScreenUnitConversion;
+import dc.longshot.geometry.UnitConversion;
 
 public final class BackdropManager {
 	
@@ -46,12 +46,12 @@ public final class BackdropManager {
 			for (Polygon decoration : entry.getValue()) {
 				Rectangle boundingRectangle = decoration.getBoundingRectangle();
 				spriteBatch.draw(entry.getKey().textureRegion, 
-						decoration.getX() * ScreenUnitConversion.PIXELS_PER_UNIT, 
-						decoration.getY() * ScreenUnitConversion.PIXELS_PER_UNIT, 
-						decoration.getOriginX() * ScreenUnitConversion.PIXELS_PER_UNIT, 
-						decoration.getOriginY() * ScreenUnitConversion.PIXELS_PER_UNIT, 
-						boundingRectangle.getWidth() * ScreenUnitConversion.PIXELS_PER_UNIT, 
-						boundingRectangle.getHeight() * ScreenUnitConversion.PIXELS_PER_UNIT, 
+						decoration.getX() * UnitConversion.PIXELS_PER_UNIT, 
+						decoration.getY() * UnitConversion.PIXELS_PER_UNIT, 
+						decoration.getOriginX() * UnitConversion.PIXELS_PER_UNIT, 
+						decoration.getOriginY() * UnitConversion.PIXELS_PER_UNIT, 
+						boundingRectangle.getWidth() * UnitConversion.PIXELS_PER_UNIT, 
+						boundingRectangle.getHeight() * UnitConversion.PIXELS_PER_UNIT, 
 						1, 1, decoration.getRotation(), true);
 			}
 		}

@@ -70,7 +70,7 @@ public final class TransformPart extends Part {
 		polygon.setRotation(degrees);
 	}
 	
-	public final Vector2 getCenter() {
+	public final Vector2 getGlobalCenter() {
 		return polygon.getBoundingRectangle().getCenter(new Vector2());
 	}
 	

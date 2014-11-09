@@ -13,32 +13,32 @@ public final class WaypointsSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.hasActive(WaypointsPart.class, TransformPart.class,
-				SpeedPart.class)) {
+		if (entity.hasActive(WaypointsPart.class)) {
 			WaypointsPart waypointsPart = entity.get(WaypointsPart.class);
 			float maxDistanceCovered = entity.get(SpeedPart.class).getSpeed() * delta;
-			while (waypointsPart.hasWaypoints() && maxDistanceCovered > 0) {
+			while (waypointsPart.hasWaypoints() && maxDistanceCovered > VectorUtils.BUFFER) {
 				maxDistanceCovered = moveToWaypoint(entity, maxDistanceCovered);
 			}
 		}
 	}
 
-	private float moveToWaypoint(final Entity entity, final float maxDistanceCovered) {
+	private float moveToWaypoint(final Entity entity, float maxDistanceCovered) {
 		WaypointsPart waypointsPart = entity.get(WaypointsPart.class);
 		Vector2 currentWaypoint = waypointsPart.getCurrentWaypoint();
 		TransformPart transformPart = entity.get(TransformPart.class);
-		Vector2 oldPosition = transformPart.getPosition();
-		Vector2 waypointOffset = currentWaypoint.cpy().sub(oldPosition);
-		Vector2 lengthenedWaypointOffset = VectorUtils.lengthened(waypointOffset, maxDistanceCovered);
-		if (lengthenedWaypointOffset.len() < waypointOffset.len()) {
-			Vector2 newPosition = oldPosition.cpy().add(lengthenedWaypointOffset);
-			transformPart.setPosition(newPosition);
+		Vector2 oldGlobalCenter = transformPart.getGlobalCenter();
+		Vector2 waypointOffset = currentWaypoint.cpy().sub(oldGlobalCenter);
+		Vector2 offset;
+		if (maxDistanceCovered < waypointOffset.len()) {
+			offset = VectorUtils.lengthened(waypointOffset, maxDistanceCovered);
 		} else {
 			// reached waypoint
-			transformPart.setPosition(currentWaypoint);
+			offset = waypointOffset;
 			waypointsPart.removeCurrentWaypoint();
 		}
-		return maxDistanceCovered - waypointOffset.len();
+		Vector2 newPosition = transformPart.getPosition().add(offset);
+		transformPart.setPosition(newPosition);
+		return maxDistanceCovered - offset.len();
 	}
 
 }

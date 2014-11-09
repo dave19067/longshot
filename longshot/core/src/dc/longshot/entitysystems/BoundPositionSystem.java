@@ -9,15 +9,11 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.TransformPart;
 
 public final class BoundPositionSystem implements EntitySystem {
-
-	/**
-	 * Buffer required for floating point calculations to make sure object is completely in bounds
-	 */
-	private static final float BOUNDS_BUFFER = 1e-5f;
 	
 	private final Rectangle boundsBox;
 
@@ -37,7 +33,7 @@ public final class BoundPositionSystem implements EntitySystem {
 				if (bounds.contains(checkedBound)) {
 					switch (checkedBound) {
 					case LEFT:
-						newPosition.x -= (boundingBox.x - BOUNDS_BUFFER);
+						newPosition.x -= (boundingBox.x - VectorUtils.BUFFER);
 						break;
 					case RIGHT:
 						newPosition.x -= (PolygonUtils.right(boundingBox) - PolygonUtils.right(boundsBox));
@@ -46,7 +42,7 @@ public final class BoundPositionSystem implements EntitySystem {
 						newPosition.y -= (PolygonUtils.top(boundingBox) - PolygonUtils.top(boundsBox));
 						break;
 					case BOTTOM:
-						newPosition.y -= (boundingBox.y - BOUNDS_BUFFER);
+						newPosition.y -= (boundingBox.y - VectorUtils.BUFFER);
 						break;
 					}
 				}

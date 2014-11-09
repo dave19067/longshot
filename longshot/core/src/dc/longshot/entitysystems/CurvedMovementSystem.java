@@ -37,7 +37,7 @@ public final class CurvedMovementSystem implements EntitySystem {
 	}
 	
 	private void setCurveWaypoints(final Entity entity) {
-		Vector2 start = entity.get(TransformPart.class).getPosition();
+		Vector2 start = entity.get(TransformPart.class).getGlobalCenter();
 		Vector2 end = createEndPoint(start);
 		float curveSize = entity.get(CurvedMovementPart.class).getCurveSize();
 		Vector2 startCurve = createCurvePoint(start, end, curveSize);

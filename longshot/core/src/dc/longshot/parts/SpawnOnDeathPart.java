@@ -18,7 +18,7 @@ public final class SpawnOnDeathPart extends Part {
 	public final Entity createSpawn() {
 		Entity spawn = Cloning.clone(original);
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
-		Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
+		Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getGlobalCenter(), 
 				spawnTransform.getBoundingSize());
 		spawnTransform.setPosition(position);
 		return spawn;

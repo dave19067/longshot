@@ -5,6 +5,13 @@ import com.badlogic.gdx.math.Vector2;
 
 public final class VectorUtils {
 	
+	/**
+	 * Buffer used for floating point calculations involving vectors.
+	 * Vector calculations don't always round well to exact numbers, so this buffer can be used to check if any 
+	 * attribute of the vector (e.g. x, y, length) is near the expected number.
+	 */
+	public static final float BUFFER = 1e-5f;
+	
 	private VectorUtils() {
 	}
 	

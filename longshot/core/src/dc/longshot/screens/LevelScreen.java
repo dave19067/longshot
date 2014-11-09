@@ -62,7 +62,7 @@ import dc.longshot.game.LevelController;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.geometry.ScreenUnitConversion;
+import dc.longshot.geometry.UnitConversion;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.models.Level;
@@ -76,6 +76,7 @@ import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
+import dc.longshot.parts.WaypointsPart;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
@@ -155,6 +156,7 @@ public final class LevelScreen implements Screen {
 		if (!gameOver) {
 			if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
 				gameOver = true;
+				hideStatusUI();
 				gameOverDelegate.notify(new GameOverEvent(score));
 			}
 		}
@@ -220,8 +222,8 @@ public final class LevelScreen implements Screen {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
 					for (Entity other : entityManager.getAll()) {
 						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
-							Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
-							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
+							Vector2 entityCenter = entity.get(TransformPart.class).getGlobalCenter();
+							Vector2 otherCenter = other.get(TransformPart.class).getGlobalCenter();
 							float distance = otherCenter.cpy().sub(entityCenter).len(); 
 							if (distance <= explodeOnSpawnPart.getRadius()) {
 								other.get(HealthPart.class).decrease(explodeOnSpawnPart.getDamage());
@@ -261,8 +263,8 @@ public final class LevelScreen implements Screen {
 	
 	private void setupCamera() {
 		Rectangle levelBoundsBox = level.getBoundsBox();
-		camera = new OrthographicCamera(levelBoundsBox.width * ScreenUnitConversion.PIXELS_PER_UNIT, 
-				levelBoundsBox.height * ScreenUnitConversion.PIXELS_PER_UNIT);
+		Vector2 viewportSize = UnitConversion.worldToScreen(levelBoundsBox.getSize(new Vector2()));
+		camera = new OrthographicCamera(viewportSize.x, viewportSize.y);
 		camera.position.set(levelBoundsBox.x + camera.viewportWidth / 2, 
 				levelBoundsBox.y + camera.viewportHeight / 2, 0);
 	}
@@ -387,12 +389,18 @@ public final class LevelScreen implements Screen {
 			}
 		}
 	}
+
+	private void hideStatusUI() {
+		healthLabel.setVisible(false);
+		scoreLabel.setVisible(false);
+	}
 	
 	private void draw() {
 		clearScreen();
 		setWorldViewport();
 		drawWorld();
 		drawWorldPolygons();
+		drawWaypoints();
 		setUIViewPort();
 		stage.draw();
 		drawCursor();
@@ -433,10 +441,27 @@ public final class LevelScreen implements Screen {
 				List<Vector2> transformedVertices = transformPart.getTransformedVertices();
 				float[] vertices = new float[transformedVertices.size() * 2];
 				for (int i = 0; i < transformedVertices.size(); i++) {
-					vertices[i * 2] = transformedVertices.get(i).x * ScreenUnitConversion.PIXELS_PER_UNIT;
-					vertices[i * 2 + 1] = transformedVertices.get(i).y * ScreenUnitConversion.PIXELS_PER_UNIT;
+					Vector2 screenVertex = UnitConversion.worldToScreen(transformedVertices.get(i));
+					vertices[i * 2] = screenVertex.x;
+					vertices[i * 2 + 1] = screenVertex.y;
 				}
 				shapeRenderer.polygon(vertices);
+			}
+		}
+		shapeRenderer.end();
+	}
+	
+	private void drawWaypoints() {
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeType.Line);
+		for (Entity entity : entityManager.getAll()) {
+			if (entity.hasActive(WaypointsPart.class)) {
+				List<Vector2> waypoints = entity.get(WaypointsPart.class).getWaypoints();
+				for (int i = 0; i < waypoints.size() - 1; i++) {
+					Vector2 currentWaypoint = UnitConversion.worldToScreen(waypoints.get(i));
+					Vector2 nextWaypoint = UnitConversion.worldToScreen(waypoints.get(i + 1));
+					shapeRenderer.line(currentWaypoint, nextWaypoint);
+				}
 			}
 		}
 		shapeRenderer.end();

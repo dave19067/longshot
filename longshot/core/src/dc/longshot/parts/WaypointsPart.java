@@ -29,6 +29,10 @@ public final class WaypointsPart extends Part {
 		waypoints.remove(0);
 	}
 	
+	public final List<Vector2> getWaypoints() {
+		return new ArrayList<Vector2>(waypoints);
+	}
+	
 	public final void setWaypoints(final List<Vector2> waypoints) {
 		this.waypoints = waypoints;
 	}

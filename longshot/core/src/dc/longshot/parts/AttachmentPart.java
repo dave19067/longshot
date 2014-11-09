@@ -20,7 +20,7 @@ public final class AttachmentPart extends Part {
 	@Override
 	public final void update(final float delta) {
 		if (child.isActive()) {
-			Vector2 parentCenter = entity.get(TransformPart.class).getCenter();
+			Vector2 parentCenter = entity.get(TransformPart.class).getGlobalCenter();
 			child.get(TransformPart.class).setPosition(parentCenter);
 		}
 	}
