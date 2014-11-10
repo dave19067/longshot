@@ -226,8 +226,6 @@ public final class EntityFactory {
 		entity.attach(new HealthPart(1));
 		entity.attach(new ScorePart(100));
 		entity.attach(new AutoRotatePart());
-		entity.attach(new BouncePart());
-		entity.attach(new BoundsPart());
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
@@ -238,7 +236,7 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
 		entity.attach(new WaypointsPart());
-		entity.attach(new CurvedMovementPart(3));
+		entity.attach(new CurvedMovementPart(10));
 		return entity;
 	}
 	

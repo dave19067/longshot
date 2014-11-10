@@ -6,10 +6,6 @@
             <score>300</score>
         </highScores>
         <highScores>
-            <name>h</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
             <name>fu</name>
             <score>1800</score>
         </highScores>
@@ -26,10 +22,6 @@
             <score>400</score>
         </highScores>
         <highScores>
-            <name>ds</name>
-            <score>200</score>
-        </highScores>
-        <highScores>
             <name>fds</name>
             <score>800</score>
         </highScores>
@@ -42,8 +34,16 @@
             <score>1700</score>
         </highScores>
         <highScores>
-            <name>dave</name>
-            <score>300</score>
+            <name></name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>f</name>
+            <score>1600</score>
+        </highScores>
+        <highScores>
+            <name>f</name>
+            <score>500</score>
         </highScores>
     </highScores>
 </gameSession>

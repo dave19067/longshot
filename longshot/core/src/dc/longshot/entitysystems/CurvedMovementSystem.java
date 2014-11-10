@@ -37,11 +37,12 @@ public final class CurvedMovementSystem implements EntitySystem {
 	}
 	
 	private void setCurveWaypoints(final Entity entity) {
-		Vector2 start = entity.get(TransformPart.class).getGlobalCenter();
+		TransformPart transformPart = entity.get(TransformPart.class);
+		Vector2 start = transformPart.getGlobalCenter();
 		Vector2 end = createEndPoint(start);
 		float curveSize = entity.get(CurvedMovementPart.class).getCurveSize();
-		Vector2 startCurve = createCurvePoint(start, end, curveSize);
-		Vector2 endCurve = createCurvePoint(end, start, curveSize);
+		Vector2 startCurve = createStartCurvePoint(start, transformPart.getRotation(), curveSize);
+		Vector2 endCurve = createEndCurvePoint(start, end, curveSize);
 		List<Vector2> waypoints = createWaypoints(start, startCurve, endCurve, end);
 		entity.get(WaypointsPart.class).setWaypoints(waypoints);
 	}
@@ -56,16 +57,26 @@ public final class CurvedMovementSystem implements EntitySystem {
 		return waypoints;
 	}
 	
-	private Vector2 createCurvePoint(final Vector2 start, final Vector2 end, final float curveSize) {
-		Vector2 offset = end.cpy().sub(start);
-		Vector2 curvePointOffset = offset.rotate(MathUtils.random(-90, 90));
-		curvePointOffset = VectorUtils.lengthened(curvePointOffset, MathUtils.random(0, curveSize));
+	private Vector2 createStartCurvePoint(final Vector2 start, final float currentRotation, final float curveSize) {
+		Vector2 curvePointOffset = VectorUtils.createVectorFromAngle(-currentRotation);
+		curvePointOffset = VectorUtils.lengthened(curvePointOffset, curveSize);
 		return start.cpy().add(curvePointOffset);
 	}
 	
+	private Vector2 createEndCurvePoint(final Vector2 start, final Vector2 end, final float curveSize) {
+		Vector2 offset = start.cpy().sub(end);
+		Vector2 curvePointOffset = offset.rotate(MathUtils.random(-90, 90));
+		curvePointOffset = VectorUtils.lengthened(curvePointOffset, MathUtils.random(0, curveSize));
+		return end.cpy().add(curvePointOffset);
+	}
+	
 	private Vector2 createEndPoint(final Vector2 start) {
-		float endX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox));
-		float endY = MathUtils.random(start.y - 5, start.y);
+		float maxOffsetX = 20;
+		float minX = Math.max(start.x - maxOffsetX / 2, boundsBox.x);
+		float maxX = Math.min(start.x + maxOffsetX / 2, PolygonUtils.right(boundsBox));
+		float endX = MathUtils.random(minX, maxX);
+		float maxOffsetY = 5;
+		float endY = MathUtils.random(start.y - maxOffsetY, start.y);
 		return new Vector2(endX, endY);
 	}
 
