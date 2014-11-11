@@ -90,9 +90,12 @@ public final class LevelController {
 		case MISSILE:
 		case NUKE:
 			placeAbove(spawn);
+			setupDestination(spawn);
+			break;
+		case CATERPILLAR:
+			placeAbove(spawn);
 			break;
 		case UFO:
-		case CATERPILLAR:
 			placeInSpace(spawn);
 			break;
 		}
@@ -108,21 +111,27 @@ public final class LevelController {
 		float spawnX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - size.y);
 		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(levelBoundsBox));
 		transform.setPosition(spawnPosition);
+	}
+	
+	private void setupDestination(Entity entity) {
+		Rectangle levelBoundsBox = level.getBoundsBox();
+		TransformPart transformPart = entity.get(TransformPart.class);
 		
 		// Get the destination, which is a random point on the ground
-		float destX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - size.y);
+		float destX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - transformPart.getSize().x);
 		Vector2 destPosition = new Vector2(destX, 0);
 		
 		// Find the direction to get from the entity spawn position to the destination
-		Vector2 offset = destPosition.cpy().sub(spawnPosition);
+		Vector2 position = transformPart.getPosition();
+		Vector2 offset = destPosition.cpy().sub(position);
 		TranslatePart translate = entity.get(TranslatePart.class);
 		translate.setVelocity(offset);
 		
 		// If the spawn is partially in bounds, move to just out of bounds using the negative velocity
-		float unboundedOverlapY = PolygonUtils.top(levelBoundsBox) - transform.getBoundingBox().y;
+		float unboundedOverlapY = PolygonUtils.top(levelBoundsBox) - transformPart.getBoundingBox().y;
 		Vector2 velocity = translate.getVelocity();
 		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
-		transform.setPosition(spawnPosition.cpy().add(outOfBoundsOffset));
+		transformPart.setPosition(position.cpy().add(outOfBoundsOffset));
 	}
 
 	private void placeInSpace(final Entity entity) {
