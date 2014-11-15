@@ -32,12 +32,14 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import dc.longshot.collision.CollisionManager;
 import dc.longshot.entitysystems.AIShooterSystem;
+import dc.longshot.entitysystems.AttachmentSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
 import dc.longshot.entitysystems.CityDamageSystem;
 import dc.longshot.entitysystems.CollisionDamageSystem;
 import dc.longshot.entitysystems.CurvedMovementSystem;
 import dc.longshot.entitysystems.EmitSystem;
+import dc.longshot.entitysystems.FollowerSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.NoHealthSystem;
 import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
@@ -72,6 +74,7 @@ import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.ExplodeOnSpawnPart;
+import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.SpawnOnDeathPart;
@@ -218,6 +221,16 @@ public final class LevelScreen implements Screen {
 		return new EntityAddedListener() {
 			@Override
 			public void created(final Entity entity) {
+				if (entity.hasActive(AttachmentPart.class)) {
+					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
+					entityManager.add(attachedEntity);
+				}
+				
+				if (entity.hasActive(FollowerPart.class)) {
+					Entity follower = entity.get(FollowerPart.class).getFollower();
+					entityManager.add(follower);
+				}
+				
 				if (entity.hasActive(ExplodeOnSpawnPart.class, TransformPart.class)) {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
 					for (Entity other : entityManager.getAll()) {
@@ -254,8 +267,8 @@ public final class LevelScreen implements Screen {
 				}
 				
 				if (entity.hasActive(AttachmentPart.class)) {
-					Entity child = entity.get(AttachmentPart.class).getChild();
-					entityManager.remove(child);
+					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
+					entityManager.remove(attachedEntity);
 				}
 			}
 		};
@@ -352,6 +365,8 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new ShooterInputSystem(entityManager));
 		entitySystems.add(new CurvedMovementSystem(level.getBoundsBox()));
 		entitySystems.add(new WaypointsSystem());
+		entitySystems.add(new AttachmentSystem());
+		entitySystems.add(new FollowerSystem());
 	}
 	
 	private void setupInitialEntities() {
@@ -362,7 +377,6 @@ public final class LevelScreen implements Screen {
 		Vector3 shooterSize = new Vector3(2, 1.5f, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		Entity shooterCannon = entityFactory.createShooterCannon();
-		entityManager.add(shooterCannon);
 		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
 		Vector2 shooterPosition = new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox()));
 		shooter = entityFactory.createShooter(shooterSize, shooterPosition, shooterCannon);

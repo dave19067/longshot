@@ -9,7 +9,7 @@ import dc.longshot.epf.Part;
 
 public final class WaypointsPart extends Part {
 
-	private List<Vector2> waypoints = new ArrayList<Vector2>();
+	private final List<Vector2> waypoints = new ArrayList<Vector2>();
 
 	public final boolean hasWaypoints() {
 		return waypoints.size() > 0;
@@ -33,8 +33,8 @@ public final class WaypointsPart extends Part {
 		return new ArrayList<Vector2>(waypoints);
 	}
 	
-	public final void setWaypoints(final List<Vector2> waypoints) {
-		this.waypoints = waypoints;
+	public final void addWaypoints(final List<Vector2> waypoints) {
+		this.waypoints.addAll(waypoints);
 	}
 	
 }

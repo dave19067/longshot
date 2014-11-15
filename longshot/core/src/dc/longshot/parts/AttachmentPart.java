@@ -1,28 +1,18 @@
 package dc.longshot.parts;
 
-import com.badlogic.gdx.math.Vector2;
-
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 
 public final class AttachmentPart extends Part {
 
-	private final Entity child;
+	private final Entity attachedEntity;
 	
-	public AttachmentPart(final Entity child) {
-		this.child = child;
+	public AttachmentPart(final Entity attachedEntity) {
+		this.attachedEntity = attachedEntity;
 	}
 	
-	public final Entity getChild() {
-		return child;
-	}
-	
-	@Override
-	public final void update(final float delta) {
-		if (child.isActive()) {
-			Vector2 parentCenter = entity.get(TransformPart.class).getGlobalCenter();
-			child.get(TransformPart.class).setPosition(parentCenter);
-		}
+	public final Entity getAttachedEntity() {
+		return attachedEntity;
 	}
 	
 }

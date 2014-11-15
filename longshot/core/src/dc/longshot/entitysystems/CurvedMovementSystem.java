@@ -44,7 +44,7 @@ public final class CurvedMovementSystem implements EntitySystem {
 		Vector2 startCurve = createStartCurvePoint(start, transformPart.getRotation(), curveSize);
 		Vector2 endCurve = createEndCurvePoint(start, end, curveSize);
 		List<Vector2> waypoints = createWaypoints(start, startCurve, endCurve, end);
-		entity.get(WaypointsPart.class).setWaypoints(waypoints);
+		entity.get(WaypointsPart.class).addWaypoints(waypoints);
 	}
 	
 	private List<Vector2> createWaypoints(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) {

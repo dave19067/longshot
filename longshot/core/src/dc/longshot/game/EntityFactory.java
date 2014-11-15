@@ -39,6 +39,7 @@ import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.DrawableUpdaterPart;
 import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.ExplodeOnSpawnPart;
+import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.RotateToCursorPart;
@@ -237,6 +238,26 @@ public final class EntityFactory {
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
 		entity.attach(new WaypointsPart());
 		entity.attach(new CurvedMovementPart(10));
+		entity.attach(new FollowerPart(createCaterpillarSegment()));
+		return entity;
+	}
+	
+	public final Entity createCaterpillarSegment() {
+		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_HEAD);
+		entity.attach(new SpeedPart(5));
+		entity.attach(new HealthPart(1));
+		entity.attach(new ScorePart(100));
+		entity.attach(new AutoRotatePart());
+		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
+		entity.attach(new AlliancePart(Alliance.ENEMY));
+		List<Bound> deathBounds = new ArrayList<Bound>();
+		deathBounds.add(Bound.BOTTOM);
+		entity.attach(new BoundsDiePart(deathBounds));
+		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
+		collisionTypes.add(CollisionType.PLAYER);
+		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
+		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
+		entity.attach(new WaypointsPart());
 		return entity;
 	}
 	

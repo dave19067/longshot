@@ -30,7 +30,7 @@ public final class ShooterInputSystem implements EntitySystem {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
 					Entity bullet = weaponPart.createSpawn();
-					Entity cannon = entity.get(AttachmentPart.class).getChild();
+					Entity cannon = entity.get(AttachmentPart.class).getAttachedEntity();
 					Vector2 spawnPosition = getMiddleOfCannonMouth(cannon, bullet);
 					bullet.get(TransformPart.class).setPosition(spawnPosition);
 					Vector2 velocity = VectorUtils.createVectorFromAngle(
