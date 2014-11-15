@@ -67,6 +67,7 @@ import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConversion;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
+import dc.longshot.models.DebugSettings;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
 import dc.longshot.models.SpriteKey;
@@ -94,8 +95,10 @@ public final class LevelScreen implements Screen {
 	private final EventDelegate<GameOverListener> gameOverDelegate = new EventDelegate<GameOverListener>();
 	
 	private final SpriteCache<SpriteKey> spriteCache;
-	private Camera camera;
 	private final SpriteBatch spriteBatch;
+	private final DebugSettings debugSettings;
+	
+	private Camera camera;
 	private final ShapeRenderer shapeRenderer;
 	private final float speedMultiplier = 1f;
 
@@ -122,9 +125,11 @@ public final class LevelScreen implements Screen {
 	private Entity shooter;
 	private boolean gameOver = false;
 	
-	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch) {
+	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch, 
+			final DebugSettings debugSettings) {
 		this.spriteCache = spriteCache;
 		this.spriteBatch = spriteBatch;
+		this.debugSettings = debugSettings;
 		shapeRenderer = new ShapeRenderer();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
@@ -413,8 +418,12 @@ public final class LevelScreen implements Screen {
 		clearScreen();
 		setWorldViewport();
 		drawWorld();
-		drawWorldPolygons();
-		drawWaypoints();
+		if (debugSettings.drawPolygons()) {
+			drawPolygons();
+		}
+		if (debugSettings.drawWaypoints()) {
+			drawWaypoints();
+		}
 		setUIViewPort();
 		stage.draw();
 		drawCursor();
@@ -446,7 +455,7 @@ public final class LevelScreen implements Screen {
 		spriteBatch.end();
 	}
 	
-	private void drawWorldPolygons() {
+	private void drawPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
 		for (Entity entity : entityManager.getAll()) {

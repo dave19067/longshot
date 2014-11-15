@@ -238,11 +238,11 @@ public final class EntityFactory {
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
 		entity.attach(new WaypointsPart());
 		entity.attach(new CurvedMovementPart(10));
-		entity.attach(new FollowerPart(createCaterpillarSegment()));
+		entity.attach(new FollowerPart(createCaterpillarSegment(5)));
 		return entity;
 	}
 	
-	public final Entity createCaterpillarSegment() {
+	public final Entity createCaterpillarSegment(int segmentNum) {
 		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_HEAD);
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
@@ -258,6 +258,10 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
 		entity.attach(new WaypointsPart());
+		segmentNum--;
+		if (segmentNum > 0) {
+			entity.attach(new FollowerPart(createCaterpillarSegment(segmentNum)));
+		}
 		return entity;
 	}
 	

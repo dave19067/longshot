@@ -92,7 +92,7 @@ public final class ScoreEntryDialog {
 	private void saveHighScore() {
 		ScoreEntry scoreEntry = new ScoreEntry(nameTextField.getText(), score);
 		gameSession.addHighScore(scoreEntry);
-		OutputStream gameSessionOutputStream = Gdx.files.local(Paths.HIGH_SCORES_PATH).write(false);
+		OutputStream gameSessionOutputStream = Gdx.files.local(Paths.GAME_SESSION_PATH).write(false);
 		XmlUtils.marshal(gameSession, gameSessionOutputStream, new Class[] { GameSession.class });
 	}
 	

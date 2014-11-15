@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,17 +13,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 public final class GameSession {
 	
 	private final int MAX_HIGH_SCORES = 10;
+	private final Comparator<ScoreEntry> highScoreComparator = new HighScoreComparator();
+	
+	@XmlElement
+	private DebugSettings debugSettings;
 	
 	@XmlElementWrapper
 	private List<ScoreEntry> highScores;
-	private final Comparator<ScoreEntry> highScoreComparator = new HighScoreComparator();
 	
 	public GameSession() {
 		// For serialization
 	}
 	
-	public GameSession(final List<ScoreEntry> highScores) {
-		this.highScores = highScores;
+	public final DebugSettings getDebugSettings() {
+		return debugSettings;
 	}
 	
 	public final List<ScoreEntry> getSortedHighScores() {

@@ -65,7 +65,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private void loadGameSession() {
-		InputStream gameSessionInputStream = Gdx.files.local(Paths.HIGH_SCORES_PATH).read();
+		InputStream gameSessionInputStream = Gdx.files.local(Paths.GAME_SESSION_PATH).read();
 		gameSession = XmlUtils.unmarshal(gameSessionInputStream, new Class[] { GameSession.class });
 	}
 	
@@ -94,7 +94,7 @@ public final class LongshotGame extends Game {
 	
 	private void setupScreens() {
 		MainMenuScreen mainMenuScreen = new MainMenuScreen();
-		LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch);
+		LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch, gameSession.getDebugSettings());
 		HighScoresScreen highScoresScreen = new HighScoresScreen(gameSession);
 		setupMainMenuScreen(mainMenuScreen, levelScreen, highScoresScreen);
 		setupLevelScreen(levelScreen, mainMenuScreen, highScoresScreen);
