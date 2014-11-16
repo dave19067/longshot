@@ -23,7 +23,7 @@ public final class BoundPositionSystem implements EntitySystem {
 	
 	@Override
 	public void update(final float delta, final Entity entity) {
-		if (entity.hasActive(TransformPart.class, BoundsPart.class)) {
+		if (entity.hasActive(BoundsPart.class)) {
 			TransformPart transformPart = entity.get(TransformPart.class);
 			Rectangle boundingBox = transformPart.getBoundingBox();
 			List<Bound> bounds = Bound.getViolatedBounds(boundingBox, boundsBox);

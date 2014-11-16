@@ -57,6 +57,8 @@ import dc.longshot.epf.EntitySystem;
 import dc.longshot.eventmanagement.Event;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.EventManager;
+import dc.longshot.eventmanagement.NoArgsEvent;
+import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
@@ -91,7 +93,7 @@ public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 
-	private final EventDelegate<PausedListener> pausedDelegate = new EventDelegate<PausedListener>();
+	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<GameOverListener> gameOverDelegate = new EventDelegate<GameOverListener>();
 	
 	private final SpriteCache<SpriteKey> spriteCache;
@@ -134,11 +136,11 @@ public final class LevelScreen implements Screen {
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
 
-	public final void addEventListener(PausedListener listener) {
+	public final void addPausedListener(NoArgsListener listener) {
 		pausedDelegate.listen(listener);
 	}
 
-	public final void addEventListener(GameOverListener listener) {
+	public final void addGameOverListener(GameOverListener listener) {
 		gameOverDelegate.listen(listener);
 	}
 	
@@ -236,7 +238,7 @@ public final class LevelScreen implements Screen {
 					entityManager.add(follower);
 				}
 				
-				if (entity.hasActive(ExplodeOnSpawnPart.class, TransformPart.class)) {
+				if (entity.hasActive(ExplodeOnSpawnPart.class)) {
 					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
 					for (Entity other : entityManager.getAll()) {
 						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
@@ -522,21 +524,6 @@ public final class LevelScreen implements Screen {
 	    
 	}
 	
-	public interface PausedListener {
-		
-		void paused();
-		
-	}
-	
-	private final class PausedEvent implements Event<PausedListener> {
-
-		@Override
-		public void notify(PausedListener listener) {
-			listener.paused();
-		}
-		
-	}
-	
 	public interface GameOverListener {
 		
 		void gameOver(int score);
@@ -569,7 +556,7 @@ public final class LevelScreen implements Screen {
 		public final boolean keyUp(final int keycode) {
 			switch (keycode) {
 			case Keys.ESCAPE:
-				pausedDelegate.notify(new PausedEvent());
+				pausedDelegate.notify(new NoArgsEvent());
 				return true;
 			};
 			return false;

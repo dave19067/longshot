@@ -22,7 +22,7 @@ public final class AIShooterSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (entity.hasActive(AIShooterPart.class, WeaponPart.class)) {
+		if (entity.hasActive(AIShooterPart.class)) {
 			AIShooterPart aiShooterPart = entity.get(AIShooterPart.class);
 			if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);

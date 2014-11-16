@@ -14,8 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import dc.longshot.eventmanagement.Event;
 import dc.longshot.eventmanagement.EventDelegate;
+import dc.longshot.eventmanagement.NoArgsEvent;
+import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.Skins;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.ScoreEntry;
@@ -24,7 +25,7 @@ import dc.longshot.ui.UIFactory;
 
 public class HighScoresScreen implements Screen {
 
-	private final EventDelegate<ContinuedListener> continuedDelegate = new EventDelegate<ContinuedListener>();
+	private final EventDelegate<NoArgsListener> nextScreenRequestedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final GameSession gameSession;
 
@@ -39,8 +40,8 @@ public class HighScoresScreen implements Screen {
 		font = Skins.ocrFont;
 	}
 	
-	public final void addEventListener(ContinuedListener listener) {
-		continuedDelegate.listen(listener);
+	public final void addNextScreenRequestedListener(NoArgsListener listener) {
+		nextScreenRequestedDelegate.listen(listener);
 	}
 
 	@Override
@@ -107,24 +108,9 @@ public class HighScoresScreen implements Screen {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
-				continuedDelegate.notify(new ContinuedEvent());
+				nextScreenRequestedDelegate.notify(new NoArgsEvent());
 			}
 		};
-	}
-	
-	public interface ContinuedListener {
-		
-		void continued();
-		
-	}
-	
-	private final class ContinuedEvent implements Event<ContinuedListener> {
-
-		@Override
-		public void notify(ContinuedListener listener) {
-			listener.continued();
-		}
-		
 	}
 	
 }

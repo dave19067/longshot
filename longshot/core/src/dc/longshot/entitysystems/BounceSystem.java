@@ -23,7 +23,7 @@ public final class BounceSystem implements EntitySystem {
 	
 	@Override
 	public final void update(final float dt, final Entity entity) {
-		if (entity.hasActive(TransformPart.class, TranslatePart.class, BouncePart.class)) {
+		if (entity.hasActive(BouncePart.class)) {
 			List<Bound> bounds = Bound.getViolatedBounds(entity.get(TransformPart.class).getBoundingBox(), boundsBox);
 			Vector2 velocity = entity.get(TranslatePart.class).getVelocity();
 			Vector2 newVelocity = velocity.cpy();

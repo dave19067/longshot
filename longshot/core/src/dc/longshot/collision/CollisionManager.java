@@ -39,7 +39,6 @@ public final class CollisionManager {
 				Polygon polygon1 = entity1.get(TransformPart.class).getPolygon();
 				for (int j = i + 1; j < entities.size(); j++) {
 					Entity entity2 = entities.get(j);
-					
 					if (entity2.hasActive(TransformPart.class)) {
 						Polygon polygon2 = entity2.get(TransformPart.class).getPolygon();
 						if (Intersector.overlapConvexPolygons(polygon1, polygon2)) {

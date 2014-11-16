@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.Skins;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
@@ -16,13 +17,9 @@ import dc.longshot.models.GameSession;
 import dc.longshot.models.Paths;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.screens.HighScoresScreen;
-import dc.longshot.screens.HighScoresScreen.ContinuedListener;
 import dc.longshot.screens.LevelScreen;
 import dc.longshot.screens.LevelScreen.GameOverListener;
-import dc.longshot.screens.LevelScreen.PausedListener;
 import dc.longshot.screens.MainMenuScreen;
-import dc.longshot.screens.MainMenuScreen.HighScoresListener;
-import dc.longshot.screens.MainMenuScreen.NewGameListener;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.ui.controls.ScoreEntryDialog;
@@ -104,16 +101,16 @@ public final class LongshotGame extends Game {
 	
 	private void setupMainMenuScreen(final MainMenuScreen mainMenuScreen, final LevelScreen levelScreen, 
 			final HighScoresScreen highScoresScreen) {
-		mainMenuScreen.addListener(new NewGameListener() {
+		mainMenuScreen.addNewGameRequestedListener(new NoArgsListener() {
 			@Override
-			public void requested() {
+			public void executed() {
 				screenManager.swap(mainMenuScreen, levelScreen);
 			}
 		});
 		
-		mainMenuScreen.addListener(new HighScoresListener() {
+		mainMenuScreen.addHighScoresRequestedListener(new NoArgsListener() {
 			@Override
-			public void requested() {
+			public void executed() {
 				screenManager.swap(mainMenuScreen, highScoresScreen);
 			}
 		});
@@ -121,16 +118,16 @@ public final class LongshotGame extends Game {
 	
 	private void setupLevelScreen(final LevelScreen levelScreen, final MainMenuScreen mainMenuScreen, 
 			final HighScoresScreen highScoresScreen) {
-		levelScreen.addEventListener(new PausedListener() {
+		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
-			public void paused() {
+			public void executed() {
 				PauseMenu pauseMenu = new PauseMenu(Skins.defaultSkin, Skins.ocrFont, levelScreen.getStage(), 
 						screenManager, levelScreen.getLevelSession(), levelScreen, mainMenuScreen);
 				pauseMenu.showDialog();
 			}
 		});
 		
-		levelScreen.addEventListener(new GameOverListener() {
+		levelScreen.addGameOverListener(new GameOverListener() {
 			@Override
 			public void gameOver(int score) {
 				if (gameSession.canAddHighScore(score)) {
@@ -146,9 +143,9 @@ public final class LongshotGame extends Game {
 	}
 	
 	private void setupHighScoresScreen(final HighScoresScreen highScoresScreen, final MainMenuScreen mainMenuScreen) {
-		highScoresScreen.addEventListener(new ContinuedListener() {
+		highScoresScreen.addNextScreenRequestedListener(new NoArgsListener() {
 			@Override
-			public void continued() {
+			public void executed() {
 				screenManager.swap(highScoresScreen, mainMenuScreen);
 			}
 		});
