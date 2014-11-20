@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.geometry.LinearUtils;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
@@ -15,7 +16,7 @@ public final class WaypointsSystem implements EntitySystem {
 	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(WaypointsPart.class)) {
 			WaypointsPart waypointsPart = entity.get(WaypointsPart.class);
-			float maxDistanceCovered = entity.get(SpeedPart.class).getSpeed() * delta;
+			float maxDistanceCovered = LinearUtils.distance(entity.get(SpeedPart.class).getSpeed(), delta);
 			while (waypointsPart.hasWaypoints() && maxDistanceCovered > VectorUtils.BUFFER) {
 				maxDistanceCovered = moveToWaypoint(entity, maxDistanceCovered);
 			}

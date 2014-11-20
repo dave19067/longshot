@@ -6,10 +6,22 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
+import dc.longshot.geometry.VectorUtils;
 
 public final class WaypointsPart extends Part {
 
 	private final List<Vector2> waypoints = new ArrayList<Vector2>();
+	
+	public final float getPathDistance(Vector2 start) {
+		float distance = 0;
+		if (waypoints.size() > 0) {
+			distance += VectorUtils.offset(start, waypoints.get(0)).len();
+			for (int i = 1; i < waypoints.size(); i++) {
+				distance += VectorUtils.offset(waypoints.get(i - 1), waypoints.get(i)).len();
+			}
+		}
+		return distance;
+	}
 
 	public final boolean hasWaypoints() {
 		return waypoints.size() > 0;

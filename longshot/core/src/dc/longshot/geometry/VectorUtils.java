@@ -23,6 +23,10 @@ public final class VectorUtils {
 	public static final Vector2 lengthened(final Vector2 vector, final float length) {
 		return vector.cpy().scl(length / vector.len());
 	}
+	
+	public static final Vector2 offset(final Vector2 from, final Vector2 to) {
+		return to.cpy().sub(from);
+	}
 
 	public static final float angleToPoint(final Vector2 from, final Vector2 to) {
 		Vector2 offset = to.cpy().sub(from);

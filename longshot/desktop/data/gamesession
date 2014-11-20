@@ -30,10 +30,6 @@
             <score>1600</score>
         </highScores>
         <highScores>
-            <name>f</name>
-            <score>500</score>
-        </highScores>
-        <highScores>
             <name>fd</name>
             <score>1500</score>
         </highScores>
@@ -48,6 +44,10 @@
         <highScores>
             <name>fd</name>
             <score>7300</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>800</score>
         </highScores>
     </highScores>
 </gameSession>

@@ -10,13 +10,14 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.geometry.LinearUtils;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.CurvedMovementPart;
+import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
 
-// TODO: Refine
 public final class CurvedMovementSystem implements EntitySystem {
 	
 	private final int SAMPLE_NUM = 20;
@@ -30,15 +31,21 @@ public final class CurvedMovementSystem implements EntitySystem {
 	@Override
 	public void update(final float delta, final Entity entity) {
 		if (entity.hasActive(CurvedMovementPart.class)) {
-			if (!entity.get(WaypointsPart.class).hasWaypoints()) {
-				setCurveWaypoints(entity);
+			WaypointsPart waypointsPart = entity.get(WaypointsPart.class);
+			TransformPart transformPart = entity.get(TransformPart.class);
+			float maxDistanceCovered = LinearUtils.distance(entity.get(SpeedPart.class).getSpeed(), delta);
+			if (!waypointsPart.hasWaypoints()) {
+				setCurveWaypoints(entity, transformPart.getGlobalCenter());
+			}
+			// TODO: check this
+			else if (maxDistanceCovered >= waypointsPart.getPathDistance(transformPart.getGlobalCenter())) {
+				setCurveWaypoints(entity, waypointsPart.getWaypoints().get(waypointsPart.getWaypoints().size() - 1));
 			}
 		}
 	}
 	
-	private void setCurveWaypoints(final Entity entity) {
+	private void setCurveWaypoints(final Entity entity, final Vector2 start) {
 		TransformPart transformPart = entity.get(TransformPart.class);
-		Vector2 start = transformPart.getGlobalCenter();
 		Vector2 end = createEndPoint(start);
 		float curveSize = entity.get(CurvedMovementPart.class).getCurveSize();
 		Vector2 startCurve = createStartCurvePoint(start, transformPart.getRotation(), curveSize);
