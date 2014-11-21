@@ -75,8 +75,8 @@ import dc.longshot.models.LevelSession;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
+import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
-import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.ScorePart;
@@ -234,19 +234,19 @@ public final class LevelScreen implements Screen {
 				}
 				
 				if (entity.hasActive(FollowerPart.class)) {
-					Entity follower = entity.get(FollowerPart.class).getFollower();
-					entityManager.add(follower);
+					List<Entity> followers = entity.get(FollowerPart.class).getFollowers();
+					entityManager.addAll(followers);
 				}
 				
-				if (entity.hasActive(ExplodeOnSpawnPart.class)) {
-					ExplodeOnSpawnPart explodeOnSpawnPart = entity.get(ExplodeOnSpawnPart.class);
+				if (entity.hasActive(DamageOnSpawnPart.class)) {
+					DamageOnSpawnPart damageOnSpawnPart = entity.get(DamageOnSpawnPart.class);
 					for (Entity other : entityManager.getAll()) {
 						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
 							Vector2 entityCenter = entity.get(TransformPart.class).getGlobalCenter();
 							Vector2 otherCenter = other.get(TransformPart.class).getGlobalCenter();
 							float distance = otherCenter.cpy().sub(entityCenter).len(); 
-							if (distance <= explodeOnSpawnPart.getRadius()) {
-								other.get(HealthPart.class).decrease(explodeOnSpawnPart.getDamage());
+							if (distance <= damageOnSpawnPart.getRadius()) {
+								other.get(HealthPart.class).decrease(damageOnSpawnPart.getDamage());
 							}
 						}
 					}
@@ -276,6 +276,12 @@ public final class LevelScreen implements Screen {
 				if (entity.hasActive(AttachmentPart.class)) {
 					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
 					entityManager.remove(attachedEntity);
+				}
+				
+				if (entity.hasActive(FollowerPart.class)) {
+					for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
+						entityManager.remove(follower);
+					}
 				}
 			}
 		};
@@ -325,22 +331,16 @@ public final class LevelScreen implements Screen {
 	private void setupStage() {
 		Skin skin = Skins.defaultSkin;
 		LabelStyle labelStyle = Skins.ocrStyle;
-		worldTable = createWorldTable(skin);
+		worldTable = new Table(skin);
 		Table statusTable = createStatusTable(skin, labelStyle);
 		Table mainTable = createMainTable(skin, worldTable, statusTable);
 		stage.addActor(mainTable);
 	}
 	
-	private Table createWorldTable(Skin skin) {
-		Table worldTable = new Table(skin);
-		return worldTable;
-	}
-	
 	private Table createStatusTable(Skin skin, LabelStyle labelStyle) {
 		Table statusTable = new Table(skin);
 		healthLabel = new Label("", labelStyle);
-		statusTable.add(healthLabel).expandX().left();
-		statusTable.row();
+		statusTable.add(healthLabel).expandX().left().row();
 		scoreLabel = new Label("", labelStyle);
 		statusTable.add(scoreLabel).left();
 		return statusTable;
@@ -349,10 +349,8 @@ public final class LevelScreen implements Screen {
 	private Table createMainTable(Skin skin, Table worldTable, Table statusTable) {
 		Table mainTable = new Table(skin).top().left();
 		mainTable.setFillParent(true);
-		mainTable.add(worldTable).expand().fill();
-		mainTable.row();
-		mainTable.add(statusTable).expandX().fillX();
-		mainTable.row();
+		mainTable.add(worldTable).expand().fill().row();
+		mainTable.add(statusTable).expandX().fillX().row();
 		return mainTable;
 	}
 	

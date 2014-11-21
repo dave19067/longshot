@@ -16,10 +16,11 @@ public final class FollowerSystem implements EntitySystem {
 	@Override
 	public void update(float delta, Entity entity) {;
 		if (entity.hasActive(FollowerPart.class)) {
-			Entity follower = entity.get(FollowerPart.class).getFollower();
-			List<Vector2> waypoints = new ArrayList<Vector2>();
-			waypoints.add(entity.get(TransformPart.class).getGlobalCenter());
-			follower.get(WaypointsPart.class).addWaypoints(waypoints);
+			for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
+				List<Vector2> waypoints = new ArrayList<Vector2>();
+				waypoints.add(entity.get(TransformPart.class).getGlobalCenter());
+				follower.get(WaypointsPart.class).addWaypoints(waypoints);
+			}
 		}
 	}
 

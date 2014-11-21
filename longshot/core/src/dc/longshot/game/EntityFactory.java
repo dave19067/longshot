@@ -35,10 +35,10 @@ import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.DamageOnCollisionPart;
+import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.DrawableUpdaterPart;
 import dc.longshot.parts.EmitterPart;
-import dc.longshot.parts.ExplodeOnSpawnPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
@@ -164,7 +164,7 @@ public final class EntityFactory {
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, damage));
 		entity.attach(new EmitterPart(trailParticle, 0.2f));
-		entity.attach(new SpawnOnDeathPart(createExplosion(explosionRadius, 3)));
+		entity.attach(new SpawnOnDeathPart(createExplosion(explosionRadius, 3, 1)));
 		entity.attach(new CityDamagePart());
 		return entity;
 	}
@@ -195,7 +195,7 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
+		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 1)));
 		entity.attach(new WeaponPart(createUFOLaser(), 1, 0));
 		entity.attach(new WanderMovementPart(3, 1));
 		entity.attach(new AIShooterPart(3, Alliance.PLAYER));
@@ -234,15 +234,20 @@ public final class EntityFactory {
 		entity.attach(new BoundsDiePart(deathBounds));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
-		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
+		entity.attach(new DamageOnCollisionPart(collisionTypes, 5));
+		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 0)));
 		entity.attach(new WaypointsPart());
 		entity.attach(new CurvedMovementPart(10));
-		entity.attach(new FollowerPart(createCaterpillarSegment(5)));
+		List<Entity> segments = new ArrayList<Entity>();
+		for (int i = 0; i < 5; i++) {
+			segments.add(createCaterpillarSegment());
+		}
+		entity.attach(new FollowerPart(segments));
+		entity.attach(new CityDamagePart());
 		return entity;
 	}
 	
-	public final Entity createCaterpillarSegment(int segmentNum) {
+	public final Entity createCaterpillarSegment() {
 		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_HEAD);
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
@@ -256,20 +261,16 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3)));
+		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 0)));
 		entity.attach(new WaypointsPart());
-		segmentNum--;
-		if (segmentNum > 0) {
-			entity.attach(new FollowerPart(createCaterpillarSegment(segmentNum)));
-		}
 		return entity;
 	}
 	
-	public final Entity createExplosion(final float radius, final float maxLifeTime) {
+	public final Entity createExplosion(final float radius, final float maxLifeTime, final float damage) {
 		float diameter = radius * 2;
 		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), 
 				SpriteKey.CIRCLE);
-		entity.attach(new ExplodeOnSpawnPart(radius, 1));
+		entity.attach(new DamageOnSpawnPart(radius, damage));
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		Color endColor = Color.ORANGE.cpy();
 		endColor.a = 0;
