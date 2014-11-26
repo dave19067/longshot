@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import box2dLight.RayHandler;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -23,6 +25,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -102,6 +105,8 @@ public final class LevelScreen implements Screen {
 	
 	private Camera camera;
 	private final ShapeRenderer shapeRenderer;
+	private final World world = new World(new Vector2(), true);
+	private final RayHandler rayHandler = new RayHandler(world);
 	private final float speedMultiplier = 1f;
 
 	private Stage stage;
@@ -134,6 +139,8 @@ public final class LevelScreen implements Screen {
 		this.debugSettings = debugSettings;
 		shapeRenderer = new ShapeRenderer();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
+		rayHandler.setShadows(false);
+		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
 	}
 
 	public final void addPausedListener(NoArgsListener listener) {
@@ -218,6 +225,8 @@ public final class LevelScreen implements Screen {
 
 	@Override
 	public final void dispose() {
+		rayHandler.dispose();
+		world.dispose();
 		Input.removeProcessor(levelInputProcessor);
 		Input.removeProcessor(stage);
 		stage.dispose();
@@ -398,6 +407,7 @@ public final class LevelScreen implements Screen {
 		backdropManager.update(delta);
 		levelController.update(delta);
 		updateEntities(delta);
+		rayHandler.update();
 	}
 	
 	private void updateEntities(final float delta) {
@@ -453,6 +463,9 @@ public final class LevelScreen implements Screen {
 			}
 		}
 		spriteBatch.end();
+		
+		rayHandler.setCombinedMatrix(camera.combined);
+		rayHandler.render();
 	}
 	
 	private void drawPolygons() {

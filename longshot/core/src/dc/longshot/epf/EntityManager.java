@@ -72,9 +72,10 @@ public final class EntityManager {
 		
 		while (!entitiesToRemove.isEmpty()) {
 			Entity entityToRemove = entitiesToRemove.remove(0);
-			entityToRemove.cleanup();
-			entities.remove(entityToRemove);
-			eventManager.notify(new EntityRemovedEvent(entityToRemove));
+			if (entities.remove(entityToRemove)) {
+				entityToRemove.cleanup();
+				eventManager.notify(new EntityRemovedEvent(entityToRemove));
+			}
 		}
 	}
 	
