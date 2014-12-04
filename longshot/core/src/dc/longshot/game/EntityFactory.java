@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import box2dLight.Light;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -42,6 +46,7 @@ import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
+import dc.longshot.parts.LightPart;
 import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.ScorePart;
 import dc.longshot.parts.ShotStatsPart;
@@ -57,10 +62,12 @@ import dc.longshot.parts.WeaponPart;
 public final class EntityFactory {
 	
 	private final SpriteCache<SpriteKey> spriteCache;
+	private final RayHandler rayHandler;
 	private final Map<SpriteKey, float[]> convexHullCache = new HashMap<SpriteKey, float[]>(); 
 	
-	public EntityFactory(final SpriteCache<SpriteKey> spriteCache) {
+	public EntityFactory(final SpriteCache<SpriteKey> spriteCache, final RayHandler rayHandler) {
 		this.spriteCache = spriteCache;
+		this.rayHandler = rayHandler;
 		generateConvexHulls(spriteCache);
 	}
 	
@@ -127,6 +134,9 @@ public final class EntityFactory {
 		entity.attach(new BoundsPart(bounds));
 		entity.attach(new TimedDeathPart(4));
 		entity.attach(new BoundsDiePart());
+		Light light = new PointLight(rayHandler, 8, Color.ORANGE, 100, 0, 0);
+		light.setActive(false);
+		entity.attach(new LightPart(light));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <gameSession>
     <debugSettings>
-        <drawPolygons>false</drawPolygons>
+        <drawPolygons>true</drawPolygons>
         <drawWaypoints>true</drawWaypoints>
     </debugSettings>
     <highScores>
@@ -12,6 +12,10 @@
         <highScores>
             <name>fdaad</name>
             <score>800</score>
+        </highScores>
+        <highScores>
+            <name>fdafs</name>
+            <score>3700</score>
         </highScores>
     </highScores>
 </gameSession>

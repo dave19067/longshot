@@ -44,6 +44,7 @@ import dc.longshot.entitysystems.CurvedMovementSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.FollowerSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
+import dc.longshot.entitysystems.LightSystem;
 import dc.longshot.entitysystems.NoHealthSystem;
 import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
@@ -188,7 +189,7 @@ public final class LevelScreen implements Screen {
 
 	@Override
 	public final void show() {
-		entityFactory = new EntityFactory(spriteCache);
+		entityFactory = new EntityFactory(spriteCache, rayHandler);
 		eventManager = new EventManager();
 		entityManager = new EntityManager(eventManager);
 		collisionManager = new CollisionManager(eventManager);
@@ -381,6 +382,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new WaypointsSystem());
 		entitySystems.add(new AttachmentSystem());
 		entitySystems.add(new FollowerSystem());
+		entitySystems.add(new LightSystem());
 	}
 	
 	private void setupInitialEntities() {
@@ -428,6 +430,7 @@ public final class LevelScreen implements Screen {
 		clearScreen();
 		setWorldViewport();
 		drawWorld();
+		drawLights();
 		if (debugSettings.drawPolygons()) {
 			drawPolygons();
 		}
@@ -446,6 +449,8 @@ public final class LevelScreen implements Screen {
 	
 	private void setWorldViewport() {
 		Rectangle worldTableRect = UIUtils.boundingBox(worldTable);
+		rayHandler.useCustomViewport((int)worldTable.getX(), (int)worldTable.getY(), (int)worldTable.getWidth(), 
+				(int)worldTable.getHeight());
 		Gdx.gl.glViewport((int)worldTableRect.x, (int)worldTableRect.y, (int)worldTableRect.getWidth(), 
 				(int)worldTableRect.getHeight());
 	}
@@ -463,7 +468,9 @@ public final class LevelScreen implements Screen {
 			}
 		}
 		spriteBatch.end();
-		
+	}
+	
+	private void drawLights() {
 		rayHandler.setCombinedMatrix(camera.combined);
 		rayHandler.render();
 	}
