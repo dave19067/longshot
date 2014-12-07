@@ -40,6 +40,11 @@ public final class WeaponPart extends Part {
 	}
 	
 	@Override
+	public final void cleanup() {
+		original.cleanup();
+	}
+	
+	@Override
 	public final void update(final float delta) {
 		spawnTime += delta;
 		Iterator<Entity> it = spawns.iterator();

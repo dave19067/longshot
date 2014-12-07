@@ -43,6 +43,11 @@ public final class EmitterPart extends Part {
 			throw new IllegalStateException("Cannot emit spawn");
 		}
 	}
+	
+	@Override
+	public final void cleanup() {
+		original.cleanup();
+	}
 
 	@Override
 	public final void update(final float delta) {

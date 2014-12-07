@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <gameSession>
     <debugSettings>
-        <drawPolygons>true</drawPolygons>
-        <drawWaypoints>true</drawWaypoints>
+        <drawWorld>true</drawWorld>
+        <drawPolygons>false</drawPolygons>
+        <drawWaypoints>false</drawWaypoints>
     </debugSettings>
     <highScores>
         <highScores>
@@ -16,6 +17,22 @@
         <highScores>
             <name>fdafs</name>
             <score>3700</score>
+        </highScores>
+        <highScores>
+            <name>reqw</name>
+            <score>3400</score>
+        </highScores>
+        <highScores>
+            <name>fdas</name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>fdsfsafsfas</name>
+            <score>500</score>
+        </highScores>
+        <highScores>
+            <name>gf</name>
+            <score>2700</score>
         </highScores>
     </highScores>
 </gameSession>

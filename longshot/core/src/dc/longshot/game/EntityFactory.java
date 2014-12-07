@@ -15,12 +15,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.geometry.Bound;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureGeometry;
 import dc.longshot.models.Alliance;
@@ -136,7 +136,7 @@ public final class EntityFactory {
 		entity.attach(new BoundsDiePart());
 		Light light = new PointLight(rayHandler, 8, Color.ORANGE, 100, 0, 0);
 		light.setActive(false);
-		entity.attach(new LightPart(light));
+		entity.attach(new LightPart(light, new Vector2(0.3f, 0.05f)));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -176,6 +176,9 @@ public final class EntityFactory {
 		entity.attach(new EmitterPart(trailParticle, 0.2f));
 		entity.attach(new SpawnOnDeathPart(createExplosion(explosionRadius, 3, 1)));
 		entity.attach(new CityDamagePart());
+		Light light = new PointLight(rayHandler, 8, Color.YELLOW, 100, 0, 0);
+		light.setActive(false);
+		entity.attach(new LightPart(light, new Vector2(0f, size.y / 2)));
 		return entity;
 	}
 	
@@ -228,6 +231,9 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
+		Light light = new PointLight(rayHandler, 8, Color.GREEN, 100, 0, 0);
+		light.setActive(false);
+		entity.attach(new LightPart(light, new Vector2(0.15f, 0.05f)));
 		return entity;
 	}
 	
@@ -315,10 +321,24 @@ public final class EntityFactory {
 	}
 	
 	private Polygon createConvexHull(final SpriteKey spriteKey, final Vector3 size) {
-		Polygon polygon = new Polygon(convexHullCache.get(spriteKey));
-		Rectangle boundingRectangle = polygon.getBoundingRectangle();
-		polygon.setScale(size.x / boundingRectangle.width, size.y / boundingRectangle.height);
-		return polygon;
+		float[] vertices = sizedVertices(convexHullCache.get(spriteKey), size);
+		return new Polygon(vertices);
+	}
+	
+	private float[] sizedVertices(final float[] vertices, final Vector3 size) {
+		Vector2 verticesSize = PolygonUtils.size(vertices);
+		float scaleX = size.x / verticesSize.x;
+		float scaleY = size.y / verticesSize.y;
+		float[] sizedVertices = new float[vertices.length];
+		for (int i = 0; i < vertices.length; i++) {
+			if (i % 2 == 0) {
+				sizedVertices[i] = vertices[i] * scaleX;
+			}
+			else {
+				sizedVertices[i] = vertices[i] * scaleY;
+			}
+		}
+		return sizedVertices;
 	}
 	
 }

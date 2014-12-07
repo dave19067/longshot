@@ -106,8 +106,8 @@ public final class LevelScreen implements Screen {
 	
 	private Camera camera;
 	private final ShapeRenderer shapeRenderer;
-	private final World world = new World(new Vector2(), true);
-	private final RayHandler rayHandler = new RayHandler(world);
+	private World world;
+	private RayHandler rayHandler;
 	private final float speedMultiplier = 1f;
 
 	private Stage stage;
@@ -140,8 +140,6 @@ public final class LevelScreen implements Screen {
 		this.debugSettings = debugSettings;
 		shapeRenderer = new ShapeRenderer();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
-		rayHandler.setShadows(false);
-		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
 	}
 
 	public final void addPausedListener(NoArgsListener listener) {
@@ -189,6 +187,10 @@ public final class LevelScreen implements Screen {
 
 	@Override
 	public final void show() {
+		world = new World(new Vector2(), true);
+		rayHandler = new RayHandler(world);
+		rayHandler.setShadows(false);
+		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
 		entityFactory = new EntityFactory(spriteCache, rayHandler);
 		eventManager = new EventManager();
 		entityManager = new EntityManager(eventManager);
@@ -199,7 +201,7 @@ public final class LevelScreen implements Screen {
 		InputStream levelInputStream = Gdx.files.internal("levels/level1.xml").read();
 		level = XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
-
+		
 		Gdx.input.setCursorCatched(true);
 		setupCamera();
 		setupBackdropManager();
@@ -226,6 +228,7 @@ public final class LevelScreen implements Screen {
 
 	@Override
 	public final void dispose() {
+		entityManager.cleanup();
 		rayHandler.dispose();
 		world.dispose();
 		Input.removeProcessor(levelInputProcessor);
@@ -429,7 +432,9 @@ public final class LevelScreen implements Screen {
 	private void draw() {
 		clearScreen();
 		setWorldViewport();
-		drawWorld();
+		if (debugSettings.drawWorld()) {
+			drawWorld();
+		}
 		drawLights();
 		if (debugSettings.drawPolygons()) {
 			drawPolygons();

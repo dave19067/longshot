@@ -2,6 +2,7 @@ package dc.longshot.epf;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import dc.longshot.eventmanagement.EventManager;
@@ -58,6 +59,15 @@ public final class EntityManager {
 	 */
 	public final void remove(final Entity entity) {
 		entitiesToRemove.add(entity);
+	}
+	
+	public final void cleanup() {
+		Iterator<Entity> it = entities.iterator();
+		while (it.hasNext()) {
+			Entity entity = it.next();
+			entity.cleanup();
+			it.remove();
+		}
 	}
 
 	/**

@@ -18,8 +18,10 @@ public final class PointLightCloner implements IFastCloner {
 			// HACK: Getting hidden fields using reflection
 			RayHandler rayHandler = getFieldValue(pointLight, "rayHandler");
 			int rays = getFieldValue(pointLight, "rayNum");
-			return new PointLight(rayHandler, rays, pointLight.getColor(), pointLight.getDistance(), pointLight.getX(), 
-					pointLight.getY());
+			PointLight clone = new PointLight(rayHandler, rays, pointLight.getColor(), pointLight.getDistance(), 
+					pointLight.getX(), pointLight.getY());
+			clone.setActive(pointLight.isActive());
+			return clone;
 		} 
 		catch (NoSuchFieldException e) {
 			throw new RuntimeException(e);
