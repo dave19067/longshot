@@ -1,28 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <level>
+    <name>WAVE 1</name>
     <boundsBox>
         <x>0</x>
         <y>0</y>
         <width>40.0</width>
         <height>30.0</height>
     </boundsBox>
-    <spawnDuration>60.0</spawnDuration>
+    <spawnDuration>5.0</spawnDuration>
     <spawns>
         <entry>
-            <key>CATERPILLAR</key>
-            <value>30</value>
-        </entry>
-        <entry>
             <key>MISSILE</key>
-            <value>30</value>
-        </entry>
-        <entry>
-            <key>NUKE</key>
-            <value>10</value>
-        </entry>
-        <entry>
-            <key>UFO</key>
-            <value>5</value>
+            <value>1</value>
         </entry>
     </spawns>
 </level>

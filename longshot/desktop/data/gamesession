@@ -5,6 +5,10 @@
         <drawPolygons>false</drawPolygons>
         <drawWaypoints>false</drawWaypoints>
     </debugSettings>
+    <levelNames>
+        <levelNames>level1.xml</levelNames>
+        <levelNames>level1.xml</levelNames>
+    </levelNames>
     <highScores>
         <highScores>
             <name>fu</name>
@@ -33,6 +37,14 @@
         <highScores>
             <name>gf</name>
             <score>2700</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>9300</score>
+        </highScores>
+        <highScores>
+            <name>fdadf</name>
+            <score>200</score>
         </highScores>
     </highScores>
 </gameSession>

@@ -1,6 +1,5 @@
 package dc.longshot.screens;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -58,7 +57,6 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.eventmanagement.Event;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.eventmanagement.NoArgsEvent;
@@ -76,6 +74,7 @@ import dc.longshot.graphics.SpriteCache;
 import dc.longshot.models.DebugSettings;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
+import dc.longshot.models.PlaySession;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
@@ -83,7 +82,7 @@ import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.HealthPart;
-import dc.longshot.parts.ScorePart;
+import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
@@ -91,18 +90,21 @@ import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.util.ColorUtils;
-import dc.longshot.util.XmlUtils;
 
 public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
 
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
-	private final EventDelegate<GameOverListener> gameOverDelegate = new EventDelegate<GameOverListener>();
+	private final EventDelegate<NoArgsListener> completeDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> gameOverDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final SpriteCache<SpriteKey> spriteCache;
 	private final SpriteBatch spriteBatch;
 	private final DebugSettings debugSettings;
+	private LevelSession levelSession;
+	private final PlaySession playSession;
+	private final Level level;
 	
 	private Camera camera;
 	private final ShapeRenderer shapeRenderer;
@@ -126,18 +128,17 @@ public final class LevelScreen implements Screen {
 
 	private final Texture cursorTexture;
 	
-	private LevelSession levelSession; 
-	private int score;
 	
-	private Level level;
 	private Entity shooter;
 	private boolean gameOver = false;
 	
 	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch, 
-			final DebugSettings debugSettings) {
+			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
 		this.spriteCache = spriteCache;
 		this.spriteBatch = spriteBatch;
 		this.debugSettings = debugSettings;
+		this.playSession = playSession;
+		this.level = level;
 		shapeRenderer = new ShapeRenderer();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
@@ -145,8 +146,12 @@ public final class LevelScreen implements Screen {
 	public final void addPausedListener(NoArgsListener listener) {
 		pausedDelegate.listen(listener);
 	}
+	
+	public final void addCompleteListener(NoArgsListener listener) {
+		completeDelegate.listen(listener);
+	}
 
-	public final void addGameOverListener(GameOverListener listener) {
+	public final void addGameOverListener(NoArgsListener listener) {
 		gameOverDelegate.listen(listener);
 	}
 	
@@ -173,7 +178,12 @@ public final class LevelScreen implements Screen {
 			if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
 				gameOver = true;
 				hideStatusUI();
-				gameOverDelegate.notify(new GameOverEvent(score));
+			}
+			if (levelSession.getHealth() <= 0) {
+				gameOverDelegate.notify(new NoArgsEvent());
+			}
+			else if (levelController.isComplete()) {
+				completeDelegate.notify(new NoArgsEvent());
 			}
 		}
 		
@@ -197,9 +207,6 @@ public final class LevelScreen implements Screen {
 		collisionManager = new CollisionManager(eventManager);
 		stage = new Stage(new ScreenViewport());
 		levelSession = new LevelSession();
-		score = 0;
-		InputStream levelInputStream = Gdx.files.internal("levels/level1.xml").read();
-		level = XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 		levelController = new LevelController(entityManager, entityFactory, level);
 		
 		Gdx.input.setCursorCatched(true);
@@ -253,7 +260,7 @@ public final class LevelScreen implements Screen {
 				
 				if (entity.hasActive(DamageOnSpawnPart.class)) {
 					DamageOnSpawnPart damageOnSpawnPart = entity.get(DamageOnSpawnPart.class);
-					for (Entity other : entityManager.getAll()) {
+					for (Entity other : entityManager.getManaged()) {
 						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
 							Vector2 entityCenter = entity.get(TransformPart.class).getGlobalCenter();
 							Vector2 otherCenter = other.get(TransformPart.class).getGlobalCenter();
@@ -279,10 +286,10 @@ public final class LevelScreen implements Screen {
 				}
 				
 				// If killed, increase score
-				if (entity.hasActive(ScorePart.class)) {
+				if (entity.hasActive(PointsPart.class)) {
 					if (!Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
 							entity.get(BoundsDiePart.class).getBounds())) {
-						score += entity.get(ScorePart.class).getScore();
+						playSession.addToScore(entity.get(PointsPart.class).getPoints());
 					}
 				}
 				
@@ -404,11 +411,11 @@ public final class LevelScreen implements Screen {
 	
 	private void updateUI() {
 		healthLabel.setText("HEALTH: " + levelSession.getHealth());
-		scoreLabel.setText("SCORE: " + score);
+		scoreLabel.setText("SCORE: " + playSession.getScore());
 	}
 	
 	private void updateWorld(final float delta) {
-		collisionManager.checkCollisions(entityManager.getAll());
+		collisionManager.checkCollisions(entityManager.getManaged());
 		backdropManager.update(delta);
 		levelController.update(delta);
 		updateEntities(delta);
@@ -416,7 +423,7 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void updateEntities(final float delta) {
-		for (Entity entity : entityManager.getAll()) {
+		for (Entity entity : entityManager.getManaged()) {
 			entity.update(delta);
 			for (EntitySystem entitySystem : entitySystems) {
 				entitySystem.update(delta, entity);
@@ -464,7 +471,7 @@ public final class LevelScreen implements Screen {
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
 		backdropManager.draw(spriteBatch);
-		List<Entity> entities = entityManager.getAll();
+		List<Entity> entities = entityManager.getManaged();
 		Collections.sort(entities, new ZComparator());
 		for (Entity entity : entities) {
 			if (entity.hasActive(DrawablePart.class)) {
@@ -483,7 +490,7 @@ public final class LevelScreen implements Screen {
 	private void drawPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
-		for (Entity entity : entityManager.getAll()) {
+		for (Entity entity : entityManager.getManaged()) {
 			if (entity.hasActive(TransformPart.class)) {
 				TransformPart transformPart = entity.get(TransformPart.class);
 				List<Vector2> transformedVertices = transformPart.getTransformedVertices();
@@ -502,7 +509,7 @@ public final class LevelScreen implements Screen {
 	private void drawWaypoints() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
-		for (Entity entity : entityManager.getAll()) {
+		for (Entity entity : entityManager.getManaged()) {
 			if (entity.hasActive(WaypointsPart.class)) {
 				List<Vector2> waypoints = entity.get(WaypointsPart.class).getWaypoints();
 				for (int i = 0; i < waypoints.size() - 1; i++) {
@@ -545,27 +552,6 @@ public final class LevelScreen implements Screen {
 	    	}
 	    }
 	    
-	}
-	
-	public interface GameOverListener {
-		
-		void gameOver(int score);
-		
-	}
-	
-	private final class GameOverEvent implements Event<GameOverListener> {
-
-		private final int score;
-		
-		private GameOverEvent(int score) {
-			this.score = score;
-		}
-		
-		@Override
-		public final void notify(GameOverListener listener) {
-			listener.gameOver(score);
-		}
-		
 	}
 	
 	private final class LevelInputProcessor implements InputProcessor {

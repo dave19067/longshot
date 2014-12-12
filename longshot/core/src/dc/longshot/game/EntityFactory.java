@@ -48,7 +48,7 @@ import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.LightPart;
 import dc.longshot.parts.RotateToCursorPart;
-import dc.longshot.parts.ScorePart;
+import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.SpeedPart;
@@ -162,7 +162,7 @@ public final class EntityFactory {
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));
 		entity.attach(new HealthPart(1));
-		entity.attach(new ScorePart(100));
+		entity.attach(new PointsPart(100));
 		entity.attach(new TranslatePart());
 		entity.attach(new AutoRotatePart());
 		entity.attach(new AlliancePart(Alliance.ENEMY));
@@ -196,7 +196,7 @@ public final class EntityFactory {
 		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.UFO);
 		entity.attach(new SpeedPart(3));
 		entity.attach(new HealthPart(1));
-		entity.attach(new ScorePart(300));
+		entity.attach(new PointsPart(300));
 		entity.attach(new TranslatePart());
 		entity.attach(new BouncePart());
 		entity.attach(new BoundsPart());
@@ -241,7 +241,7 @@ public final class EntityFactory {
 		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_HEAD);
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
-		entity.attach(new ScorePart(100));
+		entity.attach(new PointsPart(100));
 		entity.attach(new AutoRotatePart());
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		entity.attach(new AlliancePart(Alliance.ENEMY));
@@ -267,7 +267,7 @@ public final class EntityFactory {
 		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_HEAD);
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
-		entity.attach(new ScorePart(100));
+		entity.attach(new PointsPart(100));
 		entity.attach(new AutoRotatePart());
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		entity.attach(new AlliancePart(Alliance.ENEMY));

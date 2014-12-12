@@ -12,12 +12,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public final class GameSession {
 	
-	private final int MAX_HIGH_SCORES = 10;
-	private final Comparator<ScoreEntry> highScoreComparator = new HighScoreComparator();
+	private static final int MAX_HIGH_SCORES = 10;
+	private static final Comparator<ScoreEntry> highScoreComparator = new HighScoreComparator();
 	
 	@XmlElement
 	private DebugSettings debugSettings;
-	
+	@XmlElementWrapper
+	private List<String> levelNames;
 	@XmlElementWrapper
 	private List<ScoreEntry> highScores;
 	
@@ -27,6 +28,10 @@ public final class GameSession {
 	
 	public final DebugSettings getDebugSettings() {
 		return debugSettings;
+	}
+	
+	public final List<String> getLevelNames() {
+		return new ArrayList<String>(levelNames);
 	}
 	
 	public final List<ScoreEntry> getSortedHighScores() {
@@ -54,7 +59,7 @@ public final class GameSession {
 		return getSortedHighScores().get(0);
 	}
 	
-	private class HighScoreComparator implements Comparator<ScoreEntry> {
+	private static class HighScoreComparator implements Comparator<ScoreEntry> {
 		
 	    @Override
 	    public final int compare(final ScoreEntry s1, final ScoreEntry s2) {

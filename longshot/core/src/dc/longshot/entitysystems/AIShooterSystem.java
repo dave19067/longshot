@@ -27,7 +27,7 @@ public final class AIShooterSystem implements EntitySystem {
 			if (MathUtils.random(aiShooterPart.getShootRate()) < delta) {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
-					for (Entity other : entityManager.getAll()) {
+					for (Entity other : entityManager.getManaged()) {
 						if (other != entity && other.hasActive(AlliancePart.class)) {
 							if (other.get(AlliancePart.class).getAlliance() == aiShooterPart.getTargetAlliance()) {
 								spawn(entity, other);

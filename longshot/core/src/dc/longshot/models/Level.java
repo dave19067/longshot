@@ -15,6 +15,7 @@ import dc.longshot.xmladapters.RectangleAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class Level {
 	 
+	private String name;
 	@XmlJavaTypeAdapter(RectangleAdapter.class)
 	private Rectangle boundsBox;
 	private float spawnDuration;
@@ -22,6 +23,10 @@ public final class Level {
 	
 	public Level() {
 		// For serialization
+	}
+	
+	public final String getName() {
+		return name;
 	}
 	
 	public final Rectangle getBoundsBox() {

@@ -14,11 +14,13 @@ import dc.longshot.game.Skins;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
 import dc.longshot.models.GameSession;
+import dc.longshot.models.Level;
 import dc.longshot.models.Paths;
+import dc.longshot.models.PlaySession;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.screens.HighScoresScreen;
+import dc.longshot.screens.LevelPreviewScreen;
 import dc.longshot.screens.LevelScreen;
-import dc.longshot.screens.LevelScreen.GameOverListener;
 import dc.longshot.screens.MainMenuScreen;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
@@ -29,17 +31,22 @@ import dc.longshot.util.XmlUtils;
 
 public final class LongshotGame extends Game {
 	
+	private static final String LEVELS_PATH = "levels/";
+	
 	private final ScreenManager screenManager = new ScreenManager();
 	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
 	private SpriteBatch spriteBatch;
 	private GameSession gameSession;
+	private PlaySession playSession;
 	
 	@Override
 	public final void create() {
 		spriteBatch = new SpriteBatch();
 		loadGameSession();
 		loadSprites();
-		setupScreens();
+		playSession = new PlaySession(gameSession.getLevelNames());
+		MainMenuScreen mainMenuScreen = createMainMenuScreen();
+		screenManager.add(mainMenuScreen);
 	}
 
 	@Override
@@ -89,66 +96,104 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.BUG_HEAD, "images/bug_head.png");
 	}
 	
-	private void setupScreens() {
-		MainMenuScreen mainMenuScreen = new MainMenuScreen();
-		LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch, gameSession.getDebugSettings());
-		HighScoresScreen highScoresScreen = new HighScoresScreen(gameSession);
-		setupMainMenuScreen(mainMenuScreen, levelScreen, highScoresScreen);
-		setupLevelScreen(levelScreen, mainMenuScreen, highScoresScreen);
-		setupHighScoresScreen(highScoresScreen, mainMenuScreen);
-		screenManager.add(mainMenuScreen);
-	}
-	
-	private void setupMainMenuScreen(final MainMenuScreen mainMenuScreen, final LevelScreen levelScreen, 
-			final HighScoresScreen highScoresScreen) {
+	private MainMenuScreen createMainMenuScreen() {
+		final MainMenuScreen mainMenuScreen = new MainMenuScreen();
 		mainMenuScreen.addNewGameRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
-				screenManager.swap(mainMenuScreen, levelScreen);
+				// TODO: Ensure the playsession gets reset if the user uses other means to start a New Game other than from the main menu
+				playSession.reset();
+				Level level = loadNextLevel();
+				LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);
+				screenManager.swap(mainMenuScreen, levelPreviewScreen);
 			}
 		});
-		
 		mainMenuScreen.addHighScoresRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
+				HighScoresScreen highScoresScreen = createHighScoresScreen();
 				screenManager.swap(mainMenuScreen, highScoresScreen);
 			}
 		});
+		return mainMenuScreen;
 	}
 	
-	private void setupLevelScreen(final LevelScreen levelScreen, final MainMenuScreen mainMenuScreen, 
-			final HighScoresScreen highScoresScreen) {
+	private LevelPreviewScreen createLevelPreviewScreen(final Level level) {
+		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(level.getName(), 1);
+		levelPreviewScreen.addNextScreenRequestedListener(new NoArgsListener() {
+			@Override
+			public void executed() {
+				LevelScreen levelScreen = createLevelScreen(level);
+				screenManager.swap(levelPreviewScreen, levelScreen);
+			}
+		});
+		return levelPreviewScreen;
+	}
+	
+	private HighScoresScreen createHighScoresScreen() {
+		final HighScoresScreen highScoresScreen = new HighScoresScreen(gameSession);
+		highScoresScreen.addNextScreenRequestedListener(new NoArgsListener() {
+			@Override
+			public void executed() {
+				MainMenuScreen mainMenuScreen = createMainMenuScreen();
+				screenManager.swap(highScoresScreen, mainMenuScreen);
+			}
+		});
+		return highScoresScreen;
+	}
+	
+	private LevelScreen createLevelScreen(final Level level) {
+		final LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch, gameSession.getDebugSettings(), 
+				playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
+				MainMenuScreen mainMenuScreen = createMainMenuScreen();
 				PauseMenu pauseMenu = new PauseMenu(Skins.defaultSkin, Skins.ocrFont, levelScreen.getStage(), 
 						screenManager, levelScreen.getLevelSession(), levelScreen, mainMenuScreen);
 				pauseMenu.showDialog();
 			}
 		});
-		
-		levelScreen.addGameOverListener(new GameOverListener() {
-			@Override
-			public void gameOver(int score) {
-				if (gameSession.canAddHighScore(score)) {
-					ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(Skins.defaultSkin, Skins.ocrFont, 
-							levelScreen.getStage(), screenManager, levelScreen, highScoresScreen, gameSession, score);
-					scoreEntryDialog.showDialog();
-				}
-				else {
-					screenManager.swap(levelScreen, highScoresScreen);
-				}
-			}
-		});
-	}
-	
-	private void setupHighScoresScreen(final HighScoresScreen highScoresScreen, final MainMenuScreen mainMenuScreen) {
-		highScoresScreen.addNextScreenRequestedListener(new NoArgsListener() {
+		final LevelScreen currentLevelScreen = levelScreen;
+		levelScreen.addCompleteListener(new NoArgsListener() {
 			@Override
 			public void executed() {
-				screenManager.swap(highScoresScreen, mainMenuScreen);
+				if (playSession.hasNextLevel()) {
+					Level level = loadNextLevel();
+					LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);
+					screenManager.swap(currentLevelScreen, levelPreviewScreen);
+				}
+				else {
+					endGame(levelScreen);
+				}
 			}
 		});
+		levelScreen.addGameOverListener(new NoArgsListener() {
+			@Override
+			public void executed() {
+				endGame(levelScreen);
+			}
+		});
+		return levelScreen;
+	}
+	
+	private void endGame(final LevelScreen levelScreen) {
+		HighScoresScreen highScoresScreen = createHighScoresScreen();
+		int score = playSession.getScore();
+		if (gameSession.canAddHighScore(score)) {
+			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(Skins.defaultSkin, Skins.ocrFont, 
+					levelScreen.getStage(), screenManager, levelScreen, highScoresScreen, gameSession, score);
+			scoreEntryDialog.showDialog();
+		}
+		else {
+			screenManager.swap(levelScreen, highScoresScreen);
+		}
+	}
+	
+	private Level loadNextLevel() {
+		String levelName = playSession.advanceLevel();
+		InputStream levelInputStream = Gdx.files.internal(LEVELS_PATH + levelName).read();
+		return XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
 	}
 	
 }

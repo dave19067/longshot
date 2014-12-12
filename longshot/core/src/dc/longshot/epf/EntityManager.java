@@ -28,9 +28,18 @@ public final class EntityManager {
 	}
 	
 	/**
-	 * @return all managed entities
+	 * @return all managed and cached entities
 	 */
 	public final List<Entity> getAll() {
+		List<Entity> entities = new ArrayList<Entity>(this.entities);
+		entities.addAll(entitiesToAdd);
+		return entities;
+	}
+	
+	/**
+	 * @return all managed entities
+	 */
+	public final List<Entity> getManaged() {
 		return new ArrayList<Entity>(entities);
 	}
 	
