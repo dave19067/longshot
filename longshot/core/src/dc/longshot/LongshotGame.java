@@ -25,7 +25,6 @@ import dc.longshot.screens.MainMenuScreen;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.ui.controls.ScoreEntryDialog;
-import dc.longshot.util.ColorUtils;
 import dc.longshot.util.InputUtils;
 import dc.longshot.util.XmlUtils;
 
@@ -44,7 +43,6 @@ public final class LongshotGame extends Game {
 		spriteBatch = new SpriteBatch();
 		loadGameSession();
 		loadSprites();
-		playSession = new PlaySession(gameSession.getLevelNames());
 		MainMenuScreen mainMenuScreen = createMainMenuScreen();
 		screenManager.add(mainMenuScreen);
 	}
@@ -77,9 +75,7 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
 		spriteCache.add(SpriteKey.STAR, "images/star.png");
 		spriteCache.add(SpriteKey.CIRCLE, "images/circle.png");
-		Color cloudColor = ColorUtils.toGdxColor(64, 64, 64, 223);
-		Texture cloudTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.CIRCLE), cloudColor);
-		spriteCache.add(SpriteKey.CLOUD, cloudTexture);
+		spriteCache.add(SpriteKey.CLOUD, "images/cloud.png");
 		spriteCache.add(SpriteKey.WHITE, "images/white.png");
 		spriteCache.add(SpriteKey.GREEN, "images/green.png");
 		spriteCache.add(SpriteKey.SHOOTER, "images/tank.png");
@@ -102,7 +98,7 @@ public final class LongshotGame extends Game {
 			@Override
 			public void executed() {
 				// TODO: Ensure the playsession gets reset if the user uses other means to start a New Game other than from the main menu
-				playSession.reset();
+				playSession = new PlaySession(gameSession.getLevelNames());
 				Level level = loadNextLevel();
 				LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);
 				screenManager.swap(mainMenuScreen, levelPreviewScreen);

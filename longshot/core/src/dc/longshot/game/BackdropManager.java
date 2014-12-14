@@ -31,9 +31,7 @@ public final class BackdropManager {
 		if (spawnBound != Bound.LEFT && spawnBound != Bound.RIGHT) {
 			throw new IllegalArgumentException("Spawn bound must be left or right");
 		}
-		
 		this.startBound = spawnBound;
-		
 		for (DecorationProfile decorationProfile : decorationProfiles) {
 			decorations.put(decorationProfile, new ArrayList<Polygon>());
 			generateInitialDecorations(decorationProfile);

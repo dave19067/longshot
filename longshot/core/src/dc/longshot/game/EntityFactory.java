@@ -47,8 +47,8 @@ import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.LightPart;
-import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.PointsPart;
+import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.SpeedPart;
@@ -134,7 +134,7 @@ public final class EntityFactory {
 		entity.attach(new BoundsPart(bounds));
 		entity.attach(new TimedDeathPart(4));
 		entity.attach(new BoundsDiePart());
-		Light light = new PointLight(rayHandler, 8, Color.ORANGE, 100, 0, 0);
+		Light light = new PointLight(rayHandler, 8, Color.ORANGE, 70, 0, 0);
 		light.setActive(false);
 		entity.attach(new LightPart(light, new Vector2(0.3f, 0.05f)));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();

@@ -30,6 +30,8 @@ public final class FollowerPart extends Part {
 			Vector2 followerPosition = PolygonUtils.relativeCenter(entityCenter, followerSize);
 			followerPosition.add(0, offsetY);
 			followerTransformPart.setPosition(followerPosition);
+			float endBuffer = followerTransformPart.getGlobalCenter().sub(entityCenter).dst(new Vector2());
+			follower.get(WaypointsPart.class).setEndBuffer(endBuffer);
 			offsetY += followerSize.y;
 		}
 	}

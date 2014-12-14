@@ -1,8 +1,5 @@
 package dc.longshot.entitysystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
@@ -17,9 +14,8 @@ public final class FollowerSystem implements EntitySystem {
 	public void update(float delta, Entity entity) {;
 		if (entity.hasActive(FollowerPart.class)) {
 			for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
-				List<Vector2> waypoints = new ArrayList<Vector2>();
-				waypoints.add(entity.get(TransformPart.class).getGlobalCenter());
-				follower.get(WaypointsPart.class).addWaypoints(waypoints);
+				Vector2 waypoint = entity.get(TransformPart.class).getGlobalCenter();
+				follower.get(WaypointsPart.class).addWaypoint(waypoint);
 			}
 		}
 	}

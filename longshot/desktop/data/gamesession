@@ -3,7 +3,7 @@
     <debugSettings>
         <drawWorld>true</drawWorld>
         <drawPolygons>false</drawPolygons>
-        <drawWaypoints>false</drawWaypoints>
+        <drawWaypoints>true</drawWaypoints>
     </debugSettings>
     <levelNames>
         <levelNames>level1.xml</levelNames>
@@ -44,6 +44,10 @@
         </highScores>
         <highScores>
             <name>fdadf</name>
+            <score>200</score>
+        </highScores>
+        <highScores>
+            <name>fda</name>
             <score>200</score>
         </highScores>
     </highScores>
