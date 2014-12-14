@@ -93,7 +93,7 @@ import dc.longshot.util.ColorUtils;
 
 public final class LevelScreen implements Screen {
 	
-	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 12, 36);
+	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 6, 18);
 
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> completeDelegate = new EventDelegate<NoArgsListener>();
@@ -166,7 +166,6 @@ public final class LevelScreen implements Screen {
 	@Override
 	public final void render(final float delta) {
 		stage.act(delta);
-		entityManager.update();
 		camera.update();
 		updateUI();
 		
@@ -188,6 +187,7 @@ public final class LevelScreen implements Screen {
 		}
 		
 		draw();
+		entityManager.update();
 	}
 
 	@Override
@@ -400,7 +400,7 @@ public final class LevelScreen implements Screen {
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
 				new Vector2(boundsBox.x, boundsBox.y), SpriteKey.GREEN);
 		entityManager.add(ground);
-		Vector3 shooterSize = new Vector3(2, 1.5f, 1);
+		Vector3 shooterSize = new Vector3(2, 1, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		Entity shooterCannon = entityFactory.createShooterCannon();
 		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);

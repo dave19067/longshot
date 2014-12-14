@@ -89,6 +89,7 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
 		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
 		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
+		spriteCache.add(SpriteKey.BUG_BODY, "images/bug_body.png");
 		spriteCache.add(SpriteKey.BUG_HEAD, "images/bug_head.png");
 	}
 	

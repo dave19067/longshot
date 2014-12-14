@@ -22,7 +22,8 @@ public final class FollowerPart extends Part {
 	
 	@Override
 	public final void initialize() {
-		float offsetY = entity.get(TransformPart.class).getSize().y;
+		float followerSizeY = followers.get(0).get(TransformPart.class).getSize().y;
+		float offsetY = followerSizeY / 2 + entity.get(TransformPart.class).getSize().y / 2;
 		for (Entity follower : followers) {
 			Vector2 entityCenter = entity.get(TransformPart.class).getGlobalCenter();
 			TransformPart followerTransformPart = follower.get(TransformPart.class);

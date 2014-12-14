@@ -50,5 +50,9 @@
             <name>fda</name>
             <score>200</score>
         </highScores>
+        <highScores>
+            <name>fd</name>
+            <score>1200</score>
+        </highScores>
     </highScores>
 </gameSession>

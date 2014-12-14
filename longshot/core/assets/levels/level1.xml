@@ -13,5 +13,13 @@
             <key>CATERPILLAR</key>
             <value>1</value>
         </entry>
+        <entry>
+            <key>MISSILE</key>
+            <value>2</value>
+        </entry>
+        <entry>
+            <key>NUKE</key>
+            <value>2</value>
+        </entry>
     </spawns>
 </level>
