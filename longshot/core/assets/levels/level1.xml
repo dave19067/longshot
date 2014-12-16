@@ -10,7 +10,7 @@
     <spawnDuration>5.0</spawnDuration>
     <spawns>
         <entry>
-            <key>CATERPILLAR</key>
+            <key>UFO</key>
             <value>1</value>
         </entry>
         <entry>

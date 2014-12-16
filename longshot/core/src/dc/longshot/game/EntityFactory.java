@@ -316,7 +316,15 @@ public final class EntityFactory {
 		for (SpriteKey spriteKey : spriteCache.getKeys()) {
 			TextureRegion textureRegion = new TextureRegion(spriteCache.getTexture(spriteKey));
 			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
+			// libgdx y-axis is flipped
+			flipY(convexHull, textureRegion.getRegionHeight());
 			convexHullCache.put(spriteKey, convexHull);
+		}
+	}
+	
+	private static final void flipY(final float[] vertices, final float maxY) {
+		for (int i = 0; i < vertices.length / 2; i++) {
+			vertices[i * 2 + 1] = maxY - vertices[i * 2 + 1];
 		}
 	}
 	

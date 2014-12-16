@@ -111,6 +111,7 @@ public final class LevelScreen implements Screen {
 	private World world;
 	private RayHandler rayHandler;
 	private final float speedMultiplier = 1f;
+	private boolean gameOver = false;
 
 	private Stage stage;
 	private Table worldTable;
@@ -127,10 +128,6 @@ public final class LevelScreen implements Screen {
 	private InputProcessor levelInputProcessor;
 
 	private final Texture cursorTexture;
-	
-	
-	private Entity shooter;
-	private boolean gameOver = false;
 	
 	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch, 
 			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
@@ -194,7 +191,7 @@ public final class LevelScreen implements Screen {
 	public final void resize(final int width, final int height) {
 	    stage.getViewport().update(width, height, true);
 	}
-
+	
 	@Override
 	public final void show() {
 		world = new World(new Vector2(), true);
@@ -405,7 +402,7 @@ public final class LevelScreen implements Screen {
 		Entity shooterCannon = entityFactory.createShooterCannon();
 		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
 		Vector2 shooterPosition = new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox()));
-		shooter = entityFactory.createShooter(shooterSize, shooterPosition, shooterCannon);
+		Entity shooter = entityFactory.createShooter(shooterSize, shooterPosition, shooterCannon);
 		entityManager.add(shooter);
 	}
 	

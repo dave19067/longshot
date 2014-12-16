@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
 import dc.longshot.geometry.PolygonFactory;
+import dc.longshot.geometry.PolygonUtils;
 
 public final class TransformPart extends Part {
 
@@ -35,11 +36,7 @@ public final class TransformPart extends Part {
 	}
 	
 	public final Vector2 getSize() {
-		float rotation = polygon.getRotation();
-		polygon.setRotation(0);
-		Vector2 size = polygon.getBoundingRectangle().getSize(new Vector2());
-		polygon.setRotation(rotation);
-		return size;
+		return PolygonUtils.size(polygon);
 	}
 	
 	public final Vector2 getBoundingSize() {

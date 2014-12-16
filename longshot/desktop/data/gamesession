@@ -3,7 +3,7 @@
     <debugSettings>
         <drawWorld>true</drawWorld>
         <drawPolygons>false</drawPolygons>
-        <drawWaypoints>true</drawWaypoints>
+        <drawWaypoints>false</drawWaypoints>
     </debugSettings>
     <levelNames>
         <levelNames>level1.xml</levelNames>

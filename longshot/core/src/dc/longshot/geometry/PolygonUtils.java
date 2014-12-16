@@ -9,6 +9,14 @@ public final class PolygonUtils {
 	private PolygonUtils() {
 	}
 	
+	public static final Vector2 size(Polygon polygon) {
+		float rotation = polygon.getRotation();
+		polygon.setRotation(0);
+		Vector2 size = polygon.getBoundingRectangle().getSize(new Vector2());
+		polygon.setRotation(rotation);
+		return size;
+	}
+	
 	public static final Vector2 size(final float[] vertices) {
 		float width = vertices[0];
 		float height = vertices[1];
@@ -46,8 +54,19 @@ public final class PolygonUtils {
 	 * @param polygon polygon
 	 * @return global point
 	 */
-	public static Vector2 toGlobal(Vector2 local, Polygon polygon) {
-		return new Vector2(local)
+	public static Vector2 toGlobal(final Vector2 local, final Polygon polygon) {
+		return toGlobal(local.x, local.y, polygon);
+	}
+	
+	/**
+	 * Convert a point local to the polygon to a point in global space.
+	 * @param localX local X within the untransformed polygon
+	 * @param localY local Y within the untransformed polygon
+	 * @param polygon polygon
+	 * @return global point
+	 */
+	public static Vector2 toGlobal(final float localX, final float localY, final Polygon polygon) {
+		return new Vector2(localX, localY)
 			.sub(polygon.getOriginX(), polygon.getOriginY())
 			.scl(polygon.getScaleX(), polygon.getScaleY())
 			.rotate(polygon.getRotation())
