@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -61,6 +62,7 @@ import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.frag.Fragmenter;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
@@ -68,7 +70,7 @@ import dc.longshot.game.LevelController;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.geometry.UnitConversion;
+import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.models.DebugSettings;
@@ -81,6 +83,7 @@ import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
+import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
@@ -94,6 +97,9 @@ import dc.longshot.util.ColorUtils;
 public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 6, 18);
+	private static final int FRAG_WIDTH = 4;
+	private static final int FRAG_HEIGHT = 4;
+	private static final int FRAG_FADE_TIME = 2;
 
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> completeDelegate = new EventDelegate<NoArgsListener>();
@@ -125,6 +131,7 @@ public final class LevelScreen implements Screen {
 	private BackdropManager backdropManager;
 	private LevelController levelController;
 	private List<EntitySystem> entitySystems;
+	private final Fragmenter fragmenter = new Fragmenter(FRAG_WIDTH, FRAG_HEIGHT);
 	private InputProcessor levelInputProcessor;
 
 	private final Texture cursorTexture;
@@ -165,11 +172,9 @@ public final class LevelScreen implements Screen {
 		stage.act(delta);
 		camera.update();
 		updateUI();
-		
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
 			updateWorld(delta * speedMultiplier);
 		}
-		
 		if (!gameOver) {
 			if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
 				gameOver = true;
@@ -182,7 +187,6 @@ public final class LevelScreen implements Screen {
 				completeDelegate.notify(new NoArgsEvent());
 			}
 		}
-		
 		draw();
 		entityManager.update();
 	}
@@ -249,12 +253,10 @@ public final class LevelScreen implements Screen {
 					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
 					entityManager.add(attachedEntity);
 				}
-				
 				if (entity.hasActive(FollowerPart.class)) {
 					List<Entity> followers = entity.get(FollowerPart.class).getFollowers();
 					entityManager.addAll(followers);
 				}
-				
 				if (entity.hasActive(DamageOnSpawnPart.class)) {
 					DamageOnSpawnPart damageOnSpawnPart = entity.get(DamageOnSpawnPart.class);
 					for (Entity other : entityManager.getManaged()) {
@@ -276,25 +278,27 @@ public final class LevelScreen implements Screen {
 		return new EntityRemovedListener() {
 			@Override
 			public void removed(final Entity entity) {
-				// Spawn on death of the entity
 				if (entity.hasActive(SpawnOnDeathPart.class)) {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					entityManager.add(spawn);
 				}
-				
-				// If killed, increase score
+				if (entity.hasActive(FragsPart.class)) {
+					DrawablePart drawablePart = entity.get(DrawablePart.class);
+					Polygon polygon = entity.get(TransformPart.class).getPolygon();
+					List<Entity> frags = fragmenter.createFrags(drawablePart.getSprite(), polygon, 
+							drawablePart.getZ(), FRAG_FADE_TIME);
+					entityManager.addAll(frags);
+				}
 				if (entity.hasActive(PointsPart.class)) {
 					if (!Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
 							entity.get(BoundsDiePart.class).getBounds())) {
 						playSession.addToScore(entity.get(PointsPart.class).getPoints());
 					}
 				}
-				
 				if (entity.hasActive(AttachmentPart.class)) {
 					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
 					entityManager.remove(attachedEntity);
 				}
-				
 				if (entity.hasActive(FollowerPart.class)) {
 					for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
 						entityManager.remove(follower);
@@ -306,10 +310,11 @@ public final class LevelScreen implements Screen {
 	
 	private void setupCamera() {
 		Rectangle levelBoundsBox = level.getBoundsBox();
-		Vector2 viewportSize = UnitConversion.worldToScreen(levelBoundsBox.getSize(new Vector2()));
+		Vector2 viewportSize = UnitConvert.worldToPixel(levelBoundsBox.getSize(new Vector2()));
 		camera = new OrthographicCamera(viewportSize.x, viewportSize.y);
 		camera.position.set(levelBoundsBox.x + camera.viewportWidth / 2, 
 				levelBoundsBox.y + camera.viewportHeight / 2, 0);
+		camera.update();
 	}
 	
 	private void setupBackdropManager() {
@@ -493,9 +498,9 @@ public final class LevelScreen implements Screen {
 				List<Vector2> transformedVertices = transformPart.getTransformedVertices();
 				float[] vertices = new float[transformedVertices.size() * 2];
 				for (int i = 0; i < transformedVertices.size(); i++) {
-					Vector2 screenVertex = UnitConversion.worldToScreen(transformedVertices.get(i));
-					vertices[i * 2] = screenVertex.x;
-					vertices[i * 2 + 1] = screenVertex.y;
+					Vector2 vertex = UnitConvert.worldToPixel(transformedVertices.get(i));
+					vertices[i * 2] = vertex.x;
+					vertices[i * 2 + 1] = vertex.y;
 				}
 				shapeRenderer.polygon(vertices);
 			}
@@ -510,8 +515,8 @@ public final class LevelScreen implements Screen {
 			if (entity.hasActive(WaypointsPart.class)) {
 				List<Vector2> waypoints = entity.get(WaypointsPart.class).getWaypoints();
 				for (int i = 0; i < waypoints.size() - 1; i++) {
-					Vector2 currentWaypoint = UnitConversion.worldToScreen(waypoints.get(i));
-					Vector2 nextWaypoint = UnitConversion.worldToScreen(waypoints.get(i + 1));
+					Vector2 currentWaypoint = UnitConvert.worldToPixel(waypoints.get(i));
+					Vector2 nextWaypoint = UnitConvert.worldToPixel(waypoints.get(i + 1));
 					shapeRenderer.line(currentWaypoint, nextWaypoint);
 				}
 			}

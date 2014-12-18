@@ -42,6 +42,10 @@ public final class PolygonUtils {
 	public static final float right(final Rectangle rectangle) {
 		return rectangle.x + rectangle.width;
 	}
+	
+	public static final Vector2 center(final Polygon polygon) {
+		return polygon.getBoundingRectangle().getCenter(new Vector2());
+	}
 
 	public static final Vector2 relativeCenter(final Vector2 pivotCenter, final Vector2 objectSize) {
 		Vector2 halfObjectSize = objectSize.cpy().scl(0.5f);

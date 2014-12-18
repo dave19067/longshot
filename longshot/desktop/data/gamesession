@@ -43,16 +43,16 @@
             <score>9300</score>
         </highScores>
         <highScores>
-            <name>fdadf</name>
-            <score>200</score>
+            <name>fd</name>
+            <score>1200</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>1400</score>
         </highScores>
         <highScores>
             <name>fda</name>
-            <score>200</score>
-        </highScores>
-        <highScores>
-            <name>fd</name>
-            <score>1200</score>
+            <score>3200</score>
         </highScores>
     </highScores>
 </gameSession>

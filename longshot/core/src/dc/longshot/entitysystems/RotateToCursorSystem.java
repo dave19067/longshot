@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.geometry.UnitConversion;
+import dc.longshot.geometry.UnitConvert;
 import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.ui.UIUtils;
@@ -25,7 +25,7 @@ public final class RotateToCursorSystem implements EntitySystem {
 	@Override
 	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(RotateToCursorPart.class)) {
-			Vector2 mouseCoords = UnitConversion.screenToWorld(camera, Gdx.input.getX(), Gdx.input.getY(), 
+			Vector2 mouseCoords = UnitConvert.screenToWorld(camera, Gdx.input.getX(), Gdx.input.getY(), 
 					UIUtils.boundingBox(worldTable));
 			TransformPart transform = entity.get(TransformPart.class);
 			Vector2 offset = mouseCoords.cpy().sub(entity.get(TransformPart.class).getPosition());

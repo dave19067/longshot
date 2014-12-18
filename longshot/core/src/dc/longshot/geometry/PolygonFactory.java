@@ -18,9 +18,12 @@ public final class PolygonFactory {
 	}
 	
 	public static final Polygon createRectangle(final Vector2 size) {
-		float[] vertices = new float[] { 0, 0, size.x, 0, size.x, size.y, 0, size.y };
-		Polygon polygon = new Polygon(vertices);
-		return polygon;
+		float[] vertices = createRectangleVertices(size);
+		return new Polygon(vertices);
+	}
+	
+	public static final float[] createRectangleVertices(final Vector2 size) {
+		return new float[] { 0, 0, size.x, 0, size.x, size.y, 0, size.y };
 	}
 	
 }

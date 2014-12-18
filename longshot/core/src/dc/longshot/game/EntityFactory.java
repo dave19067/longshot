@@ -44,6 +44,7 @@ import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.DrawableUpdaterPart;
 import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.FollowerPart;
+import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.LightPart;
@@ -73,7 +74,6 @@ public final class EntityFactory {
 	
 	public final Entity create(final EntityType entityType) {
 		Entity entity;
-		
 		switch (entityType) {
 			case MISSILE:
 				entity = createMissile();
@@ -90,7 +90,6 @@ public final class EntityFactory {
 			default:
 				throw new IllegalArgumentException(entityType + " is not a valid entity type to create");
 		}
-		
 		return entity;
 	}
 
@@ -180,6 +179,7 @@ public final class EntityFactory {
 		Light light = new PointLight(rayHandler, 8, Color.YELLOW, 100, 0, 0);
 		light.setActive(false);
 		entity.attach(new LightPart(light, new Vector2(0f, size.y / 2)));
+		entity.attach(new FragsPart());
 		return entity;
 	}
 	
@@ -213,6 +213,7 @@ public final class EntityFactory {
 		entity.attach(new WeaponPart(createUFOLaser(), 1, 0));
 		entity.attach(new WanderMovementPart(3, 1));
 		entity.attach(new AIShooterPart(3, Alliance.PLAYER));
+		entity.attach(new FragsPart());
 		return entity;
 	}
 	
@@ -261,6 +262,7 @@ public final class EntityFactory {
 		}
 		entity.attach(new FollowerPart(segments));
 		entity.attach(new CityDamagePart());
+		entity.attach(new FragsPart());
 		return entity;
 	}
 	
@@ -280,6 +282,7 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 0)));
 		entity.attach(new WaypointsPart());
+		entity.attach(new FragsPart());
 		return entity;
 	}
 	

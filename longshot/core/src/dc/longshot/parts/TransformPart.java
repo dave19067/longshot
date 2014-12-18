@@ -68,7 +68,7 @@ public final class TransformPart extends Part {
 	}
 	
 	public final Vector2 getGlobalCenter() {
-		return polygon.getBoundingRectangle().getCenter(new Vector2());
+		return PolygonUtils.center(polygon);
 	}
 	
 	public Rectangle getBoundingBox() {
