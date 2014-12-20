@@ -62,10 +62,10 @@ import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
-import dc.longshot.frag.Fragmenter;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.EntityFactory;
+import dc.longshot.game.Fragmenter;
 import dc.longshot.game.LevelController;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
@@ -400,7 +400,7 @@ public final class LevelScreen implements Screen {
 	private void setupInitialEntities() {
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
-				new Vector2(boundsBox.x, boundsBox.y), SpriteKey.GREEN);
+				new Vector2(boundsBox.x, boundsBox.y), false, SpriteKey.GREEN);
 		entityManager.add(ground);
 		Vector3 shooterSize = new Vector3(2, 1, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);

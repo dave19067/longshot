@@ -1,9 +1,11 @@
-package dc.longshot.frag;
+package dc.longshot.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -102,6 +104,7 @@ public final class Fragmenter {
 				}
 			}
 		}
+		textureRegionToFragSprites.put(new TextureRegionKey(textureRegion), fragSprites);
 		return fragSprites;
 	}
 	
@@ -140,6 +143,21 @@ public final class Fragmenter {
 						&& textureRegion.getV2() == other.textureRegion.getV2();
 			}
 			return false;
+		}
+		
+		@Override
+		public final int hashCode() {
+			return new HashCodeBuilder()
+				.append(textureRegion.getTexture().getTextureObjectHandle())
+				.append(textureRegion.getRegionHeight())
+				.append(textureRegion.getRegionWidth())
+				.append(textureRegion.getRegionX())
+				.append(textureRegion.getRegionY())
+				.append(textureRegion.getU())
+				.append(textureRegion.getU2())
+				.append(textureRegion.getV())
+				.append(textureRegion.getV2())
+				.toHashCode();
 		}
 		
 	}

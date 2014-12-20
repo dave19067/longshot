@@ -7,22 +7,22 @@
         <width>40.0</width>
         <height>30.0</height>
     </boundsBox>
-    <spawnDuration>5.0</spawnDuration>
+    <spawnDuration>60.0</spawnDuration>
     <spawns>
         <entry>
-            <key>UFO</key>
-            <value>2</value>
-        </entry>
-        <entry>
             <key>MISSILE</key>
-            <value>2</value>
+            <value>20</value>
         </entry>
         <entry>
             <key>NUKE</key>
-            <value>2</value>
+            <value>5</value>
         </entry>
         <entry>
             <key>CATERPILLAR</key>
+            <value>2</value>
+        </entry>
+        <entry>
+            <key>UFO</key>
             <value>1</value>
         </entry>
     </spawns>
