@@ -22,7 +22,6 @@ import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.TextureUtils;
 import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.DrawablePart;
-import dc.longshot.parts.DrawableUpdaterPart;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
@@ -74,7 +73,6 @@ public final class Fragmenter {
 		entity.attach(new TransformPart(fragPolygon, globalPosition));
 		Sprite sprite = new Sprite(fragSprite);
 		entity.attach(new DrawablePart(sprite, z));
-		entity.attach(new DrawableUpdaterPart());
 		Vector2 velocity = calculateVelocity(parentPolygon, fragPolygon);
 		entity.attach(new SpeedPart(velocity.len()));
 		TranslatePart translatePart = new TranslatePart();

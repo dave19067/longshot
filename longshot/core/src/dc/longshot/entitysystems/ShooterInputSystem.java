@@ -25,8 +25,8 @@ public final class ShooterInputSystem implements EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
-		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			if (entity.hasActive(WeaponPart.class, AttachmentPart.class)) {
+		if (entity.hasActive(WeaponPart.class, AttachmentPart.class)) {
+			if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
 					Entity bullet = weaponPart.createSpawn();

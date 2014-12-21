@@ -41,6 +41,7 @@ import dc.longshot.entitysystems.BoundPositionSystem;
 import dc.longshot.entitysystems.CityDamageSystem;
 import dc.longshot.entitysystems.CollisionDamageSystem;
 import dc.longshot.entitysystems.CurvedMovementSystem;
+import dc.longshot.entitysystems.DrawableUpdaterSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.FollowerSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
@@ -394,6 +395,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new WaypointsSystem());
 		entitySystems.add(new AttachmentSystem());
 		entitySystems.add(new FollowerSystem());
+		entitySystems.add(new DrawableUpdaterSystem());
 		entitySystems.add(new LightSystem());
 	}
 	

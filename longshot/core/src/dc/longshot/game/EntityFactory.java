@@ -42,7 +42,6 @@ import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
-import dc.longshot.parts.DrawableUpdaterPart;
 import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
@@ -317,7 +316,6 @@ public final class EntityFactory {
 		}
 		Texture texture = spriteCache.getTexture(spriteKey);
 		entity.attach(new DrawablePart(new Sprite(texture), size.z));
-		entity.attach(new DrawableUpdaterPart());
 		return entity;
 	}
 	
@@ -326,15 +324,26 @@ public final class EntityFactory {
 			TextureRegion textureRegion = new TextureRegion(spriteCache.getTexture(spriteKey));
 			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
 			// libgdx y-axis is flipped
-			flipY(convexHull, textureRegion.getRegionHeight());
+			flipY(convexHull);
 			convexHullCache.put(spriteKey, convexHull);
 		}
 	}
 	
-	private static final void flipY(final float[] vertices, final float maxY) {
+	private static final void flipY(final float[] vertices) {
+		float maxY = maxY(vertices);
 		for (int i = 0; i < vertices.length / 2; i++) {
 			vertices[i * 2 + 1] = maxY - vertices[i * 2 + 1];
 		}
+	}
+	
+	private static final float maxY(final float[] vertices) {
+		float maxY = vertices[1];
+		for (int i = 0; i < vertices.length / 2; i++) {
+			if (vertices[i * 2 + 1] > maxY) {
+				maxY = vertices[i * 2 + 1];
+			}
+		}
+		return maxY;
 	}
 	
 	private Polygon createConvexHull(final SpriteKey spriteKey, final Vector3 size) {
