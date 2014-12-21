@@ -3,6 +3,7 @@ package dc.longshot.parts;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
+import dc.longshot.geometry.VectorUtils;
 
 public final class ShotStatsPart extends Part {
 
@@ -30,7 +31,7 @@ public final class ShotStatsPart extends Part {
 	@Override
 	public final void update(final float delta) {
 		Vector2 newPosition = entity.get(TransformPart.class).getPosition();
-		distanceTraveled += (newPosition.cpy().sub(oldPosition).len());
+		distanceTraveled += VectorUtils.offset(oldPosition, newPosition).len();
 		oldPosition = newPosition.cpy();
 	}
 	

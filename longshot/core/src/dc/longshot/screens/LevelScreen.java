@@ -264,7 +264,7 @@ public final class LevelScreen implements Screen {
 						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
 							Vector2 entityCenter = entity.get(TransformPart.class).getGlobalCenter();
 							Vector2 otherCenter = other.get(TransformPart.class).getGlobalCenter();
-							float distance = otherCenter.cpy().sub(entityCenter).len(); 
+							float distance = VectorUtils.offset(entityCenter, otherCenter).len(); 
 							if (distance <= damageOnSpawnPart.getRadius()) {
 								other.get(HealthPart.class).decrease(damageOnSpawnPart.getDamage());
 							}

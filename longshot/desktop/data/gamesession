@@ -6,7 +6,7 @@
     		<speedMultipliers>0.1</speedMultipliers>
     	</speedMultipliers>
         <drawWorld>true</drawWorld>
-        <drawPolygons>true</drawPolygons>
+        <drawPolygons>false</drawPolygons>
         <drawWaypoints>false</drawWaypoints>
     </debugSettings>
     <levelNames>

@@ -29,7 +29,7 @@ public final class VectorUtils {
 	}
 
 	public static final float angleToPoint(final Vector2 from, final Vector2 to) {
-		Vector2 offset = to.cpy().sub(from);
+		Vector2 offset = offset(from, to);
 		return MathUtils.atan2(offset.y, offset.x);
 	}
 	
@@ -39,7 +39,7 @@ public final class VectorUtils {
 
 	public static final Vector2 relativeEdgeMiddle(final Vector2 edgeStart, final Vector2 edgeEnd, 
 			final float objectLength) {
-		Vector2 edgeDifference = edgeEnd.cpy().sub(edgeStart);
+		Vector2 edgeDifference = offset(edgeStart, edgeEnd);
 		Vector2 offset = lengthened(edgeDifference, (edgeDifference.len() - objectLength) / 2);
 		return edgeStart.cpy().add(offset);
 	}

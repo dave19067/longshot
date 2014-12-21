@@ -10,14 +10,14 @@ import dc.longshot.util.Cloning;
 public final class EmitterPart extends Part {
 	
 	private final Entity original;
-	private final Vector2 localPoint;
+	private final Vector2 localSpawnPosition;
 	// TODO: Timer class
 	private final float maxEmitTime;
 	private float emitTime;
 
-	public EmitterPart(final Entity original, final Vector2 localPoint, final float maxEmitTime) {
+	public EmitterPart(final Entity original, final Vector2 localSpawnPosition, final float maxEmitTime) {
 		this.original = original;
-		this.localPoint = localPoint;
+		this.localSpawnPosition = localSpawnPosition;
 		this.maxEmitTime = maxEmitTime;
 		this.emitTime = maxEmitTime;
 	}
@@ -32,12 +32,9 @@ public final class EmitterPart extends Part {
 			Entity spawn = Cloning.clone(original);
 			TransformPart transformPart = entity.get(TransformPart.class);
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
-			// TODO: clean this up.  duplicate functionality with waypointsystem
 			spawnTransform.setRotation(transformPart.getRotation());
-			Vector2 globalPoint = PolygonUtils.toGlobal(localPoint, transformPart.getPolygon());
-			Vector2 spawnPosition = PolygonUtils.relativeCenter(globalPoint, spawnTransform.getBoundingSize());
-			Vector2 offset = spawnPosition.cpy().sub(spawnTransform.getGlobalCenter());
-			spawnTransform.setPosition(spawnTransform.getPosition().add(offset));
+			Vector2 spawnPosition = PolygonUtils.toGlobal(localSpawnPosition, transformPart.getPolygon());
+			spawnTransform.setCenter(spawnPosition);
 			return spawn;
 		}
 		else {

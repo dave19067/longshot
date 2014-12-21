@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.VectorUtils;
 
 public final class FollowerPart extends Part {
 
@@ -31,7 +32,8 @@ public final class FollowerPart extends Part {
 			Vector2 followerPosition = PolygonUtils.relativeCenter(entityCenter, followerSize);
 			followerPosition.add(0, offsetY);
 			followerTransformPart.setPosition(followerPosition);
-			float endBuffer = followerTransformPart.getGlobalCenter().sub(entityCenter).dst(new Vector2());
+			float endBuffer = VectorUtils.offset(entityCenter, followerTransformPart.getGlobalCenter())
+					.dst(new Vector2());
 			follower.get(WaypointsPart.class).setEndBuffer(endBuffer);
 			offsetY += followerSize.y;
 		}

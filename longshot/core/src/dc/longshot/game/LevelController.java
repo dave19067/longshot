@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.Level;
@@ -123,7 +124,7 @@ public final class LevelController {
 		
 		// Find the direction to get from the entity spawn position to the destination
 		Vector2 position = transformPart.getPosition();
-		Vector2 offset = destPosition.cpy().sub(position);
+		Vector2 offset = VectorUtils.offset(position, destPosition);
 		TranslatePart translate = entity.get(TranslatePart.class);
 		translate.setVelocity(offset);
 		

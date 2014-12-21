@@ -84,7 +84,7 @@ public final class Fragmenter {
 	}
 	
 	private final Vector2 calculateVelocity(final Polygon parentPolygon, final Polygon childPolygon) {
-		Vector2 offset = PolygonUtils.center(childPolygon).sub(PolygonUtils.center(parentPolygon));
+		Vector2 offset = VectorUtils.offset(PolygonUtils.center(parentPolygon), PolygonUtils.center(childPolygon));
 		return VectorUtils.lengthened(offset, offset.len() * fragSpeedMultiplier);
 	}
 	

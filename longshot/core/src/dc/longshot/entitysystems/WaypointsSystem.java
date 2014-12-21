@@ -35,7 +35,7 @@ public final class WaypointsSystem implements EntitySystem {
 		Vector2 currentWaypoint = waypointsPart.getCurrentWaypoint();
 		TransformPart transformPart = entity.get(TransformPart.class);
 		Vector2 oldGlobalCenter = transformPart.getGlobalCenter();
-		Vector2 waypointOffset = currentWaypoint.cpy().sub(oldGlobalCenter);
+		Vector2 waypointOffset = VectorUtils.offset(oldGlobalCenter, currentWaypoint);
 		Vector2 offset;
 		if (maxDistanceCovered < waypointOffset.len()) {
 			offset = VectorUtils.lengthened(waypointOffset, maxDistanceCovered);

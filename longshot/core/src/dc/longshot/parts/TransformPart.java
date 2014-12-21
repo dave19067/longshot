@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Part;
 import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.VectorUtils;
 
 public final class TransformPart extends Part {
 
@@ -51,6 +52,15 @@ public final class TransformPart extends Part {
 		polygon.setPosition(position.x, position.y);
 	}
 	
+	public final Vector2 getGlobalCenter() {
+		return PolygonUtils.center(polygon);
+	}
+	
+	public final void setCenter(final Vector2 center) {
+		Vector2 offset = VectorUtils.offset(getGlobalCenter(), center);
+		setPosition(getPosition().add(offset));
+	}
+	
 	public final Vector2 getOrigin() {
 		return new Vector2(polygon.getOriginX(), polygon.getOriginY());
 	}
@@ -65,10 +75,6 @@ public final class TransformPart extends Part {
 	
 	public final void setRotation(final float degrees) {
 		polygon.setRotation(degrees);
-	}
-	
-	public final Vector2 getGlobalCenter() {
-		return PolygonUtils.center(polygon);
 	}
 	
 	public Rectangle getBoundingBox() {

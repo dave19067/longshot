@@ -6,6 +6,7 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TransformPart;
@@ -46,8 +47,8 @@ public final class AIShooterSystem implements EntitySystem {
 		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getGlobalCenter(), 
 				spawnTransform.getBoundingSize()));
 		TransformPart otherTransform = other.get(TransformPart.class);
-		spawn.get(TranslatePart.class).setVelocity(otherTransform.getGlobalCenter().sub(
-				spawnTransform.getGlobalCenter()));
+		spawn.get(TranslatePart.class).setVelocity(VectorUtils.offset(spawnTransform.getGlobalCenter(), 
+				otherTransform.getGlobalCenter()));
 		entityManager.add(spawn);
 	}
 
