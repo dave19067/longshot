@@ -99,6 +99,7 @@ public final class LevelScreen implements Screen {
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 6, 18);
 	private static final int FRAG_WIDTH = 4;
 	private static final int FRAG_HEIGHT = 4;
+	private static final float FRAG_SPEED_MULTIPLIER = 50;
 	private static final int FRAG_FADE_TIME = 2;
 
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
@@ -116,7 +117,6 @@ public final class LevelScreen implements Screen {
 	private final ShapeRenderer shapeRenderer;
 	private World world;
 	private RayHandler rayHandler;
-	private final float speedMultiplier = 1f;
 	private boolean gameOver = false;
 
 	private Stage stage;
@@ -131,7 +131,7 @@ public final class LevelScreen implements Screen {
 	private BackdropManager backdropManager;
 	private LevelController levelController;
 	private List<EntitySystem> entitySystems;
-	private final Fragmenter fragmenter = new Fragmenter(FRAG_WIDTH, FRAG_HEIGHT);
+	private final Fragmenter fragmenter = new Fragmenter(FRAG_WIDTH, FRAG_HEIGHT, FRAG_SPEED_MULTIPLIER);
 	private InputProcessor levelInputProcessor;
 
 	private final Texture cursorTexture;
@@ -173,7 +173,7 @@ public final class LevelScreen implements Screen {
 		camera.update();
 		updateUI();
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
-			updateWorld(delta * speedMultiplier);
+			updateWorld(delta * debugSettings.getSpeedMultiplier());
 		}
 		if (!gameOver) {
 			if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
@@ -495,12 +495,11 @@ public final class LevelScreen implements Screen {
 		for (Entity entity : entityManager.getManaged()) {
 			if (entity.hasActive(TransformPart.class)) {
 				TransformPart transformPart = entity.get(TransformPart.class);
-				List<Vector2> transformedVertices = transformPart.getTransformedVertices();
-				float[] vertices = new float[transformedVertices.size() * 2];
-				for (int i = 0; i < transformedVertices.size(); i++) {
-					Vector2 vertex = UnitConvert.worldToPixel(transformedVertices.get(i));
-					vertices[i * 2] = vertex.x;
-					vertices[i * 2 + 1] = vertex.y;
+				// TODO: refactor getTransformedVertices() of transform part to return float[] to avoid double calls
+				float[] transformedVertices = transformPart.getPolygon().getTransformedVertices();
+				float[] vertices = new float[transformedVertices.length];
+				for (int i = 0; i < transformedVertices.length; i++) {
+					vertices[i] = transformedVertices[i] * UnitConvert.PIXELS_PER_UNIT;
 				}
 				shapeRenderer.polygon(vertices);
 			}
@@ -568,6 +567,9 @@ public final class LevelScreen implements Screen {
 			switch (keycode) {
 			case Keys.ESCAPE:
 				pausedDelegate.notify(new NoArgsEvent());
+				return true;
+			case Keys.F1:
+				debugSettings.nextSpeedMultiplier();
 				return true;
 			};
 			return false;

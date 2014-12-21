@@ -32,12 +32,14 @@ public final class Fragmenter {
 	
 	private final int fragWidth;
 	private final int fragHeight;
+	private final float fragSpeedMultiplier;
 	private final Map<TextureRegionKey, List<Sprite>> textureRegionToFragSprites
 		= new HashMap<TextureRegionKey, List<Sprite>>();
 	
-	public Fragmenter(final int fragWidth, final int fragHeight) {
+	public Fragmenter(final int fragWidth, final int fragHeight, final float fragSpeedMultiplier) {
 		this.fragWidth = fragWidth;
 		this.fragHeight = fragHeight;
+		this.fragSpeedMultiplier = fragSpeedMultiplier;
 	}
 	
 	public final List<Entity> createFrags(final TextureRegion textureRegion, final Polygon parentPolygon, final float z, 
@@ -85,7 +87,7 @@ public final class Fragmenter {
 	
 	private final Vector2 calculateVelocity(final Polygon parentPolygon, final Polygon childPolygon) {
 		Vector2 offset = PolygonUtils.center(childPolygon).sub(PolygonUtils.center(parentPolygon));
-		return VectorUtils.lengthened(offset, offset.len());
+		return VectorUtils.lengthened(offset, offset.len() * fragSpeedMultiplier);
 	}
 	
 	private final List<Sprite> createFragSprites(final TextureRegion textureRegion, final int fragWidth, 

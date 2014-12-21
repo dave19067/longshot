@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <gameSession>
     <debugSettings>
+    	<speedMultipliers>
+    		<speedMultipliers>1.0</speedMultipliers>
+    		<speedMultipliers>0.1</speedMultipliers>
+    	</speedMultipliers>
         <drawWorld>true</drawWorld>
-        <drawPolygons>false</drawPolygons>
+        <drawPolygons>true</drawPolygons>
         <drawWaypoints>false</drawWaypoints>
     </debugSettings>
     <levelNames>

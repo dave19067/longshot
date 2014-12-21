@@ -174,7 +174,7 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, damage));
-		entity.attach(new EmitterPart(trailParticle, 0.2f));
+		entity.attach(new EmitterPart(trailParticle, new Vector2(size.x / 2, size.y / 2), 0.2f));
 		entity.attach(new SpawnOnDeathPart(createExplosion(explosionRadius, 3, 1)));
 		entity.attach(new CityDamagePart());
 		Light light = new PointLight(rayHandler, 8, Color.YELLOW, 100, 0, 0);
