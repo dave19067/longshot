@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
@@ -217,7 +218,7 @@ public final class LevelScreen implements Screen {
 		addInputProcessors();
 		setupStage();
 		setupSystems();
-		setupInitialEntities();
+		entityManager.addAll(createInitialEntities());
 		listenToGameEvents();
 	}
 
@@ -399,18 +400,39 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new LightSystem());
 	}
 	
-	private void setupInitialEntities() {
+	private List<Entity> createInitialEntities() {
+		List<Entity> entities = new ArrayList<Entity>();
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
 				new Vector2(boundsBox.x, boundsBox.y), false, SpriteKey.GREEN);
-		entityManager.add(ground);
+		entities.add(ground);
 		Vector3 shooterSize = new Vector3(2, 1, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		Entity shooterCannon = entityFactory.createShooterCannon();
 		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
 		Vector2 shooterPosition = new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox()));
 		Entity shooter = entityFactory.createShooter(shooterSize, shooterPosition, shooterCannon);
-		entityManager.add(shooter);
+		entities.add(shooter);
+		entities.addAll(createBackgroundEntities());
+		return entities;
+	}
+	
+	private List<Entity> createBackgroundEntities() {
+		List<Entity> entities = new ArrayList<Entity>();
+		int minWidth = (int)(5 * UnitConvert.PIXELS_PER_UNIT);
+		int maxWidth = (int)(20 * UnitConvert.PIXELS_PER_UNIT);
+		float minHeightRatio = 0.5f;
+		for (int i = 0; i < MathUtils.random(0, 10); i++) {
+			Texture texture = spriteCache.getTexture(SpriteKey.ROCK);
+			int x = MathUtils.random(0, texture.getWidth() - 1);
+			int y = MathUtils.random(0, texture.getHeight() - 1);
+			int width = MathUtils.random(minWidth, maxWidth);
+			int height = (int)(width * minHeightRatio);
+			float[] vertices = new float[] { x, y, x + width, y, x + width / 2, y + height };
+			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector2(/*TODO*/), SpriteKey.ROCK);
+			entities.add(entity);
+		}
+		return entities;
 	}
 	
 	private void updateUI() {

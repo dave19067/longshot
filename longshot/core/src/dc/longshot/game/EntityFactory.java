@@ -306,6 +306,14 @@ public final class EntityFactory {
 		return entity;
 	}
 	
+	public final Entity createBackgroundElement(final float[] vertices, final Vector2 position, final SpriteKey spriteKey) {
+		Entity entity = new Entity();
+		entity.attach(new TransformPart(new Polygon(), position));
+		Texture texture = spriteCache.getTexture(spriteKey);
+		entity.attach(new DrawablePart(new Sprite(texture), 0));
+		return entity;
+	}
+	
 	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final boolean isCollider, 
 			final SpriteKey spriteKey) {
 		Entity entity = new Entity();

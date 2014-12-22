@@ -6,6 +6,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -33,16 +34,16 @@ public final class LongshotGame extends Game {
 	private static final String LEVELS_PATH = "levels/";
 	
 	private final ScreenManager screenManager = new ScreenManager();
-	private final SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
+	private SpriteCache<SpriteKey> spriteCache;
 	private SpriteBatch spriteBatch;
 	private GameSession gameSession;
 	private PlaySession playSession;
 	
 	@Override
 	public final void create() {
+		spriteCache = createSpriteCache();
 		spriteBatch = new SpriteBatch();
 		loadGameSession();
-		loadSprites();
 		MainMenuScreen mainMenuScreen = createMainMenuScreen();
 		screenManager.add(mainMenuScreen);
 	}
@@ -71,8 +72,12 @@ public final class LongshotGame extends Game {
 		gameSession = XmlUtils.unmarshal(gameSessionInputStream, new Class[] { GameSession.class });
 	}
 	
-	private void loadSprites() {
+	private SpriteCache<SpriteKey> createSpriteCache() {
+		SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
+		Texture texture = new Texture("images/rock02.png");
+		texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+		spriteCache.add(SpriteKey.ROCK, texture);
 		spriteCache.add(SpriteKey.STAR, "images/star.png");
 		spriteCache.add(SpriteKey.CIRCLE, "images/circle.png");
 		spriteCache.add(SpriteKey.CLOUD, "images/cloud.png");
@@ -91,6 +96,7 @@ public final class LongshotGame extends Game {
 		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
 		spriteCache.add(SpriteKey.BUG_BODY, "images/bug_body.png");
 		spriteCache.add(SpriteKey.BUG_HEAD, "images/bug_head.png");
+		return spriteCache;
 	}
 	
 	private MainMenuScreen createMainMenuScreen() {
