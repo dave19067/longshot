@@ -9,8 +9,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 
@@ -19,6 +19,7 @@ import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureUtils;
 import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.DrawablePart;
@@ -27,13 +28,14 @@ import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
+// TODO: cleanup
 public final class Fragmenter {
 	
 	private final int fragWidth;
 	private final int fragHeight;
 	private final float fragSpeedMultiplier;
-	private final Map<TextureRegionKey, List<Sprite>> textureRegionToFragSprites
-		= new HashMap<TextureRegionKey, List<Sprite>>();
+	private final Map<PolygonRegionKey, List<PolygonSprite>> regionToFragSprites
+		= new HashMap<PolygonRegionKey, List<PolygonSprite>>();
 	
 	public Fragmenter(final int fragWidth, final int fragHeight, final float fragSpeedMultiplier) {
 		this.fragWidth = fragWidth;
@@ -41,37 +43,37 @@ public final class Fragmenter {
 		this.fragSpeedMultiplier = fragSpeedMultiplier;
 	}
 	
-	public final List<Entity> createFrags(final TextureRegion textureRegion, final Polygon parentPolygon, final float z, 
+	public final List<Entity> createFrags(final PolygonRegion region, final Polygon parentPolygon, final float z, 
 			final float fadeTime) {
-		List<Sprite> fragSprites;
-		TextureRegionKey key = new TextureRegionKey(textureRegion);
-		if (textureRegionToFragSprites.containsKey(key)) {
-			fragSprites = textureRegionToFragSprites.get(key);
+		List<PolygonSprite> fragSprites;
+		PolygonRegionKey key = new PolygonRegionKey(region);
+		if (regionToFragSprites.containsKey(key)) {
+			fragSprites = regionToFragSprites.get(key);
 		}
 		else {
-			fragSprites = createFragSprites(textureRegion, fragWidth, fragHeight);
+			fragSprites = createFragSprites(region, fragWidth, fragHeight);
 		}
 		List<Entity> frags = new ArrayList<Entity>();
 		Vector2 scale = UnitConvert.worldToPixel(PolygonUtils.size(parentPolygon))
-				.scl(1.0f / textureRegion.getRegionWidth(), 1.0f / textureRegion.getRegionHeight());
-		for (Sprite fragSprite : fragSprites) {
+				.scl(1.0f / region.getRegion().getRegionWidth(), 1.0f / region.getRegion().getRegionHeight());
+		for (PolygonSprite fragSprite : fragSprites) {
 			Entity frag = createFrag(fragSprite, parentPolygon, scale, z, fadeTime);
 			frags.add(frag);
 		}
 		return frags;
 	}
 	
-	private final Entity createFrag(final Sprite fragSprite, final Polygon parentPolygon, final Vector2 scale, 
+	private final Entity createFrag(final PolygonSprite fragSprite, final Polygon parentPolygon, final Vector2 scale, 
 			final float z, final float fadeTime) {
 		Entity entity = new Entity();
 		Polygon fragPolygon = new Polygon();
 		fragPolygon.setRotation(parentPolygon.getRotation());
 		Vector2 fragSize = UnitConvert.pixelToWorld(fragSprite.getWidth() * scale.x, fragSprite.getHeight() * scale.y);
-		fragPolygon.setVertices(PolygonFactory.createRectangleVertices(fragSize));
+		fragPolygon.setVertices(PolygonFactory.createRectangleVertices(fragSize.x, fragSize.y));
 		Vector2 worldPosition = UnitConvert.pixelToWorld(fragSprite.getX() * scale.x, fragSprite.getY() * scale.y);
 		Vector2 globalPosition = PolygonUtils.toGlobal(worldPosition.x, worldPosition.y, parentPolygon);
 		entity.attach(new TransformPart(fragPolygon, globalPosition));
-		Sprite sprite = new Sprite(fragSprite);
+		PolygonSprite sprite = new PolygonSprite(fragSprite);
 		entity.attach(new DrawablePart(sprite, z));
 		Vector2 velocity = calculateVelocity(parentPolygon, fragPolygon);
 		entity.attach(new SpeedPart(velocity.len()));
@@ -88,23 +90,24 @@ public final class Fragmenter {
 		return VectorUtils.lengthened(offset, offset.len() * fragSpeedMultiplier);
 	}
 	
-	private final List<Sprite> createFragSprites(final TextureRegion textureRegion, final int fragWidth, 
+	private final List<PolygonSprite> createFragSprites(final PolygonRegion region, final int fragWidth, 
 			final int fragHeight) {
-		List<Sprite> fragSprites = new ArrayList<Sprite>();
-		Pixmap pixmap = TextureUtils.toPixmap(textureRegion);
+		List<PolygonSprite> fragSprites = new ArrayList<PolygonSprite>();
+		Pixmap pixmap = TextureUtils.toPixmap(region.getRegion());
 		for (int x = 0; x < pixmap.getWidth(); x += fragWidth) {
 			for (int y = 0; y < pixmap.getHeight(); y += fragHeight) {
 				int width = Math.min(fragWidth, pixmap.getWidth() - x);
 				int height = Math.min(fragHeight, pixmap.getHeight() - y);
 				if (containsOpaquePixel(pixmap, x, y, width, height)) {
-					Sprite sprite = new Sprite(new TextureRegion(textureRegion, x, y, width, height));
+					PolygonSprite sprite = new PolygonSprite(RegionFactory.createPolygonRegion(region.getRegion(), x, y,
+							width, height));
 					sprite.setOrigin(0, 0);
 					sprite.setPosition(x, pixmap.getHeight() - y - height);
 					fragSprites.add(sprite);
 				}
 			}
 		}
-		textureRegionToFragSprites.put(new TextureRegionKey(textureRegion), fragSprites);
+		regionToFragSprites.put(new PolygonRegionKey(region), fragSprites);
 		return fragSprites;
 	}
 	
@@ -120,43 +123,29 @@ public final class Fragmenter {
 		return false;
 	}
 	
-	private final class TextureRegionKey {
+	private final class PolygonRegionKey {
 		
-		private final TextureRegion textureRegion;
+		private final PolygonRegion textureRegion;
 		
-		public TextureRegionKey(final TextureRegion textureRegion) {
+		public PolygonRegionKey(final PolygonRegion textureRegion) {
 			this.textureRegion = textureRegion;
 		}
 
+		// TODO: Fix
 		@Override
-	    public final boolean equals(Object obj) {
-			if (obj instanceof TextureRegionKey) {
-				TextureRegionKey other = (TextureRegionKey)obj;
-				return textureRegion.getTexture() == other.textureRegion.getTexture()
-						&& textureRegion.getRegionHeight() == other.textureRegion.getRegionHeight()
-						&& textureRegion.getRegionWidth() == other.textureRegion.getRegionWidth()
-						&& textureRegion.getRegionX() == other.textureRegion.getRegionX()
-						&& textureRegion.getRegionY() == other.textureRegion.getRegionY()
-						&& textureRegion.getU() == other.textureRegion.getU()
-						&& textureRegion.getU2() == other.textureRegion.getU2()
-						&& textureRegion.getV() == other.textureRegion.getV()
-						&& textureRegion.getV2() == other.textureRegion.getV2();
+	    public final boolean equals(final Object obj) {
+			if (obj instanceof PolygonRegionKey) {
+				PolygonRegionKey other = (PolygonRegionKey)obj;
+				return textureRegion.getRegion().getTexture() == other.textureRegion.getRegion().getTexture();
 			}
 			return false;
 		}
-		
+
+		// TODO: Fix
 		@Override
 		public final int hashCode() {
 			return new HashCodeBuilder()
-				.append(textureRegion.getTexture().getTextureObjectHandle())
-				.append(textureRegion.getRegionHeight())
-				.append(textureRegion.getRegionWidth())
-				.append(textureRegion.getRegionX())
-				.append(textureRegion.getRegionY())
-				.append(textureRegion.getU())
-				.append(textureRegion.getU2())
-				.append(textureRegion.getV())
-				.append(textureRegion.getV2())
+				.append(textureRegion.getRegion().getTexture().getTextureObjectHandle())
 				.toHashCode();
 		}
 		

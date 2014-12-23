@@ -31,7 +31,7 @@ public class TextureUtils {
 		return pixmap;
 	}
 
-	public static boolean isAlpha(int pixel) {
+	public static boolean isAlpha(final int pixel) {
 		return pixel == Color.CLEAR.toIntBits();
 	}
 }

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
 public final class SpriteCache<T> {
 
@@ -18,11 +16,6 @@ public final class SpriteCache<T> {
 	
 	public final Collection<T> getKeys() {
 		return textureMap.keySet();
-	}
-	
-	public final SpriteDrawable getDrawable(final T key) {
-		Texture texture = getTexture(key);
-		return new SpriteDrawable(new Sprite(texture));
 	}
 	
 	public final Texture getTexture(final T key) {

@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -109,7 +109,7 @@ public final class LevelScreen implements Screen {
 	private final EventDelegate<NoArgsListener> gameOverDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final SpriteCache<SpriteKey> spriteCache;
-	private final SpriteBatch spriteBatch;
+	private final PolygonSpriteBatch spriteBatch;
 	private final DebugSettings debugSettings;
 	private LevelSession levelSession;
 	private final PlaySession playSession;
@@ -138,7 +138,7 @@ public final class LevelScreen implements Screen {
 
 	private final Texture cursorTexture;
 	
-	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SpriteBatch spriteBatch, 
+	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final PolygonSpriteBatch spriteBatch, 
 			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
 		this.spriteCache = spriteCache;
 		this.spriteBatch = spriteBatch;
@@ -149,15 +149,15 @@ public final class LevelScreen implements Screen {
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
 
-	public final void addPausedListener(NoArgsListener listener) {
+	public final void addPausedListener(final NoArgsListener listener) {
 		pausedDelegate.listen(listener);
 	}
 	
-	public final void addCompleteListener(NoArgsListener listener) {
+	public final void addCompleteListener(final NoArgsListener listener) {
 		completeDelegate.listen(listener);
 	}
 
-	public final void addGameOverListener(NoArgsListener listener) {
+	public final void addGameOverListener(final NoArgsListener listener) {
 		gameOverDelegate.listen(listener);
 	}
 	
@@ -287,7 +287,7 @@ public final class LevelScreen implements Screen {
 				if (entity.hasActive(FragsPart.class)) {
 					DrawablePart drawablePart = entity.get(DrawablePart.class);
 					Polygon polygon = entity.get(TransformPart.class).getPolygon();
-					List<Entity> frags = fragmenter.createFrags(drawablePart.getSprite(), polygon, 
+					List<Entity> frags = fragmenter.createFrags(drawablePart.getSprite().getRegion(), polygon, 
 							drawablePart.getZ(), FRAG_FADE_TIME);
 					entityManager.addAll(frags);
 				}
@@ -361,7 +361,7 @@ public final class LevelScreen implements Screen {
 		stage.addActor(mainTable);
 	}
 	
-	private Table createStatusTable(Skin skin, LabelStyle labelStyle) {
+	private Table createStatusTable(final Skin skin, final LabelStyle labelStyle) {
 		Table statusTable = new Table(skin);
 		healthLabel = new Label("", labelStyle);
 		statusTable.add(healthLabel).expandX().left().row();
@@ -370,7 +370,7 @@ public final class LevelScreen implements Screen {
 		return statusTable;
 	}
 	
-	private Table createMainTable(Skin skin, Table worldTable, Table statusTable) {
+	private Table createMainTable(final Skin skin, final Table worldTable, final Table statusTable) {
 		Table mainTable = new Table(skin).top().left();
 		mainTable.setFillParent(true);
 		mainTable.add(worldTable).expand().fill().row();
@@ -425,7 +425,9 @@ public final class LevelScreen implements Screen {
 		for (int i = 0; i < MathUtils.random(0, 10); i++) {
 			Texture texture = spriteCache.getTexture(SpriteKey.ROCK);
 			int x = MathUtils.random(0, texture.getWidth() - 1);
-			int y = MathUtils.random(0, texture.getHeight() - 1);
+			int y = 0;
+			// TODO:
+			//int y = MathUtils.random(0, texture.getHeight() - 1);
 			int width = MathUtils.random(minWidth, maxWidth);
 			int height = (int)(width * minHeightRatio);
 			float[] vertices = new float[] { x, y, x + width, y, x + width / 2, y + height };

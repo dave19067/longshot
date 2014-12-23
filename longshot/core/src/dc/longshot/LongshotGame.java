@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import dc.longshot.eventmanagement.NoArgsListener;
@@ -35,14 +35,14 @@ public final class LongshotGame extends Game {
 	
 	private final ScreenManager screenManager = new ScreenManager();
 	private SpriteCache<SpriteKey> spriteCache;
-	private SpriteBatch spriteBatch;
+	private PolygonSpriteBatch spriteBatch;
 	private GameSession gameSession;
 	private PlaySession playSession;
 	
 	@Override
 	public final void create() {
 		spriteCache = createSpriteCache();
-		spriteBatch = new SpriteBatch();
+		spriteBatch = new PolygonSpriteBatch();
 		loadGameSession();
 		MainMenuScreen mainMenuScreen = createMainMenuScreen();
 		screenManager.add(mainMenuScreen);

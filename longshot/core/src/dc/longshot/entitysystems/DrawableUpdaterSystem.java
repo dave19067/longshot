@@ -1,6 +1,6 @@
 package dc.longshot.entitysystems;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
@@ -16,7 +16,7 @@ public final class DrawableUpdaterSystem implements EntitySystem {
 		if (entity.hasActive(DrawablePart.class) && entity.hasActive(TransformPart.class)) {
 			TransformPart transformPart = entity.get(TransformPart.class);
 			DrawablePart drawablePart = entity.get(DrawablePart.class);
-			Sprite sprite = drawablePart.getSprite();
+			PolygonSprite sprite = drawablePart.getSprite();
 			Vector2 size = UnitConvert.worldToPixel(transformPart.getSize());
 			sprite.setSize(size.x, size.y);
 			Vector2 position = UnitConvert.worldToPixel(transformPart.getPosition());

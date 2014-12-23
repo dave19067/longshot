@@ -11,7 +11,8 @@ import box2dLight.RayHandler;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
@@ -22,6 +23,8 @@ import dc.longshot.entitysystems.ColliderPart;
 import dc.longshot.epf.Entity;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.UnitConvert;
+import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureGeometry;
 import dc.longshot.models.Alliance;
@@ -106,7 +109,8 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
-		entity.attach(new GhostPart(5, outlineTexture));
+		PolygonRegion region = RegionFactory.createPolygonRegion(outlineTexture);
+		entity.attach(new GhostPart(5, region));
 		entity.attach(new AttachmentPart(cannon));
 		return entity;
 	}
@@ -306,11 +310,17 @@ public final class EntityFactory {
 		return entity;
 	}
 	
+	// TODO: Duplicate codes with createBaseEntity
 	public final Entity createBackgroundElement(final float[] vertices, final Vector2 position, final SpriteKey spriteKey) {
 		Entity entity = new Entity();
-		entity.attach(new TransformPart(new Polygon(), position));
+		float[] scaledVertices = new float[vertices.length];
+		for (int i = 0; i < vertices.length; i++) {
+			scaledVertices[i] = vertices[i] / UnitConvert.PIXELS_PER_UNIT;
+		}
+		entity.attach(new TransformPart(new Polygon(scaledVertices), position));
 		Texture texture = spriteCache.getTexture(spriteKey);
-		entity.attach(new DrawablePart(new Sprite(texture), 0));
+		PolygonRegion region = RegionFactory.createPolygonRegion(texture, vertices);
+		entity.attach(new DrawablePart(new PolygonSprite(region), 0));
 		return entity;
 	}
 	
@@ -323,7 +333,8 @@ public final class EntityFactory {
 			entity.attach(new ColliderPart());
 		}
 		Texture texture = spriteCache.getTexture(spriteKey);
-		entity.attach(new DrawablePart(new Sprite(texture), size.z));
+		PolygonRegion region = RegionFactory.createPolygonRegion(texture);
+		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));
 		return entity;
 	}
 	

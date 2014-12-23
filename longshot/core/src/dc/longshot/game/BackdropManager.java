@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
@@ -27,7 +27,7 @@ public final class BackdropManager {
 	 * @param spawnBound create the decorations starting from left or right
 	 * @param decorationProfiles information needed to create different decorations
 	 */
-	public BackdropManager(final Bound spawnBound, List<DecorationProfile> decorationProfiles) {
+	public BackdropManager(final Bound spawnBound, final List<DecorationProfile> decorationProfiles) {
 		if (spawnBound != Bound.LEFT && spawnBound != Bound.RIGHT) {
 			throw new IllegalArgumentException("Spawn bound must be left or right");
 		}
@@ -38,12 +38,12 @@ public final class BackdropManager {
 		}
 	}
 	
-	public final void draw(final SpriteBatch spriteBatch) {
+	public final void draw(final Batch batch) {
 		for (Map.Entry<DecorationProfile, List<Polygon>> entry : decorations.entrySet())
 		{
 			for (Polygon decoration : entry.getValue()) {
 				Rectangle boundingRectangle = decoration.getBoundingRectangle();
-				spriteBatch.draw(entry.getKey().textureRegion, 
+				batch.draw(entry.getKey().textureRegion, 
 						decoration.getX() * UnitConvert.PIXELS_PER_UNIT, 
 						decoration.getY() * UnitConvert.PIXELS_PER_UNIT, 
 						decoration.getOriginX() * UnitConvert.PIXELS_PER_UNIT, 
@@ -64,7 +64,7 @@ public final class BackdropManager {
 		}
 	}
 	
-	private void generateInitialDecorations(DecorationProfile decorationProfile) {
+	private void generateInitialDecorations(final DecorationProfile decorationProfile) {
 		int decorationNum = (int)(decorationProfile.area.width / decorationProfile.scrollSpeed
 				/ decorationProfile.spawnRate);
 		for (int i = 0; i < decorationNum; i++) {
@@ -73,7 +73,7 @@ public final class BackdropManager {
 		}
 	}
 	
-	private Polygon createDecoration(DecorationProfile decorationProfile) {
+	private Polygon createDecoration(final DecorationProfile decorationProfile) {
 		Vector2 size;
 		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize);
 		float xyRatio = MathUtils.random(decorationProfile.minXYRatio, decorationProfile.maxXYRatio);

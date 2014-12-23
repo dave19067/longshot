@@ -1,7 +1,7 @@
 package dc.longshot.parts;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 
 import dc.longshot.epf.Part;
 
@@ -23,7 +23,7 @@ public final class ColorChangePart extends Part {
 		changeTime += delta;
 		float changePercent = changeTime / maxChangeTime;
 		Color color = startColor.cpy().lerp(endColor.r, endColor.g, endColor.b, endColor.a, changePercent);
-		Sprite sprite = entity.get(DrawablePart.class).getSprite();
+		PolygonSprite sprite = entity.get(DrawablePart.class).getSprite();
 		sprite.setColor(color);
 	}
 	
