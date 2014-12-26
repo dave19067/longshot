@@ -99,8 +99,8 @@ import dc.longshot.util.ColorUtils;
 public final class LevelScreen implements Screen {
 	
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 6, 18);
-	private static final int FRAG_WIDTH = 4;
-	private static final int FRAG_HEIGHT = 4;
+	private static final int FRAG_WIDTH = 8;
+	private static final int FRAG_HEIGHT = 8;
 	private static final float FRAG_SPEED_MULTIPLIER = 50;
 	private static final int FRAG_FADE_TIME = 2;
 
@@ -263,8 +263,8 @@ public final class LevelScreen implements Screen {
 					DamageOnSpawnPart damageOnSpawnPart = entity.get(DamageOnSpawnPart.class);
 					for (Entity other : entityManager.getManaged()) {
 						if (other != entity && other.hasActive(HealthPart.class, TransformPart.class)) {
-							Vector2 entityCenter = entity.get(TransformPart.class).getGlobalCenter();
-							Vector2 otherCenter = other.get(TransformPart.class).getGlobalCenter();
+							Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
+							Vector2 otherCenter = other.get(TransformPart.class).getCenter();
 							float distance = VectorUtils.offset(entityCenter, otherCenter).len(); 
 							if (distance <= damageOnSpawnPart.getRadius()) {
 								other.get(HealthPart.class).decrease(damageOnSpawnPart.getDamage());
@@ -329,10 +329,7 @@ public final class LevelScreen implements Screen {
 		
 		TextureRegion cloudTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.CLOUD));
 		Rectangle cloudBoundsBox = level.getBoundsBox();
-		// TODO: clean this calculation up
-		float offsetY = cloudBoundsBox.height / 2;
-		cloudBoundsBox.setY(cloudBoundsBox.y + offsetY);
-		cloudBoundsBox.setHeight(cloudBoundsBox.height - offsetY);
+		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
 		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 4, 0.75f, 3, 6, 1f, 2, 
 				cloudTextureRegion);
 		decorationProfiles.add(cloudProfile);
@@ -424,14 +421,15 @@ public final class LevelScreen implements Screen {
 		float minHeightRatio = 0.5f;
 		for (int i = 0; i < MathUtils.random(0, 10); i++) {
 			Texture texture = spriteCache.getTexture(SpriteKey.ROCK);
-			int x = MathUtils.random(0, texture.getWidth() - 1);
-			int y = 0;
-			// TODO:
-			//int y = MathUtils.random(0, texture.getHeight() - 1);
+			int textureX = MathUtils.random(0, texture.getWidth() - 1);
+			int textureY = MathUtils.random(0, texture.getHeight() - 1);
 			int width = MathUtils.random(minWidth, maxWidth);
 			int height = (int)(width * minHeightRatio);
-			float[] vertices = new float[] { x, y, x + width, y, x + width / 2, y + height };
-			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector2(/*TODO*/), SpriteKey.ROCK);
+			float[] vertices = new float[] { textureX, textureY, textureX + width, textureY, textureX + width / 2, 
+					textureY + height };
+			float x = MathUtils.random(-width / UnitConvert.PIXELS_PER_UNIT, PolygonUtils.right(level.getBoundsBox()));
+			float y = 0;
+			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector2(x, y), SpriteKey.ROCK);
 			entities.add(entity);
 		}
 		return entities;
@@ -521,7 +519,6 @@ public final class LevelScreen implements Screen {
 		for (Entity entity : entityManager.getManaged()) {
 			if (entity.hasActive(TransformPart.class)) {
 				TransformPart transformPart = entity.get(TransformPart.class);
-				// TODO: refactor getTransformedVertices() of transform part to return float[] to avoid double calls
 				float[] transformedVertices = transformPart.getPolygon().getTransformedVertices();
 				float[] vertices = new float[transformedVertices.length];
 				for (int i = 0; i < transformedVertices.length; i++) {

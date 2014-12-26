@@ -60,7 +60,7 @@ public final class WaypointsPart extends Part {
 	
 	public final float getPathDistance() {
 		float distance = 0;
-		Vector2 start = entity.get(TransformPart.class).getGlobalCenter();
+		Vector2 start = entity.get(TransformPart.class).getCenter();
 		if (waypoints.size() > 0) {
 			distance += VectorUtils.offset(start, waypoints.get(0)).len();
 			for (int i = 1; i < waypoints.size(); i++) {

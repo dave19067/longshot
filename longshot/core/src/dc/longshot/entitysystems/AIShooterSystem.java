@@ -44,11 +44,11 @@ public final class AIShooterSystem implements EntitySystem {
 		Entity spawn = entity.get(WeaponPart.class).createSpawn();
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		TransformPart transform = entity.get(TransformPart.class);
-		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getGlobalCenter(), 
+		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
 				spawnTransform.getBoundingSize()));
 		TransformPart otherTransform = other.get(TransformPart.class);
-		spawn.get(TranslatePart.class).setVelocity(VectorUtils.offset(spawnTransform.getGlobalCenter(), 
-				otherTransform.getGlobalCenter()));
+		spawn.get(TranslatePart.class).setVelocity(VectorUtils.offset(spawnTransform.getCenter(), 
+				otherTransform.getCenter()));
 		entityManager.add(spawn);
 	}
 

@@ -6,29 +6,27 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.util.Cloning;
+import dc.longshot.util.Timer;
 
 public final class EmitterPart extends Part {
 	
 	private final Entity original;
 	private final Vector2 localSpawnPosition;
-	// TODO: Timer class
-	private final float maxEmitTime;
-	private float emitTime;
+	private final Timer emitTimer;
 
 	public EmitterPart(final Entity original, final Vector2 localSpawnPosition, final float maxEmitTime) {
 		this.original = original;
 		this.localSpawnPosition = localSpawnPosition;
-		this.maxEmitTime = maxEmitTime;
-		this.emitTime = maxEmitTime;
+		emitTimer = new Timer(maxEmitTime);
 	}
 	
 	public final boolean canEmit() {
-		return emitTime >= maxEmitTime;
+		return emitTimer.isElapsed();
 	}
 	
 	public final Entity emit() {
 		if (canEmit()) {
-			emitTime = 0;
+			emitTimer.reset();
 			Entity spawn = Cloning.clone(original);
 			TransformPart transformPart = entity.get(TransformPart.class);
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
@@ -49,7 +47,7 @@ public final class EmitterPart extends Part {
 
 	@Override
 	public final void update(final float delta) {
-		emitTime += delta;
+		emitTimer.tick(delta);
 	}
 	
 }

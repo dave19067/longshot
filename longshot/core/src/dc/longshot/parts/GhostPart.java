@@ -3,17 +3,17 @@ package dc.longshot.parts;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 
 import dc.longshot.epf.Part;
+import dc.longshot.util.Timer;
 
 public final class GhostPart extends Part {
 
 	private boolean ghostMode = false;
-	private float ghostTime = 0;
-	private final float maxGhostTime;
+	private final Timer ghostTimer;
 	private PolygonRegion normalRegion;
 	private final PolygonRegion ghostRegion;
 	
 	public GhostPart(final float maxGhostTime, final PolygonRegion ghostTexture) {
-		this.maxGhostTime = maxGhostTime;
+		ghostTimer = new Timer(maxGhostTime);
 		this.ghostRegion = ghostTexture;
 	}
 	
@@ -33,9 +33,9 @@ public final class GhostPart extends Part {
 	@Override
 	public final void update(final float delta) {
 		if (ghostMode) {
-			ghostTime += delta;
-			if (ghostTime >= maxGhostTime) {
-				ghostTime = 0;
+			ghostTimer.tick(delta);
+			if (ghostTimer.isElapsed()) {
+				ghostTimer.reset();
 				ghostMode = false;
 				entity.get(DrawablePart.class).getSprite().setRegion(normalRegion);
 				entity.get(HealthPart.class).reset();

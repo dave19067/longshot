@@ -7,29 +7,28 @@ import java.util.List;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
 import dc.longshot.util.Cloning;
+import dc.longshot.util.Timer;
 
 public final class WeaponPart extends Part {
 	
 	private final Entity original;
 	private final List<Entity> spawns = new ArrayList<Entity>();
 	private final int maxSpawns;
-	private final float maxSpawnTime;
-	private float spawnTime;
+	private final Timer spawnTimer;
 
 	public WeaponPart(final Entity original, final int maxSpawns, final float maxSpawnTime) {
 		this.original = original;
 		this.maxSpawns = maxSpawns;
-		this.maxSpawnTime = maxSpawnTime;
-		this.spawnTime = maxSpawnTime;
+		spawnTimer = new Timer(maxSpawnTime);
 	}
 	
 	public final boolean canSpawn() {
-		return spawnTime >= maxSpawnTime && spawns.size() < maxSpawns;
+		return spawnTimer.isElapsed() && spawns.size() < maxSpawns;
 	}
 	
 	public final Entity createSpawn() {
 		if (canSpawn()) {
-			spawnTime = 0;
+			spawnTimer.reset();
 			Entity newSpawn = Cloning.clone(original);
 			spawns.add(newSpawn);
 			return newSpawn;
@@ -46,7 +45,7 @@ public final class WeaponPart extends Part {
 	
 	@Override
 	public final void update(final float delta) {
-		spawnTime += delta;
+		spawnTimer.tick(delta);
 		Iterator<Entity> it = spawns.iterator();
 		while (it.hasNext()) {
 			Entity spawn = it.next();

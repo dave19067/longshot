@@ -16,6 +16,7 @@ public final class RegionFactory {
 		return createPolygonRegion(textureRegion, vertices);
 	}
 	
+	// TODO: Autocrop texture region to fit polygon region?  Update Fragmenter code
 	public static final PolygonRegion createPolygonRegion(final TextureRegion textureRegion, final float[] vertices) {
 		short[] triangles = triangulator.computeTriangles(vertices).toArray();
 		return new PolygonRegion(textureRegion, vertices, triangles);

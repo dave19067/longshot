@@ -14,7 +14,7 @@ public final class AttachmentSystem implements EntitySystem {
 		if (entity.hasActive(AttachmentPart.class)) {
 			Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
 			if (attachedEntity.isActive()) {
-				Vector2 parentCenter = entity.get(TransformPart.class).getGlobalCenter();
+				Vector2 parentCenter = entity.get(TransformPart.class).getCenter();
 				attachedEntity.get(TransformPart.class).setPosition(parentCenter);
 			}
 		}

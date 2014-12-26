@@ -1,10 +1,8 @@
 package dc.longshot.parts;
 
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
-import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
 
 public final class AutoRotatePart extends Part {
@@ -17,17 +15,12 @@ public final class AutoRotatePart extends Part {
 	}
 	
 	@Override
-	public final void update(float delta) {
-		// TODO: Fix and clean up
+	public final void update(final float delta) {
 		TransformPart transformPart = entity.get(TransformPart.class);
 		Vector2 offset = VectorUtils.offset(oldPosition, transformPart.getPosition());
-		Rectangle boundingBox = transformPart.getBoundingBox();
+		Vector2 oldCenter = transformPart.getCenter();
 		transformPart.setRotation(offset.angle());
-		Rectangle rotatedBoundingBox = transformPart.getBoundingBox();
-		Vector2 relativeCenter = PolygonUtils.relativeCenter(boundingBox.getCenter(new Vector2()), 
-				rotatedBoundingBox.getSize(new Vector2()));
-		Vector2 offset2 = VectorUtils.offset(rotatedBoundingBox.getPosition(new Vector2()), relativeCenter);
-		transformPart.setPosition(transformPart.getPosition().add(offset2));
+		transformPart.setCenter(oldCenter);
 		oldPosition = transformPart.getPosition();
 	}
 	

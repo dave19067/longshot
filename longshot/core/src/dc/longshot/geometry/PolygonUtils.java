@@ -9,7 +9,7 @@ public final class PolygonUtils {
 	private PolygonUtils() {
 	}
 	
-	public static final Vector2 size(Polygon polygon) {
+	public static final Vector2 size(final Polygon polygon) {
 		float rotation = polygon.getRotation();
 		polygon.setRotation(0);
 		Vector2 size = polygon.getBoundingRectangle().getSize(new Vector2());
@@ -43,13 +43,18 @@ public final class PolygonUtils {
 		return rectangle.x + rectangle.width;
 	}
 	
+	public static final void translateY(final Rectangle rectangle, final float offsetY) {
+		rectangle.setY(rectangle.y + offsetY);
+		rectangle.setHeight(rectangle.height - offsetY);
+	}
+	
 	public static final Vector2 center(final Polygon polygon) {
 		return polygon.getBoundingRectangle().getCenter(new Vector2());
 	}
 
-	public static final Vector2 relativeCenter(final Vector2 pivotCenter, final Vector2 objectSize) {
+	public static final Vector2 relativeCenter(final Vector2 pivot, final Vector2 objectSize) {
 		Vector2 halfObjectSize = objectSize.cpy().scl(0.5f);
-		return pivotCenter.cpy().sub(halfObjectSize);
+		return pivot.cpy().sub(halfObjectSize);
 	}
 	
 	/**

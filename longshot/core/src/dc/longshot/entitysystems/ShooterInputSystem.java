@@ -1,7 +1,5 @@
 package dc.longshot.entitysystems;
 
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.math.Vector2;
@@ -9,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.TransformPart;
@@ -44,11 +43,9 @@ public final class ShooterInputSystem implements EntitySystem {
 	
 	private Vector2 getMiddleOfCannonMouth(final Entity cannon, final Entity spawn) {
 		TransformPart cannonTransform = cannon.get(TransformPart.class);
-		List<Vector2> vertices = cannonTransform.getTransformedVertices();
-		TransformPart spawnTransform = spawn.get(TransformPart.class);
-		Vector2 spawnPosition = VectorUtils.relativeEdgeMiddle(vertices.get(1), vertices.get(2), 
-				spawnTransform.getSize().y);
-		return spawnPosition;
+		Vector2 size = cannonTransform.getSize();
+		Vector2 spawnPosition = PolygonUtils.toGlobal(size.x, size.y / 2, cannonTransform.getPolygon());
+		return PolygonUtils.relativeCenter(spawnPosition, spawn.get(TransformPart.class).getBoundingSize());
 	}
 
 }

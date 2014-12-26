@@ -1,22 +1,23 @@
 package dc.longshot.parts;
 
 import dc.longshot.epf.Part;
+import dc.longshot.util.Timer;
 
 public final class TimedDeathPart extends Part {
 
-	private float deathTime;
+	private final Timer deathTimer;
 	
-	public TimedDeathPart(float deathTime) {
-		this.deathTime = deathTime;
+	public TimedDeathPart(final float deathTime) {
+		deathTimer = new Timer(deathTime);
 	}
 	
 	public final boolean isDead() {
-		return deathTime <= 0;
+		return deathTimer.isElapsed();
 	}
 
 	@Override
 	public final void update(final float delta) {
-		deathTime -= delta;
+		deathTimer.tick(delta);
 	}
 	
 }

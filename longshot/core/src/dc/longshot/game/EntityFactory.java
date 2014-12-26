@@ -310,7 +310,6 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	// TODO: Duplicate codes with createBaseEntity
 	public final Entity createBackgroundElement(final float[] vertices, final Vector2 position, final SpriteKey spriteKey) {
 		Entity entity = new Entity();
 		float[] scaledVertices = new float[vertices.length];

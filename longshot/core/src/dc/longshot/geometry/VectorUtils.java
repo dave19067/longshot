@@ -36,15 +36,8 @@ public final class VectorUtils {
 	public static final Vector2 createVectorFromAngle(final float degrees) {
 		return new Vector2(MathUtils.cosDeg(degrees), MathUtils.sinDeg(degrees));
 	}
-
-	public static final Vector2 relativeEdgeMiddle(final Vector2 edgeStart, final Vector2 edgeEnd, 
-			final float objectLength) {
-		Vector2 edgeDifference = offset(edgeStart, edgeEnd);
-		Vector2 offset = lengthened(edgeDifference, (edgeDifference.len() - objectLength) / 2);
-		return edgeStart.cpy().add(offset);
-	}
 	
-	public static float relativeMiddle(float pivotMiddle, float objectLength) {
+	public static float relativeMiddle(final float pivotMiddle, final float objectLength) {
 		return pivotMiddle - objectLength / 2;
 	}
 	

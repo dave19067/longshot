@@ -29,7 +29,6 @@ import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
-// TODO: cleanup
 public final class Fragmenter {
 	
 	private final int fragWidth;
@@ -126,27 +125,41 @@ public final class Fragmenter {
 	
 	private final class PolygonRegionKey {
 		
-		private final PolygonRegion textureRegion;
+		private final TextureRegion region;
 		
-		public PolygonRegionKey(final PolygonRegion textureRegion) {
-			this.textureRegion = textureRegion;
+		public PolygonRegionKey(final PolygonRegion region) {
+			this.region = region.getRegion();
 		}
 
-		// TODO: Fix
 		@Override
 	    public final boolean equals(final Object obj) {
 			if (obj instanceof PolygonRegionKey) {
-				PolygonRegionKey other = (PolygonRegionKey)obj;
-				return textureRegion.getRegion().getTexture() == other.textureRegion.getRegion().getTexture();
+				PolygonRegionKey other = ((PolygonRegionKey)obj);
+				return region.getTexture() == other.region.getTexture()
+					&& region.getRegionHeight() == other.region.getRegionHeight()
+					&& region.getRegionWidth() == other.region.getRegionWidth()
+					&& region.getRegionX() == other.region.getRegionX()
+					&& region.getRegionY() == other.region.getRegionY()
+					&& region.getU() == other.region.getU()
+					&& region.getU2() == other.region.getU2()
+					&& region.getV() == other.region.getV()
+					&& region.getV2() == other.region.getV2();
 			}
 			return false;
 		}
 
-		// TODO: Fix
 		@Override
 		public final int hashCode() {
 			return new HashCodeBuilder()
-				.append(textureRegion.getRegion().getTexture().getTextureObjectHandle())
+				.append(region.getTexture().getTextureObjectHandle())
+				.append(region.getRegionHeight())
+				.append(region.getRegionWidth())
+				.append(region.getRegionX())
+				.append(region.getRegionY())
+				.append(region.getU())
+				.append(region.getU2())
+				.append(region.getV())
+				.append(region.getV2())
 				.toHashCode();
 		}
 		

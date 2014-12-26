@@ -77,7 +77,6 @@ public final class BackdropManager {
 		Vector2 size;
 		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize);
 		float xyRatio = MathUtils.random(decorationProfile.minXYRatio, decorationProfile.maxXYRatio);
-		// TODO: Make this cleaner
 		if (xyRatio > 1) {
 			float ratioedLength = length / xyRatio;
 			size = new Vector2(length, ratioedLength);

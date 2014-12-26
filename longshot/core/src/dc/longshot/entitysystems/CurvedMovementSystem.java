@@ -35,7 +35,7 @@ public final class CurvedMovementSystem implements EntitySystem {
 			TransformPart transformPart = entity.get(TransformPart.class);
 			float maxDistanceCovered = LinearUtils.distance(entity.get(SpeedPart.class).getSpeed(), delta);
 			if (!waypointsPart.hasWaypoints()) {
-				setCurveWaypoints(entity, transformPart.getGlobalCenter());
+				setCurveWaypoints(entity, transformPart.getCenter());
 			}
 			else if (maxDistanceCovered >= waypointsPart.getPathDistance()) {
 				Vector2 lastWaypoint = waypointsPart.getWaypoints().get(waypointsPart.getWaypoints().size() - 1);
