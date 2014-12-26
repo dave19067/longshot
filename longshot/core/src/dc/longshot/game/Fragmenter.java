@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 
@@ -99,8 +100,8 @@ public final class Fragmenter {
 				int width = Math.min(fragWidth, pixmap.getWidth() - x);
 				int height = Math.min(fragHeight, pixmap.getHeight() - y);
 				if (containsOpaquePixel(pixmap, x, y, width, height)) {
-					PolygonSprite sprite = new PolygonSprite(RegionFactory.createPolygonRegion(region.getRegion(), x, y,
-							width, height));
+					TextureRegion croppedRegion = new TextureRegion(region.getRegion(), x, y, width, height);
+					PolygonSprite sprite = new PolygonSprite(RegionFactory.createPolygonRegion(croppedRegion));
 					sprite.setOrigin(0, 0);
 					sprite.setPosition(x, pixmap.getHeight() - y - height);
 					fragSprites.add(sprite);

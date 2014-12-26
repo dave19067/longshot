@@ -109,7 +109,7 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
-		PolygonRegion region = RegionFactory.createPolygonRegion(outlineTexture);
+		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(outlineTexture));
 		entity.attach(new GhostPart(5, region));
 		entity.attach(new AttachmentPart(cannon));
 		return entity;
@@ -319,7 +319,7 @@ public final class EntityFactory {
 		}
 		entity.attach(new TransformPart(new Polygon(scaledVertices), position));
 		Texture texture = spriteCache.getTexture(spriteKey);
-		PolygonRegion region = RegionFactory.createPolygonRegion(texture, vertices);
+		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture), vertices);
 		entity.attach(new DrawablePart(new PolygonSprite(region), 0));
 		return entity;
 	}
@@ -333,7 +333,7 @@ public final class EntityFactory {
 			entity.attach(new ColliderPart());
 		}
 		Texture texture = spriteCache.getTexture(spriteKey);
-		PolygonRegion region = RegionFactory.createPolygonRegion(texture);
+		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture));
 		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));
 		return entity;
 	}
