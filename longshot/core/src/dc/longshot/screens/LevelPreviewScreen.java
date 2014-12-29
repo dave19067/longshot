@@ -53,7 +53,6 @@ public final class LevelPreviewScreen implements Screen {
 
 	@Override
 	public final void show() {
-		// TODO: Consolidate duplicate stage code
 		stage = new Stage(new ScreenViewport());
 		Input.addProcessor(stage);
 		Gdx.input.setCursorCatched(false);

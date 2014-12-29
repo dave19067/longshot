@@ -310,16 +310,31 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	public final Entity createBackgroundElement(final float[] vertices, final Vector2 position, final SpriteKey spriteKey) {
+	public final Entity createBackgroundElement(final float[] vertices, final Vector2 position, 
+			final SpriteKey spriteKey) {
+		// TODO: cleanup
 		Entity entity = new Entity();
-		float[] scaledVertices = new float[vertices.length];
+		float minX = PolygonUtils.minX(vertices);
+		float minY = PolygonUtils.minY(vertices);
+		float[] shiftedVertices = new float[vertices.length];
 		for (int i = 0; i < vertices.length; i++) {
-			scaledVertices[i] = vertices[i] / UnitConvert.PIXELS_PER_UNIT;
+			if (i % 2 == 0) {
+				shiftedVertices[i] = vertices[i] - minX;
+			}
+			else {
+				shiftedVertices[i] = vertices[i] - minY;
+			}
 		}
-		entity.attach(new TransformPart(new Polygon(scaledVertices), position));
 		Texture texture = spriteCache.getTexture(spriteKey);
-		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture), vertices);
+		Vector2 size = PolygonUtils.size(shiftedVertices);
+		TextureRegion croppedRegion = new TextureRegion(texture, (int)minX, (int)minY, (int)size.x, (int)size.y);
+		PolygonRegion region = RegionFactory.createPolygonRegion(croppedRegion, shiftedVertices);
 		entity.attach(new DrawablePart(new PolygonSprite(region), 0));
+		float[] transformedVertices = new float[shiftedVertices.length];
+		for (int i = 0; i < shiftedVertices.length; i++) {
+			transformedVertices[i] = shiftedVertices[i] / UnitConvert.PIXELS_PER_UNIT;
+		}
+		entity.attach(new TransformPart(new Polygon(transformedVertices), position));
 		return entity;
 	}
 	
@@ -342,26 +357,9 @@ public final class EntityFactory {
 			TextureRegion textureRegion = new TextureRegion(spriteCache.getTexture(spriteKey));
 			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
 			// libgdx y-axis is flipped
-			flipY(convexHull);
+			PolygonUtils.flipY(convexHull);
 			convexHullCache.put(spriteKey, convexHull);
 		}
-	}
-	
-	private static final void flipY(final float[] vertices) {
-		float maxY = maxY(vertices);
-		for (int i = 0; i < vertices.length / 2; i++) {
-			vertices[i * 2 + 1] = maxY - vertices[i * 2 + 1];
-		}
-	}
-	
-	private static final float maxY(final float[] vertices) {
-		float maxY = vertices[1];
-		for (int i = 0; i < vertices.length / 2; i++) {
-			if (vertices[i * 2 + 1] > maxY) {
-				maxY = vertices[i * 2 + 1];
-			}
-		}
-		return maxY;
 	}
 	
 	private Polygon createConvexHull(final SpriteKey spriteKey, final Vector3 size) {
