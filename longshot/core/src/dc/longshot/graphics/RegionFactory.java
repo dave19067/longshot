@@ -3,8 +3,10 @@ package dc.longshot.graphics;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Rectangle;
 
 import dc.longshot.geometry.PolygonFactory;
+import dc.longshot.geometry.VertexUtils;
 
 public final class RegionFactory {
 	
@@ -16,10 +18,21 @@ public final class RegionFactory {
 		return createPolygonRegion(textureRegion, vertices);
 	}
 	
-	// TODO: Autocrop texture region to fit polygon region?  Update Fragmenter code
 	public static final PolygonRegion createPolygonRegion(final TextureRegion textureRegion, final float[] vertices) {
-		short[] triangles = triangulator.computeTriangles(vertices).toArray();
-		return new PolygonRegion(textureRegion, vertices, triangles);
+		Rectangle bounds = VertexUtils.bounds(vertices);
+		float[] shiftedVertices = new float[vertices.length];
+		for (int i = 0; i < vertices.length; i++) {
+			if (i % 2 == 0) {
+				shiftedVertices[i] = vertices[i] - bounds.x;
+			}
+			else {
+				shiftedVertices[i] = vertices[i] - bounds.y;
+			}
+		}
+		TextureRegion croppedRegion = new TextureRegion(textureRegion, (int)bounds.x, (int)bounds.y, 
+				(int)bounds.width, (int)bounds.height);
+		short[] triangles = triangulator.computeTriangles(shiftedVertices).toArray();
+		return new PolygonRegion(croppedRegion, shiftedVertices, triangles);
 	}
 
 }

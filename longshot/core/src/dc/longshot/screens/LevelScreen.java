@@ -344,7 +344,6 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void listenToGameEvents() {
-		// TODO: Remove method and move logic to appropriate cases
 		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
 		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
 	}
@@ -418,8 +417,11 @@ public final class LevelScreen implements Screen {
 		List<Entity> entities = new ArrayList<Entity>();
 		int minWidth = (int)(5 * UnitConvert.PIXELS_PER_UNIT);
 		int maxWidth = (int)(20 * UnitConvert.PIXELS_PER_UNIT);
+		float minNum = 20;
+		float maxNum = 40;
 		float minHeightRatio = 0.5f;
-		for (int i = 0; i < MathUtils.random(0, 10); i++) {
+		float minZ = -100;
+		for (int i = 0; i < MathUtils.random(minNum, maxNum); i++) {
 			Texture texture = spriteCache.getTexture(SpriteKey.ROCK);
 			int textureX = MathUtils.random(0, texture.getWidth() - 1);
 			int textureY = MathUtils.random(0, texture.getHeight() - 1);
@@ -429,7 +431,8 @@ public final class LevelScreen implements Screen {
 					textureY + height };
 			float x = MathUtils.random(-width / UnitConvert.PIXELS_PER_UNIT, PolygonUtils.right(level.getBoundsBox()));
 			float y = 0;
-			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector2(x, y), SpriteKey.ROCK);
+			float z = MathUtils.random(minZ, 0);
+			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, SpriteKey.ROCK);
 			entities.add(entity);
 		}
 		return entities;

@@ -22,8 +22,8 @@ import com.badlogic.gdx.math.Vector3;
 import dc.longshot.entitysystems.ColliderPart;
 import dc.longshot.epf.Entity;
 import dc.longshot.geometry.Bound;
-import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
+import dc.longshot.geometry.VertexUtils;
 import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureGeometry;
@@ -310,31 +310,21 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	public final Entity createBackgroundElement(final float[] vertices, final Vector2 position, 
+	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, final float minZ, 
 			final SpriteKey spriteKey) {
-		// TODO: cleanup
 		Entity entity = new Entity();
-		float minX = PolygonUtils.minX(vertices);
-		float minY = PolygonUtils.minY(vertices);
-		float[] shiftedVertices = new float[vertices.length];
-		for (int i = 0; i < vertices.length; i++) {
-			if (i % 2 == 0) {
-				shiftedVertices[i] = vertices[i] - minX;
-			}
-			else {
-				shiftedVertices[i] = vertices[i] - minY;
-			}
-		}
 		Texture texture = spriteCache.getTexture(spriteKey);
-		Vector2 size = PolygonUtils.size(shiftedVertices);
-		TextureRegion croppedRegion = new TextureRegion(texture, (int)minX, (int)minY, (int)size.x, (int)size.y);
-		PolygonRegion region = RegionFactory.createPolygonRegion(croppedRegion, shiftedVertices);
-		entity.attach(new DrawablePart(new PolygonSprite(region), 0));
+		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture), vertices);
+		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region), position.z);
+		Color color = Color.DARK_GRAY.cpy().lerp(Color.BLACK, position.z / minZ);
+		drawablePart.getSprite().setColor(color);
+		entity.attach(drawablePart);
+		float[] shiftedVertices = region.getVertices();
 		float[] transformedVertices = new float[shiftedVertices.length];
 		for (int i = 0; i < shiftedVertices.length; i++) {
 			transformedVertices[i] = shiftedVertices[i] / UnitConvert.PIXELS_PER_UNIT;
 		}
-		entity.attach(new TransformPart(new Polygon(transformedVertices), position));
+		entity.attach(new TransformPart(new Polygon(transformedVertices), new Vector2(position.x, position.y)));
 		return entity;
 	}
 	
@@ -357,7 +347,7 @@ public final class EntityFactory {
 			TextureRegion textureRegion = new TextureRegion(spriteCache.getTexture(spriteKey));
 			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
 			// libgdx y-axis is flipped
-			PolygonUtils.flipY(convexHull);
+			VertexUtils.flipY(convexHull);
 			convexHullCache.put(spriteKey, convexHull);
 		}
 	}
@@ -368,7 +358,7 @@ public final class EntityFactory {
 	}
 	
 	private float[] sizedVertices(final float[] vertices, final Vector3 size) {
-		Vector2 verticesSize = PolygonUtils.size(vertices);
+		Vector2 verticesSize = VertexUtils.bounds(vertices).getSize(new Vector2());
 		float scaleX = size.x / verticesSize.x;
 		float scaleY = size.y / verticesSize.y;
 		float[] sizedVertices = new float[vertices.length];
