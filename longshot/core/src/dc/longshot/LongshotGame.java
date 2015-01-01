@@ -88,12 +88,14 @@ public final class LongshotGame extends Game {
 				new TextureRegion(spriteCache.getTexture(SpriteKey.SHOOTER)));
 		spriteCache.add(SpriteKey.SHOOTER_OUTLINE, shooterOutlineTexture);
 		spriteCache.add(SpriteKey.CANNON, "images/cannon.png");
+		spriteCache.add(SpriteKey.PELLET, "images/pellet.png");
 		spriteCache.add(SpriteKey.BULLET, "images/bullet.png");
 		spriteCache.add(SpriteKey.MISSILE, "images/missile.png");
 		spriteCache.add(SpriteKey.NUKE, "images/nuke.png");
 		spriteCache.add(SpriteKey.UFO, "images/ufo.png");
 		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
 		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
+		spriteCache.add(SpriteKey.SAW, "images/sawblades.png");
 		spriteCache.add(SpriteKey.BUG_BODY, "images/bug_body.png");
 		spriteCache.add(SpriteKey.BUG_HEAD, "images/bug_head.png");
 		return spriteCache;

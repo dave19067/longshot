@@ -6,6 +6,7 @@ import java.util.List;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
+import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.util.Cloning;
 import dc.longshot.util.Timer;
 
@@ -29,9 +30,13 @@ public final class WeaponPart extends Part {
 	public final Entity createSpawn() {
 		if (canSpawn()) {
 			spawnTimer.reset();
-			Entity newSpawn = Cloning.clone(original);
-			spawns.add(newSpawn);
-			return newSpawn;
+			Entity spawn = Cloning.clone(original);
+			TransformPart spawnTransform = spawn.get(TransformPart.class);
+			TransformPart transform = entity.get(TransformPart.class);
+			spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
+					spawnTransform.getBoundingSize()));
+			spawns.add(spawn);
+			return spawn;
 		}
 		else {
 			throw new IllegalStateException("Cannot create spawn");

@@ -25,5 +25,9 @@
             <key>UFO</key>
             <value>1</value>
         </entry>
+        <entry>
+            <key>SAW</key>
+            <value>1</value>
+        </entry>
     </spawns>
 </level>

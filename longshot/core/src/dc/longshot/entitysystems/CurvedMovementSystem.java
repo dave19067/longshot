@@ -65,7 +65,7 @@ public final class CurvedMovementSystem implements EntitySystem {
 	}
 	
 	private Vector2 createStartCurvePoint(final Vector2 start, final float currentRotation, final float curveSize) {
-		Vector2 curvePointOffset = VectorUtils.createVectorFromAngle(-currentRotation);
+		Vector2 curvePointOffset = VectorUtils.fromAngle(-currentRotation);
 		curvePointOffset = VectorUtils.lengthened(curvePointOffset, curveSize);
 		return start.cpy().add(curvePointOffset);
 	}

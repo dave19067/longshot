@@ -23,7 +23,7 @@ public final class InputMovementSystem implements EntitySystem {
 				if (Gdx.input.isKeyPressed(Keys.S)) {
 					moveDirection.x += 1;
 				}	
-				entity.get(TranslatePart.class).setVelocity(moveDirection);
+				entity.get(TranslatePart.class).setDirection(moveDirection);
 			}
 		}
 	}

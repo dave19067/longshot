@@ -9,9 +9,9 @@ import java.util.Map.Entry;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 
-import dc.longshot.entitysystems.ColliderPart;
 import dc.longshot.epf.Entity;
 import dc.longshot.eventmanagement.EventManager;
+import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.TransformPart;
 
 public final class CollisionManager {
@@ -35,11 +35,11 @@ public final class CollisionManager {
 		clearCollisions();
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity1 = entities.get(i);
-			if (entity1.hasActive(ColliderPart.class) && entity1.hasActive(TransformPart.class)) {
+			if (entity1.hasActive(CollisionTypePart.class, TransformPart.class)) {
 				Polygon polygon1 = entity1.get(TransformPart.class).getPolygon();
 				for (int j = i + 1; j < entities.size(); j++) {
 					Entity entity2 = entities.get(j);
-					if (entity2.hasActive(ColliderPart.class) && entity2.hasActive(TransformPart.class)) {
+					if (entity2.hasActive(CollisionTypePart.class, TransformPart.class)) {
 						Polygon polygon2 = entity2.get(TransformPart.class).getPolygon();
 						if (Intersector.overlapConvexPolygons(polygon1, polygon2)) {
 							addCollision(entity1, entity2);

@@ -33,7 +33,7 @@ public final class VectorUtils {
 		return MathUtils.atan2(offset.y, offset.x);
 	}
 	
-	public static final Vector2 createVectorFromAngle(final float degrees) {
+	public static final Vector2 fromAngle(final float degrees) {
 		return new Vector2(MathUtils.cosDeg(degrees), MathUtils.sinDeg(degrees));
 	}
 	

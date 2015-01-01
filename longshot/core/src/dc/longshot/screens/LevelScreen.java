@@ -35,7 +35,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import dc.longshot.collision.CollisionManager;
-import dc.longshot.entitysystems.AIShooterSystem;
 import dc.longshot.entitysystems.AttachmentSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
@@ -45,12 +44,16 @@ import dc.longshot.entitysystems.CurvedMovementSystem;
 import dc.longshot.entitysystems.DrawableUpdaterSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.FollowerSystem;
+import dc.longshot.entitysystems.GravitySystem;
+import dc.longshot.entitysystems.GroundShooterSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.LightSystem;
 import dc.longshot.entitysystems.NoHealthSystem;
 import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
 import dc.longshot.entitysystems.ShooterInputSystem;
+import dc.longshot.entitysystems.SpinSystem;
+import dc.longshot.entitysystems.TargetShooterSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
 import dc.longshot.entitysystems.WaypointsSystem;
 import dc.longshot.epf.Entity;
@@ -66,15 +69,15 @@ import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.DecorationProfile;
-import dc.longshot.game.EntityFactory;
 import dc.longshot.game.Fragmenter;
-import dc.longshot.game.LevelController;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.graphics.SpriteCache;
+import dc.longshot.level.EntityFactory;
+import dc.longshot.level.LevelController;
 import dc.longshot.models.DebugSettings;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
@@ -292,7 +295,8 @@ public final class LevelScreen implements Screen {
 					entityManager.addAll(frags);
 				}
 				if (entity.hasActive(PointsPart.class)) {
-					if (!Bound.isOutOfBounds(entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
+					if (!entity.has(BoundsDiePart.class) || !Bound.isOutOfBounds(
+							entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
 							entity.get(BoundsDiePart.class).getBounds())) {
 						playSession.addToScore(entity.get(PointsPart.class).getPoints());
 					}
@@ -376,12 +380,14 @@ public final class LevelScreen implements Screen {
 	
 	private void setupSystems() {
 		entitySystems = new ArrayList<EntitySystem>();
+		entitySystems.add(new GravitySystem());
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
 		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
 		entitySystems.add(new EmitSystem(entityManager));
-		entitySystems.add(new AIShooterSystem(entityManager));
+		entitySystems.add(new TargetShooterSystem(entityManager));
+		entitySystems.add(new GroundShooterSystem(entityManager, level.getBoundsBox()));
 		entitySystems.add(new InputMovementSystem());
 		entitySystems.add(new RotateToCursorSystem(camera, worldTable));
 		entitySystems.add(new NoHealthSystem(entityManager));
@@ -393,6 +399,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new AttachmentSystem());
 		entitySystems.add(new FollowerSystem());
 		entitySystems.add(new DrawableUpdaterSystem());
+		entitySystems.add(new SpinSystem());
 		entitySystems.add(new LightSystem());
 	}
 	
@@ -400,7 +407,7 @@ public final class LevelScreen implements Screen {
 		List<Entity> entities = new ArrayList<Entity>();
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
-				new Vector2(boundsBox.x, boundsBox.y), false, SpriteKey.GREEN);
+				new Vector2(boundsBox.x, boundsBox.y), SpriteKey.GREEN);
 		entities.add(ground);
 		Vector3 shooterSize = new Vector3(2, 1, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);

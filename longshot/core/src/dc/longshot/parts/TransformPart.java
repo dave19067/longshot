@@ -64,6 +64,12 @@ public final class TransformPart extends Part {
 		polygon.setRotation(degrees);
 	}
 	
+	public final void setCenteredRotation(final float degrees) {
+		Vector2 oldCenter = getCenter();
+		setRotation(degrees);
+		setCenter(oldCenter);
+	}
+	
 	public Rectangle getBoundingBox() {
 		return new Rectangle(polygon.getBoundingRectangle());
 	}

@@ -1,4 +1,4 @@
-package dc.longshot.game;
+package dc.longshot.level;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +19,6 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-import dc.longshot.entitysystems.ColliderPart;
 import dc.longshot.epf.Entity;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.UnitConvert;
@@ -31,7 +30,6 @@ import dc.longshot.models.Alliance;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.SpriteKey;
-import dc.longshot.parts.AIShooterPart;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.AutoRotatePart;
@@ -49,6 +47,8 @@ import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.GhostPart;
+import dc.longshot.parts.GravityPart;
+import dc.longshot.parts.GroundShooterPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.LightPart;
 import dc.longshot.parts.PointsPart;
@@ -56,6 +56,8 @@ import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.SpeedPart;
+import dc.longshot.parts.SpinPart;
+import dc.longshot.parts.TargetShooterPart;
 import dc.longshot.parts.TimedDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
@@ -87,6 +89,9 @@ public final class EntityFactory {
 			case UFO:
 				entity = createUFOGlow();
 				break;
+			case SAW:
+				entity = createSaw();
+				break;
 			case CATERPILLAR:
 				entity = createCaterpillar();
 				break;
@@ -97,7 +102,7 @@ public final class EntityFactory {
 	}
 
 	public final Entity createShooter(final Vector3 size, final Vector2 position, final Entity cannon) {
-		Entity entity = createBaseEntity(size, position, true, SpriteKey.SHOOTER);
+		Entity entity = createBaseEntity(size, position, SpriteKey.SHOOTER);
 		entity.attach(new SpeedPart(7));
 		entity.attach(new HealthPart(1));
 		entity.attach(new AlliancePart(Alliance.PLAYER));
@@ -117,14 +122,14 @@ public final class EntityFactory {
 
 	public final Entity createShooterCannon() {
 		Vector3 size = new Vector3(1.5f, 0.3f, 0.3f);
-		Entity entity = createBaseEntity(size, new Vector2(), false, SpriteKey.CANNON);
+		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
 		entity.attach(new RotateToCursorPart());
 		return entity;
 	}
 	
 	public final Entity createShooterBullet() {
-		Entity entity = createBaseEntity(new Vector3(0.6f, 0.1f, 0.1f), new Vector2(), true, SpriteKey.BULLET);
+		Entity entity = createBaseEntity(new Vector3(0.6f, 0.1f, 0.1f), new Vector2(), SpriteKey.BULLET);
 		entity.attach(new SpeedPart(20));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
@@ -162,7 +167,7 @@ public final class EntityFactory {
 	
 	public final Entity createProjectile(final Vector3 size, final float damage, final float explosionRadius, 
 			final SpriteKey spriteKey, final Entity trailParticle) {
-		Entity entity = createBaseEntity(size, new Vector2(), true, spriteKey);
+		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));
 		entity.attach(new HealthPart(1));
@@ -188,7 +193,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createUFOGlow() {
-		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), false, SpriteKey.UFO_GLOW);
+		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), SpriteKey.UFO_GLOW);
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		entity.attach(new SpawnOnDeathPart(createUFO(new Vector3(1, 0.5f, 1))));
 		float maxLifeTime = 3;
@@ -198,7 +203,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createUFO(final Vector3 size) {
-		Entity entity = createBaseEntity(size, new Vector2(), true, SpriteKey.UFO);
+		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.UFO);
 		entity.attach(new SpeedPart(3));
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(300));
@@ -214,15 +219,16 @@ public final class EntityFactory {
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 1)));
-		entity.attach(new WeaponPart(createUFOLaser(), 1, 0));
 		entity.attach(new WanderMovementPart(3, 1));
-		entity.attach(new AIShooterPart(3, Alliance.PLAYER));
+		entity.attach(new WeaponPart(createEnemyBullet(new Vector3(0.3f, 0.1f, 0.1f), SpriteKey.GREEN, 
+				new PointLight(rayHandler, 8, Color.GREEN, 100, 0, 0)), 1, 0));
+		entity.attach(new TargetShooterPart(3, Alliance.PLAYER));
 		entity.attach(new FragsPart());
 		return entity;
 	}
 	
-	public final Entity createUFOLaser() {
-		Entity entity = createBaseEntity(new Vector3(0.3f, 0.1f, 0.1f), new Vector2(), true, SpriteKey.GREEN);
+	public final Entity createEnemyBullet(final Vector3 size, final SpriteKey spriteKey, final PointLight light) {
+		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
 		entity.attach(new SpeedPart(10));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
@@ -237,14 +243,35 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		Light light = new PointLight(rayHandler, 8, Color.GREEN, 100, 0, 0);
 		light.setActive(false);
 		entity.attach(new LightPart(light, new Vector2(0.15f, 0.05f)));
 		return entity;
 	}
 	
+	public final Entity createSaw() {
+		Entity entity = createBaseEntity(new Vector3(2, 2, 0.1f), new Vector2(), SpriteKey.SAW);
+		entity.attach(new HealthPart(2));
+		entity.attach(new PointsPart(200));
+		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
+		List<Bound> bounceBounds = new ArrayList<Bound>();
+		bounceBounds.add(Bound.LEFT);
+		bounceBounds.add(Bound.RIGHT);
+		bounceBounds.add(Bound.BOTTOM);
+		entity.attach(new BouncePart(bounceBounds));
+		entity.attach(new AlliancePart(Alliance.ENEMY));
+		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
+		collisionTypes.add(CollisionType.PLAYER);
+		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
+		entity.attach(new SpawnOnDeathPart(createExplosion(0.5f, 3, 0)));
+		entity.attach(new TranslatePart());
+		entity.attach(new FragsPart());
+		entity.attach(new GravityPart());
+		entity.attach(new SpinPart(-360));
+		return entity;
+	}
+	
 	public final Entity createCaterpillar() {
-		Entity entity = createBaseEntity(new Vector3(0.8f, 0.8f, 0.8f), new Vector2(), true, SpriteKey.BUG_HEAD);
+		Entity entity = createBaseEntity(new Vector3(0.8f, 0.8f, 0.8f), new Vector2(), SpriteKey.BUG_HEAD);
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(100));
@@ -256,7 +283,7 @@ public final class EntityFactory {
 		entity.attach(new BoundsDiePart(deathBounds));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
-		entity.attach(new DamageOnCollisionPart(collisionTypes, 5));
+		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 0)));
 		entity.attach(new WaypointsPart());
 		entity.attach(new CurvedMovementPart(10));
@@ -271,7 +298,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createCaterpillarSegment() {
-		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), true, SpriteKey.BUG_BODY);
+		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_BODY);
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(100));
@@ -287,13 +314,15 @@ public final class EntityFactory {
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 0)));
 		entity.attach(new WaypointsPart());
 		entity.attach(new FragsPart());
+		entity.attach(new WeaponPart(createEnemyBullet(new Vector3(0.2f, 0.2f, 0.2f), SpriteKey.PELLET, 
+				new PointLight(rayHandler, 8, Color.ORANGE, 50, 0, 0)), 1, 10));
+		entity.attach(new GroundShooterPart());
 		return entity;
 	}
 	
 	public final Entity createExplosion(final float radius, final float maxLifeTime, final float damage) {
 		float diameter = radius * 2;
-		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), false, 
-				SpriteKey.CIRCLE);
+		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), SpriteKey.CIRCLE);
 		entity.attach(new DamageOnSpawnPart(radius, damage));
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		Color endColor = Color.ORANGE.cpy();
@@ -303,7 +332,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createTrailParticle(final Vector3 size, final Color startColor, final Color endColor) {
-		Entity entity = createBaseEntity(size, new Vector2(), false, SpriteKey.WHITE);
+		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.WHITE);
 		float maxLifeTime = 3;
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		entity.attach(new ColorChangePart(maxLifeTime, startColor, endColor));
@@ -328,14 +357,10 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final boolean isCollider, 
-			final SpriteKey spriteKey) {
+	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final SpriteKey spriteKey) {
 		Entity entity = new Entity();
 		Polygon convexHull = createConvexHull(spriteKey, size);
 		entity.attach(new TransformPart(convexHull, position));
-		if (isCollider) {
-			entity.attach(new ColliderPart());
-		}
 		Texture texture = spriteCache.getTexture(spriteKey);
 		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture));
 		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));

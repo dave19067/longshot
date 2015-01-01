@@ -79,7 +79,7 @@ public final class Fragmenter {
 		entity.attach(new SpeedPart(velocity.len()));
 		TranslatePart translatePart = new TranslatePart();
 		entity.attach(translatePart);
-		translatePart.setVelocity(velocity);
+		translatePart.setDirection(velocity);
 		entity.attach(new TimedDeathPart(fadeTime));
 		entity.attach(new ColorChangePart(fadeTime, Color.WHITE.cpy(), Color.CLEAR.cpy()));
 		return entity;

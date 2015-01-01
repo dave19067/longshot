@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <gameSession>
     <debugSettings>
-    	<speedMultipliers>
-    		<speedMultipliers>1.0</speedMultipliers>
-    		<speedMultipliers>0.1</speedMultipliers>
-    	</speedMultipliers>
+        <speedMultipliers>
+            <speedMultipliers>1.0</speedMultipliers>
+            <speedMultipliers>0.1</speedMultipliers>
+        </speedMultipliers>
         <drawWorld>true</drawWorld>
         <drawPolygons>false</drawPolygons>
         <drawWaypoints>false</drawWaypoints>
@@ -15,14 +15,6 @@
     </levelNames>
     <highScores>
         <highScores>
-            <name>fu</name>
-            <score>1800</score>
-        </highScores>
-        <highScores>
-            <name>fdaad</name>
-            <score>800</score>
-        </highScores>
-        <highScores>
             <name>fdafs</name>
             <score>3700</score>
         </highScores>
@@ -31,32 +23,40 @@
             <score>3400</score>
         </highScores>
         <highScores>
-            <name>fdas</name>
-            <score>400</score>
-        </highScores>
-        <highScores>
-            <name>fdsfsafsfas</name>
-            <score>500</score>
-        </highScores>
-        <highScores>
-            <name>gf</name>
-            <score>2700</score>
-        </highScores>
-        <highScores>
             <name></name>
             <score>9300</score>
         </highScores>
         <highScores>
-            <name>fd</name>
-            <score>1200</score>
+            <name>fda</name>
+            <score>3200</score>
         </highScores>
         <highScores>
-            <name></name>
-            <score>1400</score>
+            <name>fda</name>
+            <score>3700</score>
         </highScores>
         <highScores>
             <name>fda</name>
             <score>3200</score>
+        </highScores>
+        <highScores>
+            <name>fda</name>
+            <score>4900</score>
+        </highScores>
+        <highScores>
+            <name>fda</name>
+            <score>3600</score>
+        </highScores>
+        <highScores>
+            <name>dc</name>
+            <score>4300</score>
+        </highScores>
+        <highScores>
+            <name>ds</name>
+            <score>5200</score>
+        </highScores>
+        <highScores>
+            <name>KIlla</name>
+            <score>12500</score>
         </highScores>
     </highScores>
 </gameSession>

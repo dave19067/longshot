@@ -1,4 +1,4 @@
-package dc.longshot.game;
+package dc.longshot.level;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +14,8 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
+import dc.longshot.game.LevelUtils;
 import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.geometry.VectorUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.Level;
@@ -91,7 +91,12 @@ public final class LevelController {
 		case MISSILE:
 		case NUKE:
 			placeAbove(spawn);
-			setupDestination(spawn);
+			Rectangle boundsBox = level.getBoundsBox();
+			LevelUtils.setupBottomDestination(spawn, boundsBox);
+			moveToOutOfBounds(spawn, boundsBox);
+			break;
+		case SAW:
+			setupSaw(spawn);
 			break;
 		case CATERPILLAR:
 			placeAbove(spawn);
@@ -104,47 +109,57 @@ public final class LevelController {
 	}
 
 	private void placeAbove(final Entity entity) {
-		Rectangle levelBoundsBox = level.getBoundsBox();
-		
-		// Get the spawn position, which is a random point from the skyline
+		Rectangle boundsBox = level.getBoundsBox();
 		TransformPart transform = entity.get(TransformPart.class);
 		Vector2 size = transform.getSize();
-		float spawnX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - size.y);
-		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(levelBoundsBox));
+		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.y);
+		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(boundsBox));
 		transform.setPosition(spawnPosition);
 	}
-	
-	private void setupDestination(Entity entity) {
-		Rectangle levelBoundsBox = level.getBoundsBox();
-		TransformPart transformPart = entity.get(TransformPart.class);
-		
-		// Get the destination, which is a random point on the ground
-		float destX = MathUtils.random(levelBoundsBox.x, PolygonUtils.right(levelBoundsBox) - transformPart.getSize().x);
-		Vector2 destPosition = new Vector2(destX, 0);
-		
-		// Find the direction to get from the entity spawn position to the destination
-		Vector2 position = transformPart.getPosition();
-		Vector2 offset = VectorUtils.offset(position, destPosition);
-		TranslatePart translate = entity.get(TranslatePart.class);
-		translate.setVelocity(offset);
-		
-		// If the spawn is partially in bounds, move to just out of bounds using the negative velocity
-		float unboundedOverlapY = PolygonUtils.top(levelBoundsBox) - transformPart.getBoundingBox().y;
-		Vector2 velocity = translate.getVelocity();
-		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
-		transformPart.setPosition(position.cpy().add(outOfBoundsOffset));
+
+	private void setupSaw(final Entity entity) {
+		Rectangle boundsBox = level.getBoundsBox();
+		TransformPart transform = entity.get(TransformPart.class);
+		Vector2 size = transform.getSize();
+		float spawnX;
+		float minVelocityX = 4;
+		float maxVelocityX = 16;
+		float velocityX;
+		if (MathUtils.randomBoolean()) {
+			spawnX = boundsBox.x - size.x;
+			velocityX = MathUtils.random(minVelocityX, maxVelocityX);
+		}
+		else {
+			spawnX = PolygonUtils.right(boundsBox);
+			velocityX = -MathUtils.random(minVelocityX, maxVelocityX);
+		}
+		entity.get(TranslatePart.class).setVelocity(new Vector2(velocityX, 0));
+		float boundsHeightRatio = 1 / 5f;
+		float spawnY = MathUtils.random(boundsBox.y, PolygonUtils.top(boundsBox) * boundsHeightRatio);
+		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
+		transform.setPosition(spawnPosition);
 	}
 
 	private void placeInSpace(final Entity entity) {
-		// Get the spawn position, which is a random point above the halfline
 		Rectangle boundsBox = level.getBoundsBox();
 		Vector2 size = entity.get(TransformPart.class).getSize();
 		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.x);
-		float spawnY = MathUtils.random(boundsBox.y + 2 / 3f * boundsBox.height, 
+		float boundsHeightRatio = 2 / 3f;
+		float spawnY = MathUtils.random(boundsBox.y + boundsBox.height * boundsHeightRatio, 
 				PolygonUtils.top(boundsBox) - size.y);
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		TransformPart transform = entity.get(TransformPart.class);
 		transform.setPosition(spawnPosition);
+	}
+	
+	private void moveToOutOfBounds(final Entity entity, final Rectangle boundsBox) {
+		// If the spawn is partially in bounds, move to just out of bounds using the negative velocity
+		TransformPart transformPart = entity.get(TransformPart.class);
+		float unboundedOverlapY = PolygonUtils.top(boundsBox) - transformPart.getBoundingBox().y;
+		TranslatePart translate = entity.get(TranslatePart.class);
+		Vector2 velocity = translate.getVelocity();
+		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
+		transformPart.setPosition(transformPart.getPosition().add(outOfBoundsOffset));
 	}
 
 	private class SpawnInfo {

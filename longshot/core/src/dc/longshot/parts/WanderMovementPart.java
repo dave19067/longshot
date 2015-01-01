@@ -27,7 +27,7 @@ public final class WanderMovementPart extends Part {
 	
 	@Override
 	public final void update(final float delta) {
-		if (MathUtils.random(decisionRate) < delta) {
+		if (MathUtils.randomBoolean(delta / decisionRate)) {
 			act();
 		}
 	}
@@ -35,7 +35,7 @@ public final class WanderMovementPart extends Part {
 	private void act() {
 		TranslatePart translatePart = entity.get(TranslatePart.class);
 		Vector2 direction;
-		if (MathUtils.random(idleToMoveRatio + 1) < idleToMoveRatio) {
+		if (MathUtils.randomBoolean(idleToMoveRatio / (idleToMoveRatio + 1))) {
 			// Idle
 			direction = new Vector2(0, 0);
 		}
@@ -44,7 +44,7 @@ public final class WanderMovementPart extends Part {
 			direction = new Vector2(1, 0);
 			direction.setAngle(MathUtils.random(0, 360));
 		}
-		translatePart.setVelocity(direction);
+		translatePart.setDirection(direction);
 	}
 	
 }

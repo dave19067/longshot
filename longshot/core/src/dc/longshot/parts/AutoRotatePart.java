@@ -18,9 +18,7 @@ public final class AutoRotatePart extends Part {
 	public final void update(final float delta) {
 		TransformPart transformPart = entity.get(TransformPart.class);
 		Vector2 offset = VectorUtils.offset(oldPosition, transformPart.getPosition());
-		Vector2 oldCenter = transformPart.getCenter();
-		transformPart.setRotation(offset.angle());
-		transformPart.setCenter(oldCenter);
+		transformPart.setCenteredRotation(offset.angle());
 		oldPosition = transformPart.getPosition();
 	}
 	

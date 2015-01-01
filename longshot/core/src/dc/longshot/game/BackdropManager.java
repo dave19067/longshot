@@ -116,7 +116,7 @@ public final class BackdropManager {
 	}
 	
 	private void trySpawn(final float delta, final DecorationProfile decorationProfile) {
-		if (MathUtils.random(decorationProfile.spawnRate) < delta) {
+		if (MathUtils.randomBoolean(delta / decorationProfile.spawnRate)) {
 			Polygon decoration = createDecoration(decorationProfile);
 			placeOnEdge(decorationProfile, decoration);
 		}

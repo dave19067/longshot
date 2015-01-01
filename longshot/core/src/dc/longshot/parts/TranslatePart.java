@@ -12,15 +12,16 @@ public class TranslatePart extends Part {
 	public TranslatePart() {
 	}
 	
-	public TranslatePart(final Vector2 direction) {
-		setVelocity(direction);
-	}
-	
 	public final Vector2 getVelocity() {
 		return new Vector2(velocity);
 	}
 	
-	public final void setVelocity(final Vector2 direction) {
+	public final void setVelocity(final Vector2 velocity) {
+		this.velocity = velocity;
+	}
+	
+	// TODO: this method is too high-level to be in this class
+	public final void setDirection(final Vector2 direction) {
 		if (direction.equals(new Vector2(0, 0))) {
 			velocity = new Vector2(0, 0);
 		}
