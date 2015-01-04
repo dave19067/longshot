@@ -10,10 +10,6 @@ public final class SpriteCache<T> {
 
 	private final Map<T, Texture> textureMap = new HashMap<T, Texture>();
 	
-	public final boolean containsKey(final T key) {
-		return textureMap.containsKey(key);
-	}
-	
 	public final Collection<T> getKeys() {
 		return textureMap.keySet();
 	}
@@ -22,8 +18,7 @@ public final class SpriteCache<T> {
 		if (!textureMap.containsKey(key)) {
 			throw new IllegalArgumentException("There is no texture associate with key " + key.toString());
 		}
-		Texture texture = textureMap.get(key);
-		return texture;
+		return textureMap.get(key);
 	}
 	
 	public final void add(final T key, final String path) {

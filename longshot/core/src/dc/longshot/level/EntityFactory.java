@@ -29,6 +29,7 @@ import dc.longshot.graphics.TextureGeometry;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
+import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
@@ -51,6 +52,7 @@ import dc.longshot.parts.GravityPart;
 import dc.longshot.parts.GroundShooterPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.LightPart;
+import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.ShotStatsPart;
@@ -141,7 +143,11 @@ public final class EntityFactory {
 		entity.attach(new BouncePart(bounds));
 		entity.attach(new BoundsPart(bounds));
 		entity.attach(new TimedDeathPart(4));
-		entity.attach(new BoundsDiePart());
+		List<Bound> deathBounds = new ArrayList<Bound>();
+		deathBounds.add(Bound.LEFT);
+		deathBounds.add(Bound.RIGHT);
+		deathBounds.add(Bound.BOTTOM);
+		entity.attach(new BoundsDiePart(deathBounds));
 		Light light = new PointLight(rayHandler, 8, Color.ORANGE, 70, 0, 0);
 		light.setActive(false);
 		entity.attach(new LightPart(light, new Vector2(0.3f, 0.05f)));
@@ -150,6 +156,7 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new ShotStatsPart());
 		entity.attach(new SpawnOnDeathPart(createExplosion(0.3f, 0.5f, 0)));
+		entity.attach(new PlaySoundOnSpawnPart(SoundKey.LASER));
 		return entity;
 	}
 	
@@ -245,13 +252,14 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		light.setActive(false);
 		entity.attach(new LightPart(light, new Vector2(0.15f, 0.05f)));
+		entity.attach(new PlaySoundOnSpawnPart(SoundKey.LASER));
 		return entity;
 	}
 	
 	public final Entity createSaw() {
 		Entity entity = createBaseEntity(new Vector3(2, 2, 0.1f), new Vector2(), SpriteKey.SAW);
-		entity.attach(new HealthPart(2));
-		entity.attach(new PointsPart(200));
+		entity.attach(new HealthPart(1));
+		entity.attach(new PointsPart(100));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		List<Bound> bounceBounds = new ArrayList<Bound>();
 		bounceBounds.add(Bound.LEFT);

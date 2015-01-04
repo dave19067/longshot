@@ -79,13 +79,13 @@ public final class LevelController {
 		
 		Collections.sort(spawnInfos, new Comparator<SpawnInfo>() {
 			@Override
-			public int compare(SpawnInfo spawnInfo1, SpawnInfo spawnInfo2) {
+			public int compare(final SpawnInfo spawnInfo1, final SpawnInfo spawnInfo2) {
 				return Float.compare(spawnInfo1.time, spawnInfo2.time);
 			}
 		});
 	}
 	
-	private void spawn(SpawnInfo spawnInfo) {
+	private void spawn(final SpawnInfo spawnInfo) {
 		Entity spawn = entityFactory.create(spawnInfo.entityType);
 		switch (spawnInfo.entityType) {
 		case MISSILE:
@@ -134,7 +134,7 @@ public final class LevelController {
 			velocityX = -MathUtils.random(minVelocityX, maxVelocityX);
 		}
 		entity.get(TranslatePart.class).setVelocity(new Vector2(velocityX, 0));
-		float boundsHeightRatio = 1 / 5f;
+		float boundsHeightRatio = 1 / 4f;
 		float spawnY = MathUtils.random(boundsBox.y, PolygonUtils.top(boundsBox) * boundsHeightRatio);
 		Vector2 spawnPosition = new Vector2(spawnX, spawnY);
 		transform.setPosition(spawnPosition);

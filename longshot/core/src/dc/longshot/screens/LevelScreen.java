@@ -82,6 +82,7 @@ import dc.longshot.models.DebugSettings;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
 import dc.longshot.models.PlaySession;
+import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsDiePart;
@@ -90,10 +91,12 @@ import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.HealthPart;
+import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
+import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
@@ -112,6 +115,7 @@ public final class LevelScreen implements Screen {
 	private final EventDelegate<NoArgsListener> gameOverDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final SpriteCache<SpriteKey> spriteCache;
+	private final SoundCache<SoundKey> soundCache;
 	private final PolygonSpriteBatch spriteBatch;
 	private final DebugSettings debugSettings;
 	private LevelSession levelSession;
@@ -141,9 +145,11 @@ public final class LevelScreen implements Screen {
 
 	private final Texture cursorTexture;
 	
-	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final PolygonSpriteBatch spriteBatch, 
-			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
+	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SoundCache<SoundKey> soundCache, 
+			final PolygonSpriteBatch spriteBatch, final DebugSettings debugSettings, final PlaySession playSession, 
+			final Level level) {
 		this.spriteCache = spriteCache;
+		this.soundCache = soundCache;
 		this.spriteBatch = spriteBatch;
 		this.debugSettings = debugSettings;
 		this.playSession = playSession;
@@ -274,6 +280,9 @@ public final class LevelScreen implements Screen {
 							}
 						}
 					}
+				}
+				if (entity.hasActive(PlaySoundOnSpawnPart.class)) {
+					soundCache.play(entity.get(PlaySoundOnSpawnPart.class).getSoundKey());
 				}
 			}
 		};

@@ -28,10 +28,6 @@
         </highScores>
         <highScores>
             <name>fda</name>
-            <score>3200</score>
-        </highScores>
-        <highScores>
-            <name>fda</name>
             <score>3700</score>
         </highScores>
         <highScores>
@@ -57,6 +53,10 @@
         <highScores>
             <name>KIlla</name>
             <score>12500</score>
+        </highScores>
+        <highScores>
+            <name>ds</name>
+            <score>7400</score>
         </highScores>
     </highScores>
 </gameSession>

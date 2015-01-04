@@ -18,11 +18,13 @@ import dc.longshot.models.GameSession;
 import dc.longshot.models.Level;
 import dc.longshot.models.Paths;
 import dc.longshot.models.PlaySession;
+import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.screens.HighScoresScreen;
 import dc.longshot.screens.LevelPreviewScreen;
 import dc.longshot.screens.LevelScreen;
 import dc.longshot.screens.MainMenuScreen;
+import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.ui.controls.ScoreEntryDialog;
@@ -35,6 +37,7 @@ public final class LongshotGame extends Game {
 	
 	private final ScreenManager screenManager = new ScreenManager();
 	private SpriteCache<SpriteKey> spriteCache;
+	private SoundCache<SoundKey> soundCache;
 	private PolygonSpriteBatch spriteBatch;
 	private GameSession gameSession;
 	private PlaySession playSession;
@@ -42,6 +45,7 @@ public final class LongshotGame extends Game {
 	@Override
 	public final void create() {
 		spriteCache = createSpriteCache();
+		soundCache = createSoundCache();
 		spriteBatch = new PolygonSpriteBatch();
 		loadGameSession();
 		MainMenuScreen mainMenuScreen = createMainMenuScreen();
@@ -101,6 +105,12 @@ public final class LongshotGame extends Game {
 		return spriteCache;
 	}
 	
+	private SoundCache<SoundKey> createSoundCache() {
+		SoundCache<SoundKey> soundCache = new SoundCache<SoundKey>();
+		soundCache.add(SoundKey.LASER, "sounds/laser-blast.wav");
+		return soundCache;
+	}
+	
 	private MainMenuScreen createMainMenuScreen() {
 		final MainMenuScreen mainMenuScreen = new MainMenuScreen();
 		mainMenuScreen.addNewGameRequestedListener(new NoArgsListener() {
@@ -148,8 +158,8 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(spriteCache, spriteBatch, gameSession.getDebugSettings(), 
-				playSession, level);
+		final LevelScreen levelScreen = new LevelScreen(spriteCache, soundCache, spriteBatch, 
+				gameSession.getDebugSettings(), playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
