@@ -1,1 +1,4 @@
 laser-blast.wav - http://www.freesound.org/people/Robinhood76/sounds/95933/
+fridobeck_explosion.wav - http://www.freesound.org/people/fridobeck/sounds/191694/
+power_down.wav - https://www.freesound.org/people/leviclaassen/sounds/107788/
+power_up.wav - https://www.freesound.org/people/GameAudio/sounds/220173/

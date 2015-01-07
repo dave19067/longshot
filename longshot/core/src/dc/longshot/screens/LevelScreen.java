@@ -44,11 +44,11 @@ import dc.longshot.entitysystems.CurvedMovementSystem;
 import dc.longshot.entitysystems.DrawableUpdaterSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.FollowerSystem;
+import dc.longshot.entitysystems.GhostSystem;
 import dc.longshot.entitysystems.GravitySystem;
 import dc.longshot.entitysystems.GroundShooterSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.LightSystem;
-import dc.longshot.entitysystems.NoHealthSystem;
 import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
 import dc.longshot.entitysystems.ShooterInputSystem;
@@ -90,9 +90,11 @@ import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
+import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
+import dc.longshot.parts.SoundOnDeathPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
@@ -260,6 +262,9 @@ public final class LevelScreen implements Screen {
 		return new EntityAddedListener() {
 			@Override
 			public void created(final Entity entity) {
+				if (entity.hasActive(HealthPart.class)) {
+					entity.get(HealthPart.class).addNoHealthListener(noHealth(entity));
+				}
 				if (entity.hasActive(AttachmentPart.class)) {
 					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
 					entityManager.add(attachedEntity);
@@ -283,6 +288,24 @@ public final class LevelScreen implements Screen {
 				}
 				if (entity.hasActive(PlaySoundOnSpawnPart.class)) {
 					soundCache.play(entity.get(PlaySoundOnSpawnPart.class).getSoundKey());
+				}
+			}
+		};
+	}
+	
+	private NoArgsListener noHealth(final Entity entity) {
+		return new NoArgsListener() {
+			@Override
+			public void executed() {
+				if (entity.hasActive(SoundOnDeathPart.class)) {
+					SoundKey soundKey = entity.get(SoundOnDeathPart.class).getSoundKey();
+					soundCache.play(soundKey);
+				}
+				if (entity.hasActive(GhostPart.class)) {
+					entity.get(GhostPart.class).activate();
+				}
+				else {
+					entityManager.remove(entity);
 				}
 			}
 		};
@@ -399,7 +422,6 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new GroundShooterSystem(entityManager, level.getBoundsBox()));
 		entitySystems.add(new InputMovementSystem());
 		entitySystems.add(new RotateToCursorSystem(camera, worldTable));
-		entitySystems.add(new NoHealthSystem(entityManager));
 		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
 		entitySystems.add(new ShooterInputSystem(entityManager));
@@ -410,6 +432,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new DrawableUpdaterSystem());
 		entitySystems.add(new SpinSystem());
 		entitySystems.add(new LightSystem());
+		entitySystems.add(new GhostSystem(soundCache));
 	}
 	
 	private List<Entity> createInitialEntities() {

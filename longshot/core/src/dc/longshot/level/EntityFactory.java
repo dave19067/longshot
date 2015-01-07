@@ -56,6 +56,7 @@ import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.ShotStatsPart;
+import dc.longshot.parts.SoundOnDeathPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.SpinPart;
@@ -117,8 +118,9 @@ public final class EntityFactory {
 		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
 		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(outlineTexture));
-		entity.attach(new GhostPart(5, region));
 		entity.attach(new AttachmentPart(cannon));
+		entity.attach(new GhostPart(5, region, SoundKey.POWER_UP));
+		entity.attach(new SoundOnDeathPart(SoundKey.POWER_DOWN));
 		return entity;
 	}
 
@@ -336,6 +338,7 @@ public final class EntityFactory {
 		Color endColor = Color.ORANGE.cpy();
 		endColor.a = 0;
 		entity.attach(new ColorChangePart(maxLifeTime, Color.RED.cpy(), endColor));
+		entity.attach(new PlaySoundOnSpawnPart(SoundKey.EXPLOSION));
 		return entity;
 	}
 	

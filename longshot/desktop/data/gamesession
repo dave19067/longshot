@@ -32,10 +32,6 @@
         </highScores>
         <highScores>
             <name>fda</name>
-            <score>3200</score>
-        </highScores>
-        <highScores>
-            <name>fda</name>
             <score>4900</score>
         </highScores>
         <highScores>
@@ -57,6 +53,10 @@
         <highScores>
             <name>ds</name>
             <score>7400</score>
+        </highScores>
+        <highScores>
+            <name>dc</name>
+            <score>7600</score>
         </highScores>
     </highScores>
 </gameSession>

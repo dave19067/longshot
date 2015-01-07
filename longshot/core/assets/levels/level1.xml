@@ -23,11 +23,11 @@
         </entry>
         <entry>
             <key>UFO</key>
-            <value>1</value>
+            <value>10</value>
         </entry>
         <entry>
             <key>SAW</key>
-            <value>10</value>
+            <value>1</value>
         </entry>
     </spawns>
 </level>

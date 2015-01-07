@@ -2,6 +2,6 @@ package dc.longshot.models;
 
 public enum SoundKey {
 
-	LASER
+	LASER, EXPLOSION, POWER_DOWN, POWER_UP
 	
 }

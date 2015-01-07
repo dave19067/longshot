@@ -108,6 +108,9 @@ public final class LongshotGame extends Game {
 	private SoundCache<SoundKey> createSoundCache() {
 		SoundCache<SoundKey> soundCache = new SoundCache<SoundKey>();
 		soundCache.add(SoundKey.LASER, "sounds/laser-blast.wav");
+		soundCache.add(SoundKey.EXPLOSION, "sounds/fridobeck_explosion.wav");
+		soundCache.add(SoundKey.POWER_DOWN, "sounds/power_down.wav");
+		soundCache.add(SoundKey.POWER_UP, "sounds/power-up.wav");
 		return soundCache;
 	}
 	

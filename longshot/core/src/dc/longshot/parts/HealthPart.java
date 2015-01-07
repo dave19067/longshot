@@ -1,9 +1,14 @@
 package dc.longshot.parts;
 
 import dc.longshot.epf.Part;
+import dc.longshot.eventmanagement.EventDelegate;
+import dc.longshot.eventmanagement.NoArgsEvent;
+import dc.longshot.eventmanagement.NoArgsListener;
 
 public final class HealthPart extends Part {
 
+	private final EventDelegate<NoArgsListener> noHealthDelegate = new EventDelegate<NoArgsListener>();
+	
 	private final float maxHealth;
 	private float health;
 	
@@ -12,8 +17,8 @@ public final class HealthPart extends Part {
 		this.health = maxHealth;
 	}
 	
-	public final boolean isAlive() {
-		return health > 0;
+	public final void addNoHealthListener(final NoArgsListener listener) {
+		noHealthDelegate.listen(listener);
 	}
 	
 	public final void reset() {
@@ -22,6 +27,9 @@ public final class HealthPart extends Part {
 	
 	public final void decrease(final float value) {
 		health -= value;
+		if (health <= 0) {
+			noHealthDelegate.notify(new NoArgsEvent());
+		}
 	}
 	
 }
