@@ -57,14 +57,11 @@ import dc.longshot.entitysystems.TargetShooterSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
 import dc.longshot.entitysystems.WaypointsSystem;
 import dc.longshot.epf.Entity;
-import dc.longshot.epf.EntityAddedEvent;
 import dc.longshot.epf.EntityAddedListener;
 import dc.longshot.epf.EntityManager;
-import dc.longshot.epf.EntityRemovedEvent;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.eventmanagement.EventDelegate;
-import dc.longshot.eventmanagement.EventManager;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.BackdropManager;
@@ -135,7 +132,6 @@ public final class LevelScreen implements Screen {
 	private Label healthLabel;
 	private Label scoreLabel;
 	
-	private EventManager eventManager;
 	private EntityManager entityManager;
 	private EntityFactory entityFactory;
 	private CollisionManager collisionManager;
@@ -216,9 +212,10 @@ public final class LevelScreen implements Screen {
 		rayHandler.setShadows(false);
 		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
 		entityFactory = new EntityFactory(spriteCache, rayHandler);
-		eventManager = new EventManager();
-		entityManager = new EntityManager(eventManager);
-		collisionManager = new CollisionManager(eventManager);
+		entityManager = new EntityManager();
+		entityManager.addEntityAddedListener(entityAdded());
+		entityManager.addEntityRemovedListener(entityRemoved());
+		collisionManager = new CollisionManager();
 		stage = new Stage(new ScreenViewport());
 		levelSession = new LevelSession();
 		levelController = new LevelController(entityManager, entityFactory, level);
@@ -230,7 +227,6 @@ public final class LevelScreen implements Screen {
 		setupStage();
 		setupSystems();
 		entityManager.addAll(createInitialEntities());
-		listenToGameEvents();
 	}
 
 	@Override
@@ -258,7 +254,7 @@ public final class LevelScreen implements Screen {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
-	private EntityAddedListener handleEntityAdded() {
+	private EntityAddedListener entityAdded() {
 		return new EntityAddedListener() {
 			@Override
 			public void created(final Entity entity) {
@@ -293,25 +289,7 @@ public final class LevelScreen implements Screen {
 		};
 	}
 	
-	private NoArgsListener noHealth(final Entity entity) {
-		return new NoArgsListener() {
-			@Override
-			public void executed() {
-				if (entity.hasActive(SoundOnDeathPart.class)) {
-					SoundKey soundKey = entity.get(SoundOnDeathPart.class).getSoundKey();
-					soundCache.play(soundKey);
-				}
-				if (entity.hasActive(GhostPart.class)) {
-					entity.get(GhostPart.class).activate();
-				}
-				else {
-					entityManager.remove(entity);
-				}
-			}
-		};
-	}
-	
-	private EntityRemovedListener handleEntityRemoved() {
+	private EntityRemovedListener entityRemoved() {
 		return new EntityRemovedListener() {
 			@Override
 			public void removed(final Entity entity) {
@@ -341,6 +319,24 @@ public final class LevelScreen implements Screen {
 					for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
 						entityManager.remove(follower);
 					}
+				}
+			}
+		};
+	}
+	
+	private NoArgsListener noHealth(final Entity entity) {
+		return new NoArgsListener() {
+			@Override
+			public void executed() {
+				if (entity.hasActive(SoundOnDeathPart.class)) {
+					SoundKey soundKey = entity.get(SoundOnDeathPart.class).getSoundKey();
+					soundCache.play(soundKey);
+				}
+				if (entity.hasActive(GhostPart.class)) {
+					entity.get(GhostPart.class).activate();
+				}
+				else {
+					entityManager.remove(entity);
 				}
 			}
 		};
@@ -377,11 +373,6 @@ public final class LevelScreen implements Screen {
 		levelInputProcessor = new LevelInputProcessor();
 		Input.addProcessor(stage);
 		Input.addProcessor(levelInputProcessor);
-	}
-	
-	private void listenToGameEvents() {
-		eventManager.listen(EntityAddedEvent.class, handleEntityAdded());
-		eventManager.listen(EntityRemovedEvent.class, handleEntityRemoved());
 	}
 	
 	private void setupStage() {

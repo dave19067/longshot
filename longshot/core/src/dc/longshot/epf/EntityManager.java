@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import dc.longshot.eventmanagement.EventManager;
+import dc.longshot.eventmanagement.EventDelegate;
 
 /**
  * Manages a group of entities.  Provides accessing, removing, and adding entities.
@@ -13,18 +13,21 @@ import dc.longshot.eventmanagement.EventManager;
  *
  */
 public final class EntityManager {
-
-	private final EventManager eventManager;
+	
+	private final EventDelegate<EntityAddedListener> entityAddedDelegate = new EventDelegate<EntityAddedListener>();
+	private final EventDelegate<EntityRemovedListener> entityRemovedDelegate
+	= new EventDelegate<EntityRemovedListener>();
+	
 	private final List<Entity> entities = new ArrayList<Entity>();
 	private final List<Entity> entitiesToAdd = new ArrayList<Entity>();
 	private final List<Entity> entitiesToRemove = new ArrayList<Entity>();
 	
-	/**
-	 * Constructor.
-	 * @param eventManager the event manager that publishes entity create and entity remove events.
-	 */
-	public EntityManager(final EventManager eventManager) {
-		this.eventManager = eventManager;
+	public final void addEntityAddedListener(final EntityAddedListener listener) {
+		entityAddedDelegate.listen(listener);
+	}
+	
+	public final void addEntityRemovedListener(final EntityRemovedListener listener) {
+		entityRemovedDelegate.listen(listener);
 	}
 	
 	/**
@@ -86,14 +89,14 @@ public final class EntityManager {
 		while (!entitiesToAdd.isEmpty()) {
 			Entity entityToAdd = entitiesToAdd.remove(0);
 			entities.add(entityToAdd);
-			eventManager.notify(new EntityAddedEvent(entityToAdd));
+			entityAddedDelegate.notify(new EntityAddedEvent(entityToAdd));
 		}
 		
 		while (!entitiesToRemove.isEmpty()) {
 			Entity entityToRemove = entitiesToRemove.remove(0);
 			if (entities.remove(entityToRemove)) {
 				entityToRemove.cleanup();
-				eventManager.notify(new EntityRemovedEvent(entityToRemove));
+				entityRemovedDelegate.notify(new EntityRemovedEvent(entityToRemove));
 			}
 		}
 	}

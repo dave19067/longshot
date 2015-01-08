@@ -50,20 +50,20 @@ public final class PauseMenu {
 	private void setupDialog() {
 		dialog = new Dialog("Menu", skin);
 		dialog.add(createTable(dialog));
-		dialog.addListener(dialog_input(dialog));
+		dialog.addListener(dialogInput(dialog));
 	}
 	
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
-		table.add(UIFactory.createButton(skin, font, "Resume", resumeButton_clicked(dialog)));
+		table.add(UIFactory.createButton(skin, font, "Resume", resumeButtonClicked(dialog)));
 		table.row();
-		table.add(UIFactory.createButton(skin, font, "Main Menu", mainMenuButton_clicked()));
+		table.add(UIFactory.createButton(skin, font, "Main Menu", mainMenuButtonClicked()));
 		table.row();
-		table.add(UIFactory.createButton(skin, font, "Quit", quitButton_clicked()));
+		table.add(UIFactory.createButton(skin, font, "Quit", quitButtonClicked()));
 		return table;
 	}
 	
-	private ClickListener resumeButton_clicked(final Dialog dialog) {
+	private ClickListener resumeButtonClicked(final Dialog dialog) {
 		return new ClickListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -74,7 +74,7 @@ public final class PauseMenu {
 		};
 	}
 	
-	private ClickListener mainMenuButton_clicked() {
+	private ClickListener mainMenuButtonClicked() {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
@@ -83,7 +83,7 @@ public final class PauseMenu {
 		};
 	}
 	
-	private ClickListener quitButton_clicked() {
+	private ClickListener quitButtonClicked() {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
@@ -92,7 +92,7 @@ public final class PauseMenu {
 		};
 	}
 	
-	private InputListener dialog_input(final Dialog dialog) {
+	private InputListener dialogInput(final Dialog dialog) {
 		return new InputListener() {
 			@Override
 			public boolean keyUp(InputEvent event, int keycode) {

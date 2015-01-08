@@ -98,11 +98,11 @@ public class HighScoresScreen implements Screen {
 		for (ScoreEntry highScore : descendingHighScores) {
 			mainTable.add(UIFactory.createLabel(skin, font, highScore.getName() + " " + highScore.getScore())).row();
 		}
-		mainTable.add(UIFactory.createButton(skin, font, "OK", okButton_clicked()));
+		mainTable.add(UIFactory.createButton(skin, font, "OK", okButtonClicked()));
 		return mainTable;
 	}
 	
-	private ClickListener okButton_clicked() {
+	private ClickListener okButtonClicked() {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {

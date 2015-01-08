@@ -81,7 +81,7 @@ public final class MainMenuScreen implements Screen {
 		stage.dispose();
 	}
 	
-	private ClickListener newGameButton_clicked() {
+	private ClickListener newGameButtonClicked() {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
@@ -90,7 +90,7 @@ public final class MainMenuScreen implements Screen {
 		};
 	}
 	
-	private ClickListener highScoresButton_clicked() {
+	private ClickListener highScoresButtonClicked() {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
@@ -99,7 +99,7 @@ public final class MainMenuScreen implements Screen {
 		};
 	}
 	
-	private ClickListener quitButton_clicked() {
+	private ClickListener quitButtonClicked() {
 		return new ClickListener() {
 			@Override
 			public final void clicked(InputEvent event, float x, float y) {
@@ -116,9 +116,9 @@ public final class MainMenuScreen implements Screen {
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.createButton(skin, font, "New Game", newGameButton_clicked())).row();
-		mainTable.add(UIFactory.createButton(skin, font, "High Scores", highScoresButton_clicked())).row();
-		mainTable.add(UIFactory.createButton(skin, font, "Quit", quitButton_clicked())).row();
+		mainTable.add(UIFactory.createButton(skin, font, "New Game", newGameButtonClicked())).row();
+		mainTable.add(UIFactory.createButton(skin, font, "High Scores", highScoresButtonClicked())).row();
+		mainTable.add(UIFactory.createButton(skin, font, "Quit", quitButtonClicked())).row();
 		return mainTable;
 	}
 

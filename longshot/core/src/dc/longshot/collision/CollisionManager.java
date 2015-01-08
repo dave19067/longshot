@@ -10,18 +10,14 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.eventmanagement.EventManager;
+import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.TransformPart;
 
 public final class CollisionManager {
 	
-	private final EventManager eventManager;
+	private final EventDelegate<CollidedListener> collidedDelegate = new EventDelegate<CollidedListener>();
 	private final Map<Entity, List<Entity>> collidedEntities = new HashMap<Entity, List<Entity>>();
-	
-	public CollisionManager(final EventManager eventManager) {
-		this.eventManager = eventManager;
-	}
 	
 	public final List<Entity> getCollisions(final Entity entity) {
 		List<Entity> collided = new ArrayList<Entity>();
@@ -29,6 +25,10 @@ public final class CollisionManager {
 			collided.addAll(collidedEntities.get(entity));
 		}
 		return collided;
+	}
+	
+	public final void addCollidedListener(final CollidedListener listener) {
+		collidedDelegate.listen(listener);
 	}
 
 	public final void checkCollisions(final List<Entity> entities) {
@@ -44,7 +44,7 @@ public final class CollisionManager {
 						if (Intersector.overlapConvexPolygons(polygon1, polygon2)) {
 							addCollision(entity1, entity2);
 							addCollision(entity2, entity1);
-							eventManager.notify(new CollidedEvent(entity1, entity2));
+							collidedDelegate.notify(new CollidedEvent(entity1, entity2));
 						}
 					}
 				}

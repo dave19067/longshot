@@ -64,7 +64,7 @@ public final class ScoreEntryDialog {
 		table.row();
 		table.add(createNameEntryTable());
 		table.row();
-		table.add(UIFactory.createButton(skin, font, "OK", okButton_clicked(dialog)));
+		table.add(UIFactory.createButton(skin, font, "OK", okButtonClicked(dialog)));
 		table.row();
 		return table;
 	}
@@ -77,7 +77,7 @@ public final class ScoreEntryDialog {
 		return nameEntryTable;
 	}
 	
-	private ClickListener okButton_clicked(final Dialog dialog) {
+	private ClickListener okButtonClicked(final Dialog dialog) {
 		return new ClickListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
