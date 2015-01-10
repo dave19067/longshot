@@ -78,7 +78,9 @@ public final class LongshotGame extends Game {
 	
 	private SpriteCache<SpriteKey> createSpriteCache() {
 		SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
+		// TODO: Remove redundant images/ portion of file path
 		spriteCache.add(SpriteKey.CROSSHAIRS, "images/crosshairs.png");
+		spriteCache.add(SpriteKey.HEALTH_BAR, "images/health_bar.png");
 		Texture texture = new Texture("images/rock02.png");
 		texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		spriteCache.add(SpriteKey.ROCK, texture);

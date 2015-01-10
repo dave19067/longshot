@@ -92,7 +92,7 @@ public final class LevelPreviewScreen implements Screen {
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.createLabel(skin, font, levelName)).row();
+		mainTable.add(UIFactory.label(skin, font, levelName)).row();
 		return mainTable;
 	}
 

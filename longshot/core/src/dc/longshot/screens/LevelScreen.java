@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -29,7 +30,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -98,7 +98,9 @@ import dc.longshot.parts.WaypointsPart;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
+import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
+import dc.longshot.ui.controls.HealthDisplay;
 import dc.longshot.util.ColorUtils;
 
 public final class LevelScreen implements Screen {
@@ -129,8 +131,9 @@ public final class LevelScreen implements Screen {
 
 	private Stage stage;
 	private Table worldTable;
-	private Label healthLabel;
-	private Label scoreLabel;
+	private Table statusTable;
+	private HealthDisplay healthDisplay;
+	private Label scoreValueLabel;
 	
 	private EntityManager entityManager;
 	private EntityFactory entityFactory;
@@ -377,19 +380,22 @@ public final class LevelScreen implements Screen {
 	
 	private void setupStage() {
 		Skin skin = Skins.defaultSkin;
-		LabelStyle labelStyle = Skins.ocrStyle;
 		worldTable = new Table(skin);
-		Table statusTable = createStatusTable(skin, labelStyle);
+		BitmapFont font = Skins.ocrFont;
+		Table statusTable = createStatusTable(skin, font);
 		Table mainTable = createMainTable(skin, worldTable, statusTable);
 		stage.addActor(mainTable);
 	}
 	
-	private Table createStatusTable(final Skin skin, final LabelStyle labelStyle) {
-		Table statusTable = new Table(skin);
-		healthLabel = new Label("", labelStyle);
-		statusTable.add(healthLabel).expandX().left().row();
-		scoreLabel = new Label("", labelStyle);
-		statusTable.add(scoreLabel).left();
+	private Table createStatusTable(final Skin skin, final BitmapFont font) {
+		statusTable = new Table(skin);
+		statusTable.add(UIFactory.label(skin, font, "HEALTH: ")).right();
+		TextureRegion healthBarRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.HEALTH_BAR));
+		healthDisplay = new HealthDisplay(healthBarRegion);
+		statusTable.add(healthDisplay.getTable()).left().row();
+		statusTable.add(UIFactory.label(skin, font, "SCORE: ")).right();
+		scoreValueLabel = UIFactory.label(skin, font, "");
+		statusTable.add(scoreValueLabel).left();
 		return statusTable;
 	}
 	
@@ -397,7 +403,7 @@ public final class LevelScreen implements Screen {
 		Table mainTable = new Table(skin).top().left();
 		mainTable.setFillParent(true);
 		mainTable.add(worldTable).expand().fill().row();
-		mainTable.add(statusTable).expandX().fillX().row();
+		mainTable.add(statusTable).left().row();
 		return mainTable;
 	}
 	
@@ -469,8 +475,8 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void updateUI() {
-		healthLabel.setText("HEALTH: " + levelSession.getHealth());
-		scoreLabel.setText("SCORE: " + playSession.getScore());
+		healthDisplay.setHealth(MathUtils.ceil(levelSession.getHealth()));
+		scoreValueLabel.setText(Integer.toString(playSession.getScore()));
 	}
 	
 	private void updateWorld(final float delta) {
@@ -491,8 +497,7 @@ public final class LevelScreen implements Screen {
 	}
 
 	private void hideStatusUI() {
-		healthLabel.setVisible(false);
-		scoreLabel.setVisible(false);
+		statusTable.setVisible(false);
 	}
 	
 	private void draw() {

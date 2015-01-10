@@ -15,18 +15,18 @@ public final class UIFactory {
 	
 	// Hack: Call to setStyle required to ensure that modified style from getStyle is updated
 	
-	public static final Label createBreak(final Skin skin, final BitmapFont font) {
-		return createLabel(skin, font, " ");
+	public static final Label lineBreak(final Skin skin, final BitmapFont font) {
+		return label(skin, font, " ");
 	}
 	
-	public static final Label createLabel(final Skin skin, final BitmapFont font, final String text) {
+	public static final Label label(final Skin skin, final BitmapFont font, final String text) {
 		Label label = new Label(text, skin);
 		label.getStyle().font = font;
 		label.setStyle(label.getStyle());
 		return label;
 	}
 	
-	public static final Button createButton(final Skin skin, final BitmapFont font, final String text, 
+	public static final Button button(final Skin skin, final BitmapFont font, final String text, 
 			final EventListener listener) {
 		TextButton button = new TextButton(text, skin);
 		button.getStyle().font = font;
@@ -35,7 +35,7 @@ public final class UIFactory {
 		return button;
 	}
 	
-	public static final TextField createTextField(final Skin skin, final BitmapFont font) {
+	public static final TextField textField(final Skin skin, final BitmapFont font) {
 		TextField textField = new TextField("", skin);
 		textField.getStyle().font = font;
 		textField.setStyle(textField.getStyle());

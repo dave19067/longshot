@@ -119,9 +119,9 @@ public final class MainMenuScreen implements Screen {
 		Table mainTable = new Table(skin);
 		mainTable.defaults().spaceBottom(UIConstants.TABLE_SPACE_BOTTOM_FOR_BUTTONS);
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.createButton(skin, font, "New Game", newGameButtonClicked())).row();
-		mainTable.add(UIFactory.createButton(skin, font, "High Scores", highScoresButtonClicked())).row();
-		mainTable.add(UIFactory.createButton(skin, font, "Quit", quitButtonClicked())).row();
+		mainTable.add(UIFactory.button(skin, font, "New Game", newGameButtonClicked())).row();
+		mainTable.add(UIFactory.button(skin, font, "High Scores", highScoresButtonClicked())).row();
+		mainTable.add(UIFactory.button(skin, font, "Quit", quitButtonClicked())).row();
 		UIUtils.setSameWidthForChildren(mainTable);
 		return mainTable;
 	}

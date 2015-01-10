@@ -95,18 +95,18 @@ public class HighScoresScreen implements Screen {
 		Collections.reverse(descendingHighScores);
 		Table mainTable = new Table(skin);
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.createLabel(skin, font, "High Scores")).row();
-		mainTable.add(UIFactory.createBreak(skin, font)).row();
+		mainTable.add(UIFactory.label(skin, font, "High Scores")).row();
+		mainTable.add(UIFactory.lineBreak(skin, font)).row();
 		Table scoreTable = new Table(skin);
 		int scoreSpaceLeft = 100;
 		for (ScoreEntry highScore : descendingHighScores) {
-			scoreTable.add(UIFactory.createLabel(skin, font, highScore.getName())).left();
-			scoreTable.add(UIFactory.createLabel(skin, font, Integer.toString(highScore.getScore())))
+			scoreTable.add(UIFactory.label(skin, font, highScore.getName())).left();
+			scoreTable.add(UIFactory.label(skin, font, Integer.toString(highScore.getScore())))
 				.spaceLeft(scoreSpaceLeft).right().row();
 		}
 		mainTable.add(scoreTable).row();
-		mainTable.add(UIFactory.createBreak(skin, font)).row();
-		mainTable.add(UIFactory.createLabel(skin, font, "Click or touch to continue...")).row();
+		mainTable.add(UIFactory.lineBreak(skin, font)).row();
+		mainTable.add(UIFactory.label(skin, font, "Click or touch to continue...")).row();
 		return mainTable;
 	}
 	

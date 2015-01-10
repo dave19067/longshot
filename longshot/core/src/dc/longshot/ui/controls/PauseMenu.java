@@ -58,11 +58,11 @@ public final class PauseMenu {
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
 		table.defaults().spaceBottom(UIConstants.TABLE_SPACE_BOTTOM_FOR_BUTTONS);
-		table.add(UIFactory.createButton(skin, font, "Resume", resumeButtonClicked(dialog)));
+		table.add(UIFactory.button(skin, font, "Resume", resumeButtonClicked(dialog)));
 		table.row();
-		table.add(UIFactory.createButton(skin, font, "Main Menu", mainMenuButtonClicked()));
+		table.add(UIFactory.button(skin, font, "Main Menu", mainMenuButtonClicked()));
 		table.row();
-		table.add(UIFactory.createButton(skin, font, "Quit", quitButtonClicked()));
+		table.add(UIFactory.button(skin, font, "Quit", quitButtonClicked()));
 		UIUtils.setSameWidthForChildren(table);
 		return table;
 	}

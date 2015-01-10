@@ -60,19 +60,19 @@ public final class ScoreEntryDialog {
 	
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
-		table.add(UIFactory.createLabel(skin, font, "High Score - " + score));
+		table.add(UIFactory.label(skin, font, "High Score - " + score));
 		table.row();
 		table.add(createNameEntryTable());
 		table.row();
-		table.add(UIFactory.createButton(skin, font, "OK", okButtonClicked(dialog)));
+		table.add(UIFactory.button(skin, font, "OK", okButtonClicked(dialog)));
 		table.row();
 		return table;
 	}
 	
 	private Table createNameEntryTable() {
 		Table nameEntryTable = new Table(skin);
-		nameEntryTable.add(UIFactory.createLabel(skin, font, "Enter your name"));
-		nameTextField = UIFactory.createTextField(skin, font);
+		nameEntryTable.add(UIFactory.label(skin, font, "Enter your name"));
+		nameTextField = UIFactory.textField(skin, font);
 		nameEntryTable.add(nameTextField);
 		return nameEntryTable;
 	}
