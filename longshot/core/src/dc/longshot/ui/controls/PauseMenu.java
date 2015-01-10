@@ -15,7 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.ScreenManager;
+import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
+import dc.longshot.ui.UIUtils;
 
 public final class PauseMenu {
 	
@@ -55,18 +57,21 @@ public final class PauseMenu {
 	
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
+		table.defaults().spaceBottom(UIConstants.TABLE_SPACE_BOTTOM_FOR_BUTTONS);
 		table.add(UIFactory.createButton(skin, font, "Resume", resumeButtonClicked(dialog)));
 		table.row();
 		table.add(UIFactory.createButton(skin, font, "Main Menu", mainMenuButtonClicked()));
 		table.row();
 		table.add(UIFactory.createButton(skin, font, "Quit", quitButtonClicked()));
+		UIUtils.setSameWidthForChildren(table);
 		return table;
 	}
 	
 	private ClickListener resumeButtonClicked(final Dialog dialog) {
 		return new ClickListener() {
 			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+			public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
+					final int button) {
 				levelSession.setExecutionState(ExecutionState.RUNNING);
 				dialog.hide();
 				return true;
@@ -77,7 +82,7 @@ public final class PauseMenu {
 	private ClickListener mainMenuButtonClicked() {
 		return new ClickListener() {
 			@Override
-			public final void clicked(InputEvent event, float x, float y) {
+			public final void clicked(final InputEvent event, final float x, final float y) {
 				screenManager.swap(currentScreen, mainMenuScreen);
 			}
 		};
@@ -86,7 +91,7 @@ public final class PauseMenu {
 	private ClickListener quitButtonClicked() {
 		return new ClickListener() {
 			@Override
-			public final void clicked(InputEvent event, float x, float y) {
+			public final void clicked(final InputEvent event, final float x, final float y) {
 				Gdx.app.exit();
 			}
 		};
@@ -95,7 +100,7 @@ public final class PauseMenu {
 	private InputListener dialogInput(final Dialog dialog) {
 		return new InputListener() {
 			@Override
-			public boolean keyUp(InputEvent event, int keycode) {
+			public boolean keyUp(final InputEvent event, final int keycode) {
 				if (keycode == Input.Keys.ESCAPE) {
 					levelSession.setExecutionState(ExecutionState.RUNNING);
 					dialog.hide();

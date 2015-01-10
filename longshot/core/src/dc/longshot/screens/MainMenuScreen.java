@@ -16,7 +16,9 @@ import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.Skins;
 import dc.longshot.system.Input;
+import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
+import dc.longshot.ui.UIUtils;
 
 public final class MainMenuScreen implements Screen {
 
@@ -33,11 +35,11 @@ public final class MainMenuScreen implements Screen {
 		font = Skins.ocrFont;
 	}
 	
-	public final void addNewGameRequestedListener(NoArgsListener listener) {
+	public final void addNewGameRequestedListener(final NoArgsListener listener) {
 		newGameRequestedDelegate.listen(listener);
 	}
 	
-	public final void addHighScoresRequestedListener(NoArgsListener listener) {
+	public final void addHighScoresRequestedListener(final NoArgsListener listener) {
 		highScoresRequestedDelegate.listen(listener);
 	}
 
@@ -84,7 +86,7 @@ public final class MainMenuScreen implements Screen {
 	private ClickListener newGameButtonClicked() {
 		return new ClickListener() {
 			@Override
-			public final void clicked(InputEvent event, float x, float y) {
+			public final void clicked(final InputEvent event, final float x, final float y) {
 				newGameRequestedDelegate.notify(new NoArgsEvent());
 			}
 		};
@@ -93,7 +95,7 @@ public final class MainMenuScreen implements Screen {
 	private ClickListener highScoresButtonClicked() {
 		return new ClickListener() {
 			@Override
-			public final void clicked(InputEvent event, float x, float y) {
+			public final void clicked(final InputEvent event, final float x, final float y) {
 				highScoresRequestedDelegate.notify(new NoArgsEvent());
 			}
 		};
@@ -102,7 +104,7 @@ public final class MainMenuScreen implements Screen {
 	private ClickListener quitButtonClicked() {
 		return new ClickListener() {
 			@Override
-			public final void clicked(InputEvent event, float x, float y) {
+			public final void clicked(final InputEvent event, final float x, final float y) {
 				Gdx.app.exit();
 			}
 		};
@@ -115,10 +117,12 @@ public final class MainMenuScreen implements Screen {
 	
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
+		mainTable.defaults().spaceBottom(UIConstants.TABLE_SPACE_BOTTOM_FOR_BUTTONS);
 		mainTable.setFillParent(true);
 		mainTable.add(UIFactory.createButton(skin, font, "New Game", newGameButtonClicked())).row();
 		mainTable.add(UIFactory.createButton(skin, font, "High Scores", highScoresButtonClicked())).row();
 		mainTable.add(UIFactory.createButton(skin, font, "Quit", quitButtonClicked())).row();
+		UIUtils.setSameWidthForChildren(mainTable);
 		return mainTable;
 	}
 

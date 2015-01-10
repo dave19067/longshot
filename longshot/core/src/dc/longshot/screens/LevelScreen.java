@@ -370,8 +370,8 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void addInputProcessors() {
-		levelInputProcessor = new LevelInputProcessor();
 		Input.addProcessor(stage);
+		levelInputProcessor = new LevelInputProcessor();
 		Input.addProcessor(levelInputProcessor);
 	}
 	
