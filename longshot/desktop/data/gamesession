@@ -18,5 +18,9 @@
             <name>LL COol J</name>
             <score>100</score>
         </highScores>
+        <highScores>
+            <name>d</name>
+            <score>500</score>
+        </highScores>
     </highScores>
 </gameSession>

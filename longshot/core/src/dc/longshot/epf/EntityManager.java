@@ -51,7 +51,6 @@ public final class EntityManager {
 	 * @param entity the entity to add and manage
 	 */
 	public final void add(final Entity entity) {
-		entity.initialize();
 		entitiesToAdd.add(entity);
 	}
 	
@@ -88,6 +87,7 @@ public final class EntityManager {
 	public final void update() {
 		while (!entitiesToAdd.isEmpty()) {
 			Entity entityToAdd = entitiesToAdd.remove(0);
+			entityToAdd.initialize();
 			entities.add(entityToAdd);
 			entityAddedDelegate.notify(new EntityAddedEvent(entityToAdd));
 		}

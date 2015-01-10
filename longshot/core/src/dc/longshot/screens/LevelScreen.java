@@ -184,6 +184,7 @@ public final class LevelScreen implements Screen {
 		stage.act(delta);
 		camera.update();
 		updateUI();
+		entityManager.update();
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
 			updateWorld(delta * debugSettings.getSpeedMultiplier());
 		}
@@ -200,7 +201,6 @@ public final class LevelScreen implements Screen {
 			}
 		}
 		draw();
-		entityManager.update();
 	}
 
 	@Override
