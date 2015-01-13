@@ -104,7 +104,8 @@ import dc.longshot.ui.controls.HealthDisplay;
 import dc.longshot.util.ColorUtils;
 
 public final class LevelScreen implements Screen {
-	
+
+	private static final float MAX_UPDATE_DELTA = 0.01f;
 	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 6, 18);
 	private static final int FRAG_WIDTH = 8;
 	private static final int FRAG_HEIGHT = 8;
@@ -127,6 +128,7 @@ public final class LevelScreen implements Screen {
 	private final ShapeRenderer shapeRenderer;
 	private World world;
 	private RayHandler rayHandler;
+	private double accumulatedDelta = 0;
 	private boolean gameOver = false;
 
 	private Stage stage;
@@ -184,19 +186,17 @@ public final class LevelScreen implements Screen {
 		stage.act(delta);
 		camera.update();
 		updateUI();
-		entityManager.update();
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
 			updateWorld(delta * debugSettings.getSpeedMultiplier());
 		}
 		if (!gameOver) {
-			if (levelSession.getHealth() <= 0 || levelController.isComplete()) {
+			if (levelSession.getHealth() <= 0) {
 				gameOver = true;
 				hideStatusUI();
-			}
-			if (levelSession.getHealth() <= 0) {
 				gameOverDelegate.notify(new NoArgsEvent());
 			}
 			else if (levelController.isComplete()) {
+				gameOver = true;
 				completeDelegate.notify(new NoArgsEvent());
 			}
 		}
@@ -480,11 +480,16 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void updateWorld(final float delta) {
-		collisionManager.checkCollisions(entityManager.getManaged());
-		backdropManager.update(delta);
-		levelController.update(delta);
-		updateEntities(delta);
-		rayHandler.update();
+		accumulatedDelta += delta;
+		while (accumulatedDelta >= MAX_UPDATE_DELTA) {
+			collisionManager.checkCollisions(entityManager.getManaged());
+			backdropManager.update(MAX_UPDATE_DELTA);
+			levelController.update(MAX_UPDATE_DELTA);
+			updateEntities(MAX_UPDATE_DELTA);
+			entityManager.update();
+			rayHandler.update();
+			accumulatedDelta -= MAX_UPDATE_DELTA;
+		}
 	}
 	
 	private void updateEntities(final float delta) {
