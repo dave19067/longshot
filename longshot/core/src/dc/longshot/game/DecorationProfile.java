@@ -1,6 +1,6 @@
 package dc.longshot.game;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public final class DecorationProfile {
@@ -8,12 +8,15 @@ public final class DecorationProfile {
 	public Rectangle area;
 	public boolean rotate;
 	public float spawnRate; 
-	public float scrollSpeed;
 	public float minSize;
 	public float maxSize;
 	public float minXYRatio;
 	public float maxXYRatio;
-	public TextureRegion textureRegion;
+	public float minZ;
+	public float maxZ;
+	public float minSpeed;
+	public float maxSpeed;
+	public PolygonRegion region;
 	
 	/**
 	 * Constructor.
@@ -27,9 +30,10 @@ public final class DecorationProfile {
 	 * @param maxXYRatio maximum ratio for width to height of decorations
 	 * @param textureRegion texture region of decoration
 	 */
-	public DecorationProfile(Rectangle area, boolean rotate, float spawnRate, float scrollSpeed, float minSize, 
-			float maxSize, TextureRegion textureRegion) {
-		this(area, rotate, spawnRate, scrollSpeed, minSize, maxSize, 1, 1, textureRegion);
+	public DecorationProfile(final Rectangle area, final boolean rotate, final float spawnRate, 
+			final float minSize, final float maxSize, final float minZ, final float maxZ, 
+			final float minSpeed, final float maxSpeed, final PolygonRegion region) {
+		this(area, rotate, spawnRate, minSize, maxSize, 1, 1, minZ, maxZ, minSpeed, maxSpeed, region);
 	}
 	
 	/**
@@ -44,16 +48,21 @@ public final class DecorationProfile {
 	 * @param maxXYRatio maximum ratio for width to height of decorations
 	 * @param textureRegion texture region of decoration
 	 */
-	public DecorationProfile(Rectangle area, boolean rotate, float spawnRate, float scrollSpeed, float minSize, 
-			float maxSize, float minXYRatio, float maxXYRatio, TextureRegion textureRegion) {
+	public DecorationProfile(final Rectangle area, final boolean rotate, final float spawnRate, 
+			final float minSize, final float maxSize, final float minXYRatio, 
+			final float maxXYRatio, final float minZ, final float maxZ, final float minSpeed, final float maxSpeed, 
+			final PolygonRegion region) {
 		this.area = area;
 		this.spawnRate = spawnRate;
-		this.scrollSpeed = scrollSpeed;
 		this.minSize = minSize;
 		this.maxSize = maxSize;
 		this.minXYRatio = minXYRatio;
 		this.maxXYRatio = maxXYRatio;
-		this.textureRegion = textureRegion;
+		this.minZ = minZ;
+		this.maxZ = maxZ;
+		this.minSpeed = minSpeed;
+		this.maxSpeed = maxSpeed;
+		this.region = region;
 	}
 	
 }

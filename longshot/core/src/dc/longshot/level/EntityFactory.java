@@ -35,7 +35,6 @@ import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.AutoRotatePart;
 import dc.longshot.parts.BouncePart;
-import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.CityDamagePart;
 import dc.longshot.parts.CollisionTypePart;
@@ -43,6 +42,7 @@ import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DamageOnSpawnPart;
+import dc.longshot.parts.BoundsRemovePart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.EmitterPart;
 import dc.longshot.parts.FollowerPart;
@@ -117,7 +117,7 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
-		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(outlineTexture));
+		PolygonRegion region = RegionFactory.createPolygonRegion(outlineTexture);
 		entity.attach(new AttachmentPart(cannon));
 		entity.attach(new GhostPart(5, region, SoundKey.POWER_UP));
 		entity.attach(new SoundOnDeathPart(SoundKey.POWER_DOWN));
@@ -146,10 +146,9 @@ public final class EntityFactory {
 		entity.attach(new BoundsPart(bounds));
 		entity.attach(new TimedDeathPart(4));
 		List<Bound> deathBounds = new ArrayList<Bound>();
-		deathBounds.add(Bound.LEFT);
-		deathBounds.add(Bound.RIGHT);
+		deathBounds.add(Bound.TOP);
 		deathBounds.add(Bound.BOTTOM);
-		entity.attach(new BoundsDiePart(deathBounds));
+		entity.attach(new BoundsRemovePart(deathBounds, false));
 		Light light = new PointLight(rayHandler, 8, Color.ORANGE, 70, 0, 0);
 		light.setActive(false);
 		entity.attach(new LightPart(light, new Vector2(0.3f, 0.05f)));
@@ -187,7 +186,7 @@ public final class EntityFactory {
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		deathBounds.add(Bound.BOTTOM);
-		entity.attach(new BoundsDiePart(deathBounds));
+		entity.attach(new BoundsRemovePart(deathBounds, true));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, damage));
@@ -221,9 +220,6 @@ public final class EntityFactory {
 		entity.attach(new BoundsPart());
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
 		entity.attach(new AlliancePart(Alliance.ENEMY));
-		List<Bound> deathBounds = new ArrayList<Bound>();
-		deathBounds.add(Bound.BOTTOM);
-		entity.attach(new BoundsDiePart(deathBounds));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -248,7 +244,7 @@ public final class EntityFactory {
 		bounds.add(Bound.RIGHT);
 		entity.attach(new BouncePart(bounds));
 		entity.attach(new BoundsPart(bounds));
-		entity.attach(new BoundsDiePart());
+		entity.attach(new BoundsRemovePart());
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -290,7 +286,7 @@ public final class EntityFactory {
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		deathBounds.add(Bound.BOTTOM);
-		entity.attach(new BoundsDiePart(deathBounds));
+		entity.attach(new BoundsRemovePart(deathBounds, false));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -317,7 +313,7 @@ public final class EntityFactory {
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		deathBounds.add(Bound.BOTTOM);
-		entity.attach(new BoundsDiePart(deathBounds));
+		entity.attach(new BoundsRemovePart(deathBounds, true));
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
@@ -373,7 +369,7 @@ public final class EntityFactory {
 		Polygon convexHull = createConvexHull(spriteKey, size);
 		entity.attach(new TransformPart(convexHull, position));
 		Texture texture = spriteCache.getTexture(spriteKey);
-		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture));
+		PolygonRegion region = RegionFactory.createPolygonRegion(texture);
 		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));
 		return entity;
 	}

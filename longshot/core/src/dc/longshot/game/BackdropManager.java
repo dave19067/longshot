@@ -1,79 +1,96 @@
 package dc.longshot.game;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import dc.longshot.epf.Entity;
+import dc.longshot.epf.EntityManager;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.geometry.UnitConvert;
+import dc.longshot.parts.BoundsRemovePart;
+import dc.longshot.parts.DrawablePart;
+import dc.longshot.parts.TransformPart;
+import dc.longshot.parts.TranslatePart;
 
 public final class BackdropManager {
 	
+	private final EntityManager entityManager;
 	private final Bound startBound;
-	private final Map<DecorationProfile, List<Polygon>> decorations = new HashMap<DecorationProfile, List<Polygon>>();
+	private final List<DecorationProfile> decorationProfiles;
 	
 	/**
 	 * Constructor.
 	 * @param spawnBound create the decorations starting from left or right
 	 * @param decorationProfiles information needed to create different decorations
 	 */
-	public BackdropManager(final Bound spawnBound, final List<DecorationProfile> decorationProfiles) {
+	public BackdropManager(final EntityManager entityManager, final Bound spawnBound, 
+			final List<DecorationProfile> decorationProfiles) {
 		if (spawnBound != Bound.LEFT && spawnBound != Bound.RIGHT) {
 			throw new IllegalArgumentException("Spawn bound must be left or right");
 		}
+		this.entityManager = entityManager;
 		this.startBound = spawnBound;
+		this.decorationProfiles = decorationProfiles;
 		for (DecorationProfile decorationProfile : decorationProfiles) {
-			decorations.put(decorationProfile, new ArrayList<Polygon>());
 			generateInitialDecorations(decorationProfile);
 		}
 	}
 	
-	public final void draw(final Batch batch) {
-		for (Map.Entry<DecorationProfile, List<Polygon>> entry : decorations.entrySet())
-		{
-			for (Polygon decoration : entry.getValue()) {
-				Rectangle boundingRectangle = decoration.getBoundingRectangle();
-				batch.draw(entry.getKey().textureRegion, 
-						decoration.getX() * UnitConvert.PIXELS_PER_UNIT, 
-						decoration.getY() * UnitConvert.PIXELS_PER_UNIT, 
-						decoration.getOriginX() * UnitConvert.PIXELS_PER_UNIT, 
-						decoration.getOriginY() * UnitConvert.PIXELS_PER_UNIT, 
-						boundingRectangle.getWidth() * UnitConvert.PIXELS_PER_UNIT, 
-						boundingRectangle.getHeight() * UnitConvert.PIXELS_PER_UNIT, 
-						1, 1, decoration.getRotation(), true);
-			}
-		}
-	}
-	
 	public final void update(final float delta) {
-		for (Map.Entry<DecorationProfile, List<Polygon>> entry : decorations.entrySet())
+		for (DecorationProfile decorationProfile : decorationProfiles)
 		{
-			DecorationProfile decorationProfile = entry.getKey();
 			trySpawn(delta, decorationProfile);
-			scroll(delta, decorationProfile);
 		}
 	}
 	
 	private void generateInitialDecorations(final DecorationProfile decorationProfile) {
-		int decorationNum = (int)(decorationProfile.area.width / decorationProfile.scrollSpeed
-				/ decorationProfile.spawnRate);
+		float averageSpeed = (decorationProfile.maxSpeed - decorationProfile.minSpeed) / 2;
+		int decorationNum = (int)(decorationProfile.area.width / averageSpeed / decorationProfile.spawnRate);
 		for (int i = 0; i < decorationNum; i++) {
-			Polygon decoration = createDecoration(decorationProfile);
+			Entity decoration = createDecoration(decorationProfile);
 			placeInSpace(decorationProfile, decoration);
 		}
 	}
 	
-	private Polygon createDecoration(final DecorationProfile decorationProfile) {
+	private Entity createDecoration(final DecorationProfile decorationProfile) {
+		Entity entity = new Entity();
+		Vector2 size = calculateSize(decorationProfile);
+		Polygon polygon = PolygonFactory.createRectangle(size);
+		TransformPart transformPart = new TransformPart(polygon);
+		if (decorationProfile.rotate) {
+			transformPart.setCenteredRotation(MathUtils.random(360));
+		}
+		entity.attach(transformPart);
+		PolygonSprite sprite = new PolygonSprite(decorationProfile.region);
+		float z = MathUtils.random(decorationProfile.minZ, decorationProfile.maxZ);
+		entity.attach(new DrawablePart(sprite, z));
+		List<Bound> deathBounds = new ArrayList<Bound>();
+		if (startBound == Bound.LEFT) {
+			deathBounds.add(Bound.RIGHT);
+		}
+		else {
+			deathBounds.add(Bound.LEFT);
+		}
+		entity.attach(new BoundsRemovePart(deathBounds, false));
+		TranslatePart translatePart = new TranslatePart();
+		Vector2 velocity = new Vector2(0, 0);
+		float zRatio = (z - decorationProfile.maxZ) / (decorationProfile.minZ - decorationProfile.maxZ);
+		velocity.x = MathUtils.random(decorationProfile.minSpeed, decorationProfile.maxSpeed) * zRatio;
+		if (startBound == Bound.RIGHT) {
+			velocity.x *= -1;
+		}
+		translatePart.setVelocity(velocity);
+		entity.attach(translatePart);
+		return entity;
+	}
+	
+	private Vector2 calculateSize(final DecorationProfile decorationProfile) {
 		Vector2 size;
 		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize);
 		float xyRatio = MathUtils.random(decorationProfile.minXYRatio, decorationProfile.maxXYRatio);
@@ -85,23 +102,27 @@ public final class BackdropManager {
 			float ratioedLength = length * xyRatio;
 			size = new Vector2(ratioedLength, length);
 		}
-		Polygon decoration = PolygonFactory.createRectangle(size);
-		if (decorationProfile.rotate) {
-			decoration.setRotation(MathUtils.random(360));
-		}
-		return decoration;
+		return size;
 	}
 	
-	private void placeInSpace(final DecorationProfile decorationProfile, final Polygon decoration) {
-		float startX = MathUtils.random(decorationProfile.area.x - decoration.getBoundingRectangle().width, 
-				PolygonUtils.right(decorationProfile.area));
+	private void trySpawn(final float delta, final DecorationProfile decorationProfile) {
+		if (MathUtils.randomBoolean(delta / decorationProfile.spawnRate)) {
+			Entity decoration = createDecoration(decorationProfile);
+			placeOnEdge(decorationProfile, decoration);
+		}
+	}
+	
+	private void placeInSpace(final DecorationProfile decorationProfile, final Entity decoration) {
+		float width = decoration.get(TransformPart.class).getBoundingSize().x;
+		float startX = MathUtils.random(decorationProfile.area.x - width, PolygonUtils.right(decorationProfile.area));
 		place(decorationProfile, decoration, startX);
 	}
 
-	private void placeOnEdge(final DecorationProfile decorationProfile, final Polygon decoration) {
+	private void placeOnEdge(final DecorationProfile decorationProfile, final Entity decoration) {
 		float startX;
 		if (startBound == Bound.LEFT) {
-			startX = decorationProfile.area.x - decoration.getBoundingRectangle().width;
+			float width = decoration.get(TransformPart.class).getBoundingSize().x;
+			startX = decorationProfile.area.x - width;
 		}
 		else {
 			startX = PolygonUtils.right(decorationProfile.area);
@@ -109,36 +130,10 @@ public final class BackdropManager {
 		place(decorationProfile, decoration, startX);
 	}
 	
-	private void place(final DecorationProfile decorationProfile, final Polygon decoration, final float startX) {
+	private void place(final DecorationProfile decorationProfile, final Entity decoration, final float startX) {
 		float startY = MathUtils.random(decorationProfile.area.y, PolygonUtils.top(decorationProfile.area));
-		decoration.setPosition(startX, startY);
-		decorations.get(decorationProfile).add(decoration);
-	}
-	
-	private void trySpawn(final float delta, final DecorationProfile decorationProfile) {
-		if (MathUtils.randomBoolean(delta / decorationProfile.spawnRate)) {
-			Polygon decoration = createDecoration(decorationProfile);
-			placeOnEdge(decorationProfile, decoration);
-		}
-	}
-	
-	private void scroll(final float delta, final DecorationProfile decorationProfile) {
-		Iterator<Polygon> it = decorations.get(decorationProfile).iterator();
-		while (it.hasNext()) {
-			Polygon decoration = it.next();
-			if (startBound == Bound.LEFT) { 
-				decoration.setPosition(decoration.getX() + decorationProfile.scrollSpeed * delta, decoration.getY());
-				if (decoration.getBoundingRectangle().x > PolygonUtils.right(decorationProfile.area)) {
-					it.remove();
-				}
-			}
-			else if (startBound == Bound.RIGHT) {
-				decoration.setPosition(decoration.getX() - decorationProfile.scrollSpeed * delta, decoration.getY());
-				if (PolygonUtils.right(decoration.getBoundingRectangle()) < decorationProfile.area.x) {
-					it.remove();
-				}
-			}
-		}
+		decoration.get(TransformPart.class).setPosition(new Vector2(startX, startY));
+		entityManager.add(decoration);
 	}
 	
 }

@@ -8,11 +8,6 @@ import com.badlogic.gdx.math.Rectangle;
 public enum Bound {
 	
 	LEFT, RIGHT, BOTTOM, TOP;
-
-	public static final boolean isOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox, 
-			final float buffer) {
-		return getViolatedBounds(collisionBox, boundsBox, buffer).size() > 0;
-	}
 	
 	public static final boolean isOutOfBounds(final Rectangle collisionBox, final Rectangle boundsBox, 
 			final List<Bound> checkedBounds) {

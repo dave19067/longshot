@@ -15,10 +15,6 @@
     </levelNames>
     <highScores>
         <highScores>
-            <name>LL COol J</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
             <name>d</name>
             <score>500</score>
         </highScores>
@@ -35,10 +31,6 @@
             <score>600</score>
         </highScores>
         <highScores>
-            <name>d</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
             <name>aaasssaasssssssssssssaaaaaaaaaaaaaasssssssssssssssaaaaaa</name>
             <score>200</score>
         </highScores>
@@ -52,11 +44,19 @@
         </highScores>
         <highScores>
             <name>d</name>
-            <score>100</score>
+            <score>400</score>
         </highScores>
         <highScores>
             <name>d</name>
-            <score>400</score>
+            <score>1100</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>1400</score>
+        </highScores>
+        <highScores>
+            <name>aaaa</name>
+            <score>1800</score>
         </highScores>
     </highScores>
 </gameSession>

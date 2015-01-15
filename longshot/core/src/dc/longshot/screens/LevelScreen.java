@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -38,6 +39,7 @@ import dc.longshot.collision.CollisionManager;
 import dc.longshot.entitysystems.AttachmentSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
+import dc.longshot.entitysystems.BoundsRemoveSystem;
 import dc.longshot.entitysystems.CityDamageSystem;
 import dc.longshot.entitysystems.CollisionDamageSystem;
 import dc.longshot.entitysystems.CurvedMovementSystem;
@@ -49,7 +51,6 @@ import dc.longshot.entitysystems.GravitySystem;
 import dc.longshot.entitysystems.GroundShooterSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.LightSystem;
-import dc.longshot.entitysystems.OutOfBoundsRemoveSystem;
 import dc.longshot.entitysystems.RotateToCursorSystem;
 import dc.longshot.entitysystems.ShooterInputSystem;
 import dc.longshot.entitysystems.SpinSystem;
@@ -72,6 +73,7 @@ import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.level.EntityFactory;
 import dc.longshot.level.LevelController;
@@ -82,8 +84,8 @@ import dc.longshot.models.PlaySession;
 import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
-import dc.longshot.parts.BoundsDiePart;
 import dc.longshot.parts.DamageOnSpawnPart;
+import dc.longshot.parts.BoundsRemovePart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
@@ -308,9 +310,10 @@ public final class LevelScreen implements Screen {
 					entityManager.addAll(frags);
 				}
 				if (entity.hasActive(PointsPart.class)) {
-					if (!entity.has(BoundsDiePart.class) || !Bound.isOutOfBounds(
+					// TODO: This check isn't accurate
+					if (!entity.has(BoundsRemovePart.class) || !Bound.isOutOfBounds(
 							entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
-							entity.get(BoundsDiePart.class).getBounds())) {
+							entity.get(BoundsRemovePart.class).getBounds())) {
 						playSession.addToScore(entity.get(PointsPart.class).getPoints());
 					}
 				}
@@ -357,19 +360,19 @@ public final class LevelScreen implements Screen {
 	private void setupBackdropManager() {
 		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
 		
-		TextureRegion starTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.STAR));
-		DecorationProfile starProfile = new DecorationProfile(level.getBoundsBox(), true, 1, 0.5f, 0.02f, 0.1f, 
-				starTextureRegion);
+		PolygonRegion starRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.STAR));
+		DecorationProfile starProfile = new DecorationProfile(level.getBoundsBox(), true, 1, 0.02f, 0.1f, -1000, -500, 
+				0.3f, 0.7f, starRegion);
 		decorationProfiles.add(starProfile);
 		
-		TextureRegion cloudTextureRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.CLOUD));
+		PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.CLOUD));
 		Rectangle cloudBoundsBox = level.getBoundsBox();
 		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
-		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 4, 0.75f, 3, 6, 1f, 2, 
-				cloudTextureRegion);
+		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 4, 3, 6, 1f, 2, 
+				-200, -100, 0.75f, 1.25f, cloudRegion);
 		decorationProfiles.add(cloudProfile);
 		
-		backdropManager = new BackdropManager(Bound.LEFT, decorationProfiles);
+		backdropManager = new BackdropManager(entityManager, Bound.LEFT, decorationProfiles);
 	}
 	
 	private void addInputProcessors() {
@@ -419,7 +422,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new GroundShooterSystem(entityManager, level.getBoundsBox()));
 		entitySystems.add(new InputMovementSystem());
 		entitySystems.add(new RotateToCursorSystem(camera, worldTable));
-		entitySystems.add(new OutOfBoundsRemoveSystem(level.getBoundsBox(), entityManager));
+		entitySystems.add(new BoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
 		entitySystems.add(new ShooterInputSystem(entityManager));
 		entitySystems.add(new CurvedMovementSystem(level.getBoundsBox()));
@@ -483,10 +486,10 @@ public final class LevelScreen implements Screen {
 		accumulatedDelta += delta;
 		while (accumulatedDelta >= MAX_UPDATE_DELTA) {
 			collisionManager.checkCollisions(entityManager.getManaged());
-			backdropManager.update(MAX_UPDATE_DELTA);
 			levelController.update(MAX_UPDATE_DELTA);
-			updateEntities(MAX_UPDATE_DELTA);
+			backdropManager.update(MAX_UPDATE_DELTA);
 			entityManager.update();
+			updateEntities(MAX_UPDATE_DELTA);
 			rayHandler.update();
 			accumulatedDelta -= MAX_UPDATE_DELTA;
 		}
@@ -539,7 +542,6 @@ public final class LevelScreen implements Screen {
 	private void drawWorld() {
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
-		backdropManager.draw(spriteBatch);
 		List<Entity> entities = entityManager.getManaged();
 		Collections.sort(entities, new ZComparator());
 		for (Entity entity : entities) {

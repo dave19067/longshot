@@ -13,6 +13,10 @@ public final class TransformPart extends Part {
 
 	private final Polygon polygon;
 	
+	public TransformPart(final Polygon polygon) {
+		this(polygon, new Vector2());
+	}
+	
 	public TransformPart(final Polygon polygon, final Vector2 position) {
 		this.polygon = polygon;
 		this.polygon.setPosition(position.x, position.y);

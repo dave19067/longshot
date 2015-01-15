@@ -1,5 +1,6 @@
 package dc.longshot.graphics;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.EarClippingTriangulator;
@@ -11,6 +12,11 @@ import dc.longshot.geometry.VertexUtils;
 public final class RegionFactory {
 	
 	private static final EarClippingTriangulator triangulator = new EarClippingTriangulator();
+	
+	public static final PolygonRegion createPolygonRegion(final Texture texture) {
+		TextureRegion textureRegion = new TextureRegion(texture);
+		return createPolygonRegion(textureRegion);
+	}
 	
 	public static final PolygonRegion createPolygonRegion(final TextureRegion textureRegion) {
 		float[] vertices = PolygonFactory.createRectangleVertices(textureRegion.getRegionWidth(), 
