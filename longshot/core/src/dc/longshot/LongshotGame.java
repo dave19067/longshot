@@ -1,9 +1,8 @@
 package dc.longshot;
 
-import java.io.InputStream;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -11,10 +10,13 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.Skins;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
+import dc.longshot.models.DebugSettings;
 import dc.longshot.models.GameSession;
+import dc.longshot.models.GameSettings;
 import dc.longshot.models.Level;
 import dc.longshot.models.Paths;
 import dc.longshot.models.PlaySession;
@@ -24,6 +26,7 @@ import dc.longshot.screens.HighScoresScreen;
 import dc.longshot.screens.LevelPreviewScreen;
 import dc.longshot.screens.LevelScreen;
 import dc.longshot.screens.MainMenuScreen;
+import dc.longshot.screens.OptionsScreen;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
@@ -39,6 +42,8 @@ public final class LongshotGame extends Game {
 	private SpriteCache<SpriteKey> spriteCache;
 	private SoundCache<SoundKey> soundCache;
 	private PolygonSpriteBatch spriteBatch;
+	private GameSettings gameSettings;
+	private DebugSettings debugSettings;
 	private GameSession gameSession;
 	private PlaySession playSession;
 	
@@ -47,7 +52,12 @@ public final class LongshotGame extends Game {
 		spriteCache = createSpriteCache();
 		soundCache = createSoundCache();
 		spriteBatch = new PolygonSpriteBatch();
-		loadGameSession();
+		gameSettings = XmlUtils.unmarshal(Gdx.files.local(Paths.GAME_SETTINGS_PATH), 
+				new Class[] { GameSettings.class });
+		GameSettingsApplier.apply(gameSettings);
+		debugSettings = XmlUtils.unmarshal(Gdx.files.local(Paths.DEBUG_SETTINGS_PATH), 
+				new Class[] { DebugSettings.class });
+		gameSession = XmlUtils.unmarshal(Gdx.files.local(Paths.GAME_SESSION_PATH), new Class[] { GameSession.class });
 		MainMenuScreen mainMenuScreen = createMainMenuScreen();
 		screenManager.add(mainMenuScreen);
 	}
@@ -69,11 +79,6 @@ public final class LongshotGame extends Game {
 		spriteCache.dispose();
 		screenManager.dispose();
 		Skins.dispose();
-	}
-	
-	private void loadGameSession() {
-		InputStream gameSessionInputStream = Gdx.files.local(Paths.GAME_SESSION_PATH).read();
-		gameSession = XmlUtils.unmarshal(gameSessionInputStream, new Class[] { GameSession.class });
 	}
 	
 	private SpriteCache<SpriteKey> createSpriteCache() {
@@ -128,6 +133,13 @@ public final class LongshotGame extends Game {
 				screenManager.swap(mainMenuScreen, levelPreviewScreen);
 			}
 		});
+		mainMenuScreen.addOptionsRequestedListener(new NoArgsListener() {
+			@Override
+			public void executed() {
+				OptionsScreen optionsScreen = createOptionsScreen();
+				screenManager.swap(mainMenuScreen, optionsScreen);
+			}
+		});
 		mainMenuScreen.addHighScoresRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -150,6 +162,18 @@ public final class LongshotGame extends Game {
 		return levelPreviewScreen;
 	}
 	
+	private OptionsScreen createOptionsScreen() {
+		final OptionsScreen optionsScreen = new OptionsScreen(gameSettings);
+		final Screen previousScreen = screenManager.getCurrentScreen();
+		optionsScreen.addBackRequestedListener(new NoArgsListener() {
+			@Override
+			public void executed() {
+				screenManager.swap(optionsScreen, previousScreen);
+			}
+		});
+		return optionsScreen;
+	}
+	
 	private HighScoresScreen createHighScoresScreen() {
 		final HighScoresScreen highScoresScreen = new HighScoresScreen(gameSession);
 		highScoresScreen.addNextScreenRequestedListener(new NoArgsListener() {
@@ -163,8 +187,8 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(spriteCache, soundCache, spriteBatch, 
-				gameSession.getDebugSettings(), playSession, level);
+		final LevelScreen levelScreen = new LevelScreen(spriteCache, soundCache, spriteBatch, debugSettings, 
+				playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -212,8 +236,7 @@ public final class LongshotGame extends Game {
 	
 	private Level loadNextLevel() {
 		String levelName = playSession.advanceLevel();
-		InputStream levelInputStream = Gdx.files.internal(LEVELS_PATH + levelName).read();
-		return XmlUtils.unmarshal(levelInputStream, new Class[] { Level.class });
+		return XmlUtils.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName), new Class[] { Level.class });
 	}
 	
 }

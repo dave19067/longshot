@@ -1,7 +1,5 @@
 package dc.longshot.ui.controls;
 
-import java.io.OutputStream;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -22,6 +20,8 @@ import dc.longshot.util.XmlUtils;
 
 public final class ScoreEntryDialog {
 
+	private static final int MAX_NAME_LENGTH = 10;
+	
 	private final Skin skin;
 	private final BitmapFont font;
 	private final Stage stage;
@@ -35,7 +35,7 @@ public final class ScoreEntryDialog {
 
 	public ScoreEntryDialog(final Skin skin, final BitmapFont font, final Stage stage, 
 			final ScreenManager screenManager, final Screen currentScreen, final Screen nextScreen, 
-			GameSession gameSession, int score) {
+			final GameSession gameSession, final int score) {
 		this.skin = skin;
 		this.font = font;
 		this.stage = stage;
@@ -73,6 +73,7 @@ public final class ScoreEntryDialog {
 		Table nameEntryTable = new Table(skin);
 		nameEntryTable.add(UIFactory.label(skin, font, "Enter your name"));
 		nameTextField = UIFactory.textField(skin, font);
+		nameTextField.setMaxLength(MAX_NAME_LENGTH);
 		nameEntryTable.add(nameTextField);
 		return nameEntryTable;
 	}
@@ -80,7 +81,7 @@ public final class ScoreEntryDialog {
 	private ClickListener okButtonClicked(final Dialog dialog) {
 		return new ClickListener() {
 			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+			public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, final int button) {
 				saveHighScore();
 				screenManager.swap(currentScreen, nextScreen);
 				dialog.hide();
@@ -92,8 +93,7 @@ public final class ScoreEntryDialog {
 	private void saveHighScore() {
 		ScoreEntry scoreEntry = new ScoreEntry(nameTextField.getText(), score);
 		gameSession.addHighScore(scoreEntry);
-		OutputStream gameSessionOutputStream = Gdx.files.local(Paths.GAME_SESSION_PATH).write(false);
-		XmlUtils.marshal(gameSession, gameSessionOutputStream, new Class[] { GameSession.class });
+		XmlUtils.marshal(gameSession, Gdx.files.local(Paths.GAME_SESSION_PATH), new Class[] { GameSession.class });
 	}
 	
 }

@@ -8,9 +8,21 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import com.badlogic.gdx.files.FileHandle;
+
 public final class XmlUtils {
 	
 	private XmlUtils() {
+	}
+	
+	/**
+	 * Reads an xml file to an object.
+	 * @param path local path to the xml file
+	 * @param boundClasses used to correctly unmarshal base types to derived types
+	 * @return object of type T
+	 */
+	public static final <T> T unmarshal(final FileHandle fileHandle, final Class<?>[] boundClasses) {
+		return unmarshal(fileHandle.read(), boundClasses);
 	}
 	
 	/**
@@ -30,6 +42,17 @@ public final class XmlUtils {
 		catch (JAXBException e) {
 			throw new IllegalArgumentException("Could not unmarshal " + inputStream.toString(), e);
 		}
+	}
+	
+	/**
+	 * Writes an object to an xml file.
+	 * @param object object to write
+	 * @param path local path of the xml file to write to
+	 * @param boundClasses used to correctly marshal base types to derived types
+	 */
+	public static final <T> void marshal(final T object, final FileHandle fileHandle, final Class<?>[] boundClasses) {
+		OutputStream outputStream = fileHandle.write(false);
+		marshal(object, outputStream, boundClasses);
 	}
 	
 	/**

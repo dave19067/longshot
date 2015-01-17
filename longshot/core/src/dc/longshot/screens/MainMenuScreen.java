@@ -23,6 +23,7 @@ import dc.longshot.ui.UIUtils;
 public final class MainMenuScreen implements Screen {
 
 	private final EventDelegate<NoArgsListener> newGameRequestedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> optionsRequestedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> highScoresRequestedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final Skin skin;
@@ -37,6 +38,10 @@ public final class MainMenuScreen implements Screen {
 	
 	public final void addNewGameRequestedListener(final NoArgsListener listener) {
 		newGameRequestedDelegate.listen(listener);
+	}
+	
+	public final void addOptionsRequestedListener(final NoArgsListener listener) {
+		optionsRequestedDelegate.listen(listener);
 	}
 	
 	public final void addHighScoresRequestedListener(final NoArgsListener listener) {
@@ -83,20 +88,11 @@ public final class MainMenuScreen implements Screen {
 		stage.dispose();
 	}
 	
-	private ClickListener newGameButtonClicked() {
+	private ClickListener requestButtonClicked(final EventDelegate<NoArgsListener> requestedDelegate) {
 		return new ClickListener() {
 			@Override
 			public final void clicked(final InputEvent event, final float x, final float y) {
-				newGameRequestedDelegate.notify(new NoArgsEvent());
-			}
-		};
-	}
-	
-	private ClickListener highScoresButtonClicked() {
-		return new ClickListener() {
-			@Override
-			public final void clicked(final InputEvent event, final float x, final float y) {
-				highScoresRequestedDelegate.notify(new NoArgsEvent());
+				requestedDelegate.notify(new NoArgsEvent());
 			}
 		};
 	}
@@ -117,10 +113,11 @@ public final class MainMenuScreen implements Screen {
 	
 	private Table createMainTable() {
 		Table mainTable = new Table(skin);
-		mainTable.defaults().spaceBottom(UIConstants.TABLE_SPACE_BOTTOM_FOR_BUTTONS);
+		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.button(skin, font, "New Game", newGameButtonClicked())).row();
-		mainTable.add(UIFactory.button(skin, font, "High Scores", highScoresButtonClicked())).row();
+		mainTable.add(UIFactory.button(skin, font, "New Game", requestButtonClicked(newGameRequestedDelegate))).row();
+		mainTable.add(UIFactory.button(skin, font, "Options", requestButtonClicked(optionsRequestedDelegate))).row();
+		mainTable.add(UIFactory.button(skin, font, "High Scores", requestButtonClicked(highScoresRequestedDelegate))).row();
 		mainTable.add(UIFactory.button(skin, font, "Quit", quitButtonClicked())).row();
 		UIUtils.setSameWidthForChildren(mainTable);
 		return mainTable;

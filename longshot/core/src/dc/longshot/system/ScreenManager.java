@@ -12,6 +12,13 @@ public final class ScreenManager {
 	private final List<Screen> screensToAdd = new ArrayList<Screen>();
 	private final List<Screen> screensToRemove = new ArrayList<Screen>();
 	
+	public final Screen getCurrentScreen() {
+		if (screens.size() <= 0) {
+			throw new UnsupportedOperationException("Could not get current screen because there are no screens");
+		}
+		return screens.get(0);
+	}
+	
 	public final void add(final Screen screen) {
 		screensToAdd.add(screen);
 		screen.show();
