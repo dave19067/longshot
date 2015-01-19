@@ -187,8 +187,8 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(spriteCache, soundCache, spriteBatch, debugSettings, 
-				playSession, level);
+		final LevelScreen levelScreen = new LevelScreen(spriteCache, soundCache, spriteBatch, 
+				gameSettings.getInputActions(), debugSettings, playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {

@@ -3,6 +3,7 @@ package dc.longshot.ui;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -34,6 +35,14 @@ public final class UIFactory {
 		button.setStyle(button.getStyle());
 		button.addListener(listener);
 		return button;
+	}
+	
+	public static final CheckBox checkBox(final Skin skin, final BitmapFont font, final boolean isChecked) {
+		CheckBox checkBox = new CheckBox("Windowed", skin);
+		checkBox.getStyle().font = font;
+		checkBox.setStyle(checkBox.getStyle());
+		checkBox.setChecked(isChecked);
+		return checkBox;
 	}
 	
 	public static final TextField textField(final Skin skin, final BitmapFont font) {

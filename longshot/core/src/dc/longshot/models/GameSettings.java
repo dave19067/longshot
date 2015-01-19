@@ -1,7 +1,11 @@
 package dc.longshot.models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -15,6 +19,8 @@ public final class GameSettings {
 	private int refreshRate;
 	private int bitsPerPixel;
 	private boolean isFullScreen;
+	@XmlElementWrapper
+	private Map<InputAction, Integer> inputActions;
 	
 	public final int getWidth() {
 		return width;
@@ -45,6 +51,14 @@ public final class GameSettings {
 	
 	public final void setFullScreen(final boolean isFullScreen) {
 		this.isFullScreen = isFullScreen;
+	}
+	
+	public final Map<InputAction, Integer> getInputActions() {
+		return new HashMap<InputAction, Integer>(inputActions);
+	}
+	
+	public final void set(final InputAction inputAction, final int keycode) {
+		inputActions.put(inputAction, keycode);
 	}
 	
 }

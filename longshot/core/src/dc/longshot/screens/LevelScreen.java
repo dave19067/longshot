@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import box2dLight.RayHandler;
 
@@ -78,14 +79,15 @@ import dc.longshot.graphics.SpriteCache;
 import dc.longshot.level.EntityFactory;
 import dc.longshot.level.LevelController;
 import dc.longshot.models.DebugSettings;
+import dc.longshot.models.InputAction;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
 import dc.longshot.models.PlaySession;
 import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
-import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.BoundsRemovePart;
+import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
@@ -121,6 +123,7 @@ public final class LevelScreen implements Screen {
 	private final SpriteCache<SpriteKey> spriteCache;
 	private final SoundCache<SoundKey> soundCache;
 	private final PolygonSpriteBatch spriteBatch;
+	private  final Map<InputAction, Integer> inputActions;
 	private final DebugSettings debugSettings;
 	private LevelSession levelSession;
 	private final PlaySession playSession;
@@ -151,11 +154,12 @@ public final class LevelScreen implements Screen {
 	private final Texture cursorTexture;
 	
 	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SoundCache<SoundKey> soundCache, 
-			final PolygonSpriteBatch spriteBatch, final DebugSettings debugSettings, final PlaySession playSession, 
-			final Level level) {
+			final PolygonSpriteBatch spriteBatch, final Map<InputAction, Integer> inputActions, 
+			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
 		this.spriteCache = spriteCache;
 		this.soundCache = soundCache;
 		this.spriteBatch = spriteBatch;
+		this.inputActions = inputActions;
 		this.debugSettings = debugSettings;
 		this.playSession = playSession;
 		this.level = level;
@@ -420,7 +424,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new EmitSystem(entityManager));
 		entitySystems.add(new TargetShooterSystem(entityManager));
 		entitySystems.add(new GroundShooterSystem(entityManager, level.getBoundsBox()));
-		entitySystems.add(new InputMovementSystem());
+		entitySystems.add(new InputMovementSystem(inputActions));
 		entitySystems.add(new RotateToCursorSystem(camera, worldTable));
 		entitySystems.add(new BoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
