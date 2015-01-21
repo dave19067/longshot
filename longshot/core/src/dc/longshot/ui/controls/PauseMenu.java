@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -58,12 +59,13 @@ public final class PauseMenu {
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
 		table.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
-		table.add(UIFactory.button(skin, font, "Resume", resumeButtonClicked(dialog)));
-		table.row();
-		table.add(UIFactory.button(skin, font, "Main Menu", mainMenuButtonClicked()));
-		table.row();
-		table.add(UIFactory.button(skin, font, "Quit", quitButtonClicked()));
-		UIUtils.setSameWidthForChildren(table);
+		Button resumeButton = UIFactory.button(skin, font, "Resume", resumeButtonClicked(dialog));
+		table.add(resumeButton).row();
+		Button mainMenuButton = UIFactory.button(skin, font, "Main Menu", mainMenuButtonClicked());
+		table.add(mainMenuButton).row();
+		Button quitButton = UIFactory.button(skin, font, "Quit", quitButtonClicked());
+		table.add(quitButton);
+		UIUtils.setSameWidth(table, resumeButton, mainMenuButton, quitButton);
 		return table;
 	}
 	

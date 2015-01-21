@@ -24,11 +24,14 @@ import dc.longshot.ui.UIFactory;
 
 public class HighScoresScreen implements Screen {
 	
+	private static final int SCORE_SPACE_LEFT = 100;
+	
 	private final EventDelegate<NoArgsListener> nextScreenRequestedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final GameSession gameSession;
 	private final Skin skin;
 	private final BitmapFont font;
+	private final BitmapFont smallFont;
 	
 	private Stage stage;
 	private InputProcessor highScoresInputProcessor;
@@ -37,6 +40,7 @@ public class HighScoresScreen implements Screen {
 		this.gameSession = gameSession;
 		skin = Skins.defaultSkin;
 		font = Skins.ocrFont;
+		smallFont = Skins.ocrSmallFont;
 	}
 	
 	public final void addNextScreenRequestedListener(final NoArgsListener listener) {
@@ -105,11 +109,10 @@ public class HighScoresScreen implements Screen {
 		Table scoresTable = new Table(skin);
 		List<ScoreEntry> descendingHighScores = gameSession.getSortedHighScores();
 		Collections.reverse(descendingHighScores);
-		int scoreSpaceLeft = 100;
 		for (ScoreEntry highScore : descendingHighScores) {
-			scoresTable.add(UIFactory.label(skin, font, highScore.getName())).left();
-			scoresTable.add(UIFactory.label(skin, font, Integer.toString(highScore.getScore())))
-				.spaceLeft(scoreSpaceLeft).right().row();
+			scoresTable.add(UIFactory.label(skin, smallFont, highScore.getName())).left();
+			scoresTable.add(UIFactory.label(skin, smallFont, Integer.toString(highScore.getScore())))
+				.spaceLeft(SCORE_SPACE_LEFT).right().row();
 		}
 		return scoresTable;
 	}

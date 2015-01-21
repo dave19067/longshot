@@ -3,9 +3,12 @@ package dc.longshot.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -28,12 +31,14 @@ public final class MainMenuScreen implements Screen {
 	
 	private final Skin skin;
 	private final BitmapFont font;
+	private final Texture logoTexture;
 	
 	private Stage stage;
 	
-	public MainMenuScreen() {
+	public MainMenuScreen(final Texture logoTexture) {
 		skin = Skins.defaultSkin;
 		font = Skins.ocrFont;
+		this.logoTexture = logoTexture;
 	}
 	
 	public final void addNewGameRequestedListener(final NoArgsListener listener) {
@@ -51,7 +56,6 @@ public final class MainMenuScreen implements Screen {
 	@Override
 	public final void render(final float delta) {
 		stage.act(delta);
-		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
@@ -115,13 +119,18 @@ public final class MainMenuScreen implements Screen {
 		Table mainTable = new Table(skin);
 		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.button(skin, font, "New Game", requestButtonClicked(newGameRequestedDelegate))).row();
-		mainTable.add(UIFactory.button(skin, font, "Options", requestButtonClicked(optionsRequestedDelegate))).row();
-		mainTable.add(UIFactory.button(skin, font, "High Scores", requestButtonClicked(highScoresRequestedDelegate))).row();
-		mainTable.add(UIFactory.button(skin, font, "Quit", quitButtonClicked())).row();
-		UIUtils.setSameWidthForChildren(mainTable);
+		mainTable.add(new Image(logoTexture)).row();
+		Button newGameButton = UIFactory.button(skin, font, "New Game", requestButtonClicked(newGameRequestedDelegate));
+		mainTable.add(newGameButton).row();
+		Button optionsButton = UIFactory.button(skin, font, "Options", requestButtonClicked(optionsRequestedDelegate));
+		mainTable.add(optionsButton).row();
+		Button highScoresButton = UIFactory.button(skin, font, "High Scores", 
+				requestButtonClicked(highScoresRequestedDelegate));
+		mainTable.add(highScoresButton).row();
+		Button quitButton = UIFactory.button(skin, font, "Quit", quitButtonClicked());
+		mainTable.add(quitButton).row();
+		UIUtils.setSameWidth(mainTable, newGameButton, optionsButton, highScoresButton, quitButton);
 		return mainTable;
 	}
-
 	
 }

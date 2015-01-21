@@ -1,5 +1,9 @@
 package dc.longshot.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,14 +23,21 @@ public final class UIUtils {
 	/**
 	 * Sets the width of a table's child actors to have the same width of the longest child actor.
 	 */
-	public static final void setSameWidthForChildren(final Table table) {
+	public static final void setSameWidth(final Table table, final Actor... children) {
 		table.validate();
-		float maxWidth = 0;
-		for (Cell<?> child : table.getCells()) {
-			maxWidth = Math.max(maxWidth, child.getActorWidth());
+		List<Actor> childrenList = Arrays.asList(children);
+		List<Cell<?>> childCells = new ArrayList<Cell<?>>();
+		for (Cell<?> cell : table.getCells()) {
+			if (childrenList.contains(cell.getActor())) {
+				childCells.add(cell);
+			}
 		}
-		for (Cell<?> child : table.getCells()) {
-			child.width(maxWidth);
+		float maxWidth = 0;
+		for (Cell<?> cell : childCells) {
+			maxWidth = Math.max(maxWidth, cell.getActorWidth());
+		}
+		for (Cell<?> cell : childCells) {
+			cell.width(maxWidth);
 		}
 	}
 	
