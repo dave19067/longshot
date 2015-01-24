@@ -9,7 +9,7 @@ import dc.longshot.game.LevelUtils;
 import dc.longshot.parts.GroundShooterPart;
 import dc.longshot.parts.WeaponPart;
 
-public final class GroundShooterSystem implements EntitySystem {
+public final class GroundShooterSystem extends EntitySystem {
 	
 	private final EntityManager entityManager;
 	private final Rectangle boundsBox;

@@ -10,7 +10,7 @@ import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
 
-public final class WaypointsSystem implements EntitySystem {
+public final class WaypointsSystem extends EntitySystem {
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
@@ -30,7 +30,7 @@ public final class WaypointsSystem implements EntitySystem {
 		}
 	}
 
-	private float moveToWaypoint(final Entity entity, float maxDistanceCovered) {
+	private float moveToWaypoint(final Entity entity, final float maxDistanceCovered) {
 		WaypointsPart waypointsPart = entity.get(WaypointsPart.class);
 		Vector2 currentWaypoint = waypointsPart.getCurrentWaypoint();
 		TransformPart transformPart = entity.get(TransformPart.class);

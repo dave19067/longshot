@@ -1,17 +1,42 @@
 package dc.longshot.entitysystems;
 
+import java.util.List;
+
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
 
-public final class FollowerSystem implements EntitySystem {
+public final class FollowerSystem extends EntitySystem {
 
 	@Override
-	public void update(float delta, Entity entity) {;
+	public void initialize(final Entity entity) {
+		if (entity.hasActive(FollowerPart.class)) {
+			List<Entity> followers = entity.get(FollowerPart.class).getFollowers();
+			float followerSizeY = followers.get(0).get(TransformPart.class).getSize().y;
+			float offsetY = followerSizeY / 2 + entity.get(TransformPart.class).getSize().y / 2;
+			for (Entity follower : followers) {
+				Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
+				TransformPart followerTransformPart = follower.get(TransformPart.class);
+				Vector2 followerSize = followerTransformPart.getBoundingSize();
+				Vector2 followerPosition = PolygonUtils.relativeCenter(entityCenter, followerSize);
+				followerPosition.add(0, offsetY);
+				followerTransformPart.setPosition(followerPosition);
+				float endBuffer = VectorUtils.offset(entityCenter, followerTransformPart.getCenter())
+						.dst(new Vector2());
+				follower.get(WaypointsPart.class).setEndBuffer(endBuffer);
+				offsetY += followerSize.y;
+			}
+		}
+	}
+
+	@Override
+	public void update(final float delta, final Entity entity) {;
 		if (entity.hasActive(FollowerPart.class)) {
 			for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
 				Vector2 waypoint = entity.get(TransformPart.class).getCenter();

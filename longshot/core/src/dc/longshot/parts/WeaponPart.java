@@ -42,13 +42,12 @@ public final class WeaponPart extends Part {
 			throw new IllegalStateException("Cannot create spawn");
 		}
 	}
-	
+
 	@Override
 	public final void cleanup() {
 		original.cleanup();
 	}
 	
-	@Override
 	public final void update(final float delta) {
 		spawnTimer.tick(delta);
 		Iterator<Entity> it = spawns.iterator();

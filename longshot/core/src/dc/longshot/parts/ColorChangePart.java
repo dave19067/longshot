@@ -1,7 +1,6 @@
 package dc.longshot.parts;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 
 import dc.longshot.epf.Part;
 import dc.longshot.util.Timer;
@@ -17,14 +16,17 @@ public final class ColorChangePart extends Part {
 		this.endColor = endColor;
 		changeTimer = new Timer(maxChangeTime);
 	}
-
-	@Override
-	public final void update(final float delta) {
-		changeTimer.tick(delta);
-		Color color = startColor.cpy().lerp(endColor.r, endColor.g, endColor.b, endColor.a, 
-				changeTimer.getElapsedPercent());
-		PolygonSprite sprite = entity.get(DrawablePart.class).getSprite();
-		sprite.setColor(color);
+	
+	public final Color getStartColor() {
+		return startColor;
+	}
+	
+	public final Color getEndColor() {
+		return endColor;
+	}
+	
+	public final Timer getChangeTimer() {
+		return changeTimer;
 	}
 	
 }

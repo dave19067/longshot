@@ -25,11 +25,6 @@ public final class LightPart extends Part {
 	}
 	
 	@Override
-	public final void initialize() {
-		light.setActive(true);
-	}
-	
-	@Override
 	public final void cleanup() {
 		light.remove();
 		light.dispose();

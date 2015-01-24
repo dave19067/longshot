@@ -87,7 +87,7 @@ public final class EntityManager {
 	public final void update() {
 		while (!entitiesToAdd.isEmpty()) {
 			Entity entityToAdd = entitiesToAdd.remove(0);
-			entityToAdd.initialize();
+			entityToAdd.setActive(true);
 			entities.add(entityToAdd);
 			entityAddedDelegate.notify(new EntityAddedEvent(entityToAdd));
 		}

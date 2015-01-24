@@ -3,23 +3,18 @@ package dc.longshot.parts;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
-import dc.longshot.geometry.VectorUtils;
 
 public final class AutoRotatePart extends Part {
 
+	// TODO: move oldposition to a new part
 	private Vector2 oldPosition;
 	
-	@Override
-	public final void initialize() {
-		oldPosition = entity.get(TransformPart.class).getPosition();
+	public final Vector2 getOldPosition() {
+		return oldPosition;
 	}
 	
-	@Override
-	public final void update(final float delta) {
-		TransformPart transformPart = entity.get(TransformPart.class);
-		Vector2 offset = VectorUtils.offset(oldPosition, transformPart.getPosition());
-		transformPart.setCenteredRotation(offset.angle());
-		oldPosition = transformPart.getPosition();
+	public final void setOldPosition(final Vector2 oldPosition) {
+		this.oldPosition = oldPosition;
 	}
 	
 }

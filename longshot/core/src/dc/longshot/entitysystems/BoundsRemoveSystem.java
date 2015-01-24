@@ -9,7 +9,7 @@ import dc.longshot.geometry.Bound;
 import dc.longshot.parts.BoundsRemovePart;
 import dc.longshot.parts.TransformPart;
 
-public final class BoundsRemoveSystem implements EntitySystem {
+public final class BoundsRemoveSystem extends EntitySystem {
 
 	private final Rectangle boundsBox;
 	private final EntityManager entityManager;

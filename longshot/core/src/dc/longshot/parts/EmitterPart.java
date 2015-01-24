@@ -44,8 +44,7 @@ public final class EmitterPart extends Part {
 	public final void cleanup() {
 		original.cleanup();
 	}
-
-	@Override
+	
 	public final void update(final float delta) {
 		emitTimer.tick(delta);
 	}

@@ -12,7 +12,7 @@ import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 
-public final class TargetShooterSystem implements EntitySystem {
+public final class TargetShooterSystem extends EntitySystem {
 	
 	private final EntityManager entityManager;
 	
@@ -39,7 +39,7 @@ public final class TargetShooterSystem implements EntitySystem {
 		}
 	}
 	
-	private void spawn(Entity entity, Entity other) {
+	private void spawn(final Entity entity, final Entity other) {
 		Entity spawn = entity.get(WeaponPart.class).createSpawn();
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		TransformPart otherTransform = other.get(TransformPart.class);

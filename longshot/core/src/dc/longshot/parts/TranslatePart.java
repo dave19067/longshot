@@ -30,12 +30,4 @@ public class TranslatePart extends Part {
 		}
 	}
 	
-	@Override
-	public final void update(final float delta) {
-		TransformPart transformPart = entity.get(TransformPart.class);
-		Vector2 offset = velocity.cpy().scl(delta);
-		Vector2 newPosition = transformPart.getPosition().add(offset);
-		transformPart.setPosition(newPosition);
-	}
-	
 }

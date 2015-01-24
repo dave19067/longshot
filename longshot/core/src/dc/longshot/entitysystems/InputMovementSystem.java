@@ -12,7 +12,7 @@ import dc.longshot.models.InputAction;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TranslatePart;
 
-public final class InputMovementSystem implements EntitySystem {
+public final class InputMovementSystem extends EntitySystem {
 	
 	private final Map<InputAction, Integer> inputActions;
 	

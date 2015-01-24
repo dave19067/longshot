@@ -49,7 +49,6 @@ public final class GhostPart extends Part {
 		entity.get(WeaponPart.class).setActive(true);
 	}
 	
-	@Override
 	public final void initialize() {
 		normalRegion = entity.get(DrawablePart.class).getSprite().getRegion();
 	}

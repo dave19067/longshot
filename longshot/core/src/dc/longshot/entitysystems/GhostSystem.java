@@ -7,14 +7,21 @@ import dc.longshot.parts.GhostPart;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.util.Timer;
 
-public final class GhostSystem implements EntitySystem {
+public final class GhostSystem extends EntitySystem {
 
 	private final SoundCache<SoundKey> soundCache;
 	
 	public GhostSystem(final SoundCache<SoundKey> soundCache) {
 		this.soundCache = soundCache;
 	}
-	
+
+	@Override
+	public final void initialize(final Entity entity) {
+		if (entity.hasActive(GhostPart.class)) {
+			entity.get(GhostPart.class).initialize();
+		}
+	}
+
 	@Override
 	public void update(final float delta, final Entity entity) {
 		if (entity.has(GhostPart.class)) {

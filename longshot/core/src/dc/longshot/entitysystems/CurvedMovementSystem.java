@@ -18,7 +18,7 @@ import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
 
-public final class CurvedMovementSystem implements EntitySystem {
+public final class CurvedMovementSystem extends EntitySystem {
 	
 	private final int SAMPLE_NUM = 20;
 	
@@ -54,7 +54,7 @@ public final class CurvedMovementSystem implements EntitySystem {
 		entity.get(WaypointsPart.class).addWaypoints(waypoints);
 	}
 	
-	private List<Vector2> createWaypoints(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3) {
+	private List<Vector2> createWaypoints(final Vector2 p0, final Vector2 p1, final Vector2 p2, final Vector2 p3) {
 		List<Vector2> waypoints = new ArrayList<Vector2>();
 		for (int i = 0; i < SAMPLE_NUM; i++) {
 			Vector2 out = new Vector2();

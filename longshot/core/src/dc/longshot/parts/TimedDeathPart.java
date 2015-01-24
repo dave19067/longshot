@@ -15,7 +15,6 @@ public final class TimedDeathPart extends Part {
 		return deathTimer.isElapsed();
 	}
 
-	@Override
 	public final void update(final float delta) {
 		deathTimer.tick(delta);
 	}

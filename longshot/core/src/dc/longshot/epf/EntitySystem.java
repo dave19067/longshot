@@ -1,7 +1,14 @@
 package dc.longshot.epf;
 
-public interface EntitySystem {
+public abstract class EntitySystem {
 
-	void update(float delta, Entity entity);
+	public void initialize(final Entity entity) {
+	}
+	
+	public void cleanup(final Entity entity) {
+	}
+	
+	public void update(final float delta, final Entity entity) {
+	}
 	
 }

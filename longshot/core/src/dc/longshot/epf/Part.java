@@ -36,23 +36,8 @@ public abstract class Part {
 		this.entity = entity;
 	}
 	
-	/**
-	 * Initialization logic.
-	 */
-	public void initialize() {
-	}
-	
-	/**
-	 * Cleanup logic.
-	 */
+	// TODO: Remove
 	public void cleanup() {
-	}
-	
-	/**
-	 * Update logic.
-	 * @param delta Time since last update.
-	 */
-	public void update(final float delta) {
 	}
 	
 }

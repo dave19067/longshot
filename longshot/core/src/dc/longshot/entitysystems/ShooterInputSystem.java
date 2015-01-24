@@ -14,7 +14,7 @@ import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 
-public final class ShooterInputSystem implements EntitySystem {
+public final class ShooterInputSystem extends EntitySystem {
 	
 	private final EntityManager entityManager;
 	

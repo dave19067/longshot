@@ -10,7 +10,7 @@ import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.HealthPart;
 
-public final class CollisionDamageSystem implements EntitySystem {
+public final class CollisionDamageSystem extends EntitySystem {
 	
 	private final CollisionManager collisionManager;
 

@@ -5,7 +5,7 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.parts.TimedDeathPart;
 
-public final class TimedDeathSystem implements EntitySystem {
+public final class TimedDeathSystem extends EntitySystem {
 
 	private final EntityManager entityManager;
 	
@@ -16,7 +16,9 @@ public final class TimedDeathSystem implements EntitySystem {
 	@Override
 	public void update(final float delta, final Entity entity) {
 		if (entity.hasActive(TimedDeathPart.class)) {
-			if (entity.get(TimedDeathPart.class).isDead()) {
+			TimedDeathPart timedDeathPart = entity.get(TimedDeathPart.class);
+			timedDeathPart.update(delta);
+			if (timedDeathPart.isDead()) {
 				entityManager.remove(entity);
 			}
 		}

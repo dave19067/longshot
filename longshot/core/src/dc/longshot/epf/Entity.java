@@ -13,11 +13,8 @@ import java.util.Map;
  */
 public class Entity {
 	
-	private boolean isInitialized = false;
 	private boolean isActive = false;
 	private final Map<Class<? extends Part>, Part> parts = new HashMap<Class<? extends Part>, Part>();
-	private final List<Part> partsToAdd = new ArrayList<Part>();
-	private final List<Class<? extends Part>> partsToRemove = new ArrayList<Class<? extends Part>>();
 	
 	/**
 	 * @return If the entity will be updated.
@@ -96,27 +93,6 @@ public class Entity {
 		
 		parts.put(part.getClass(), part);
 		part.setEntity(this);
-		
-		if (isInitialized) {
-			part.initialize();
-		}
-	}
-	
-	/**
-	 * If a part of the same type already exists, removes the existing part.  Adds the passed in part.
-	 * @param part The part.
-	 */
-	public final void replace(final Part part) {
-		if (has(part.getClass())) {
-			detach(part.getClass());
-		}
-		
-		if (isInitialized) {
-			partsToAdd.add(part);
-		}
-		else {
-			attach(part);
-		}
 	}
 	
 	/**
@@ -124,58 +100,17 @@ public class Entity {
 	 * @param partClass The class of the part to remove.
 	 */
 	public final <T extends Part> void detach(final Class<T> partClass) {
-		if (has(partClass) && !partsToRemove.contains(partClass)) {
-			partsToRemove.add(partClass);
+		if (!has(partClass)) {
+			throw new IllegalArgumentException("Part of type " + partClass.getName() + " could not be found.");
 		}
+		parts.remove(partClass);
 	}
 	
-	/**
-	 * Makes the entity active.  Initializes attached parts.
-	 */
-	public final void initialize() {
-		isInitialized = true;
-		isActive = true;
-		for (Part part : parts.values()) {
-			part.initialize();
-		}
-	}
-	
-	/**
-	 * Makes the entity inactive.  Cleans up attached parts.
-	 */
 	public final void cleanup() {
 		isActive = false;
 		for (Part part : parts.values()) {
 			part.cleanup();
 		}
-	}
-	
-	/**
-	 * Updates attached parts.  Removes detached parts and adds newly attached parts.
-	 * @param delta Time passed since the last update.
-	 */
-	public final void update(final float delta) {
-		for (Part part : parts.values()) {
-			if (part.isActive()) {
-				part.update(delta);
-			}
-		}
-		
-		while (!partsToRemove.isEmpty()) {
-			remove(partsToRemove.remove(0));
-		}
-		
-		while (!partsToAdd.isEmpty()) {
-			attach(partsToAdd.remove(0));
-		}
-	}
-	
-	private <T extends Part> void remove(final Class<T> partClass) {
-		if (!has(partClass)) {
-			throw new IllegalArgumentException("Part of type " + partClass.getName() + " could not be found.");
-		}
-		parts.get(partClass).cleanup();
-		parts.remove(partClass);
 	}
 	
 }

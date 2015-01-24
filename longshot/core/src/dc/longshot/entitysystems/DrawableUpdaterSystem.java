@@ -9,7 +9,7 @@ import dc.longshot.geometry.UnitConvert;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.TransformPart;
 
-public final class DrawableUpdaterSystem implements EntitySystem {
+public final class DrawableUpdaterSystem extends EntitySystem {
 
 	@Override
 	public void update(final float delta, final Entity entity) {

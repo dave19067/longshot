@@ -13,7 +13,7 @@ import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.BoundsPart;
 import dc.longshot.parts.TransformPart;
 
-public final class BoundPositionSystem implements EntitySystem {
+public final class BoundPositionSystem extends EntitySystem {
 	
 	private final Rectangle boundsBox;
 

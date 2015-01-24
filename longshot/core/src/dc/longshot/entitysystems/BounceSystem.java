@@ -9,15 +9,14 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.Bound;
 import dc.longshot.parts.BouncePart;
-import dc.longshot.parts.ShotStatsPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
-public final class BounceSystem implements EntitySystem {
+public final class BounceSystem extends EntitySystem {
 	
 	private final Rectangle boundsBox;
 	
-	public BounceSystem(Rectangle boundsBox) {
+	public BounceSystem(final Rectangle boundsBox) {
 		this.boundsBox = boundsBox;
 	}
 	
@@ -56,16 +55,6 @@ public final class BounceSystem implements EntitySystem {
 			}
 			
 			entity.get(TranslatePart.class).setVelocity(newVelocity);
-			increaseBounceStat(entity, bounds);
-		}
-	}
-	
-	private void increaseBounceStat(Entity entity, List<Bound> bounds) {
-		if (entity.hasActive(ShotStatsPart.class)) {
-			if (bounds.contains(Bound.RIGHT) || bounds.contains(Bound.LEFT)) {
-				ShotStatsPart shotStatsPart = entity.get(ShotStatsPart.class);
-				shotStatsPart.setBounceNum(shotStatsPart.getBounceNum() + 1);
-			}
 		}
 	}
 	

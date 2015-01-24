@@ -13,7 +13,7 @@ import dc.longshot.parts.RotateToCursorPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.ui.UIUtils;
 
-public final class RotateToCursorSystem implements EntitySystem {
+public final class RotateToCursorSystem extends EntitySystem {
 	
 	private final Camera camera;
 	private final Table worldTable;
@@ -22,7 +22,7 @@ public final class RotateToCursorSystem implements EntitySystem {
 		this.camera = camera;
 		this.worldTable = worldTable;
 	}
-
+	
 	@Override
 	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(RotateToCursorPart.class)) {

@@ -9,7 +9,14 @@ import dc.longshot.geometry.UnitConvert;
 import dc.longshot.parts.LightPart;
 import dc.longshot.parts.TransformPart;
 
-public final class LightSystem implements EntitySystem {
+public final class LightSystem extends EntitySystem {
+
+	@Override
+	public final void initialize(final Entity entity) {
+		if (entity.hasActive(LightPart.class)) {
+			entity.get(LightPart.class).getLight().setActive(true);
+		}
+	}
 
 	@Override
 	public final void update(final float delta, final Entity entity) {

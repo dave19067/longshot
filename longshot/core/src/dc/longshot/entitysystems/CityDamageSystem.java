@@ -14,7 +14,7 @@ import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.TransformPart;
 
-public final class CityDamageSystem implements EntitySystem {
+public final class CityDamageSystem extends EntitySystem {
 	
 	private final Rectangle boundsBox;
 	private final LevelSession levelSession;

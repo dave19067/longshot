@@ -20,19 +20,13 @@ public final class WanderMovementPart extends Part {
 		this.idleToMoveRatio = idleToMoveRatio;
 	}
 	
-	@Override
-	public final void initialize() {
-		act();
-	}
-	
-	@Override
 	public final void update(final float delta) {
 		if (MathUtils.randomBoolean(delta / decisionRate)) {
 			act();
 		}
 	}
 	
-	private void act() {
+	public final void act() {
 		TranslatePart translatePart = entity.get(TranslatePart.class);
 		Vector2 direction;
 		if (MathUtils.randomBoolean(idleToMoveRatio / (idleToMoveRatio + 1))) {

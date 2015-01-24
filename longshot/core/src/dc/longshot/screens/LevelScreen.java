@@ -38,11 +38,13 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import dc.longshot.collision.CollisionManager;
 import dc.longshot.entitysystems.AttachmentSystem;
+import dc.longshot.entitysystems.AutoRotateSystem;
 import dc.longshot.entitysystems.BounceSystem;
 import dc.longshot.entitysystems.BoundPositionSystem;
 import dc.longshot.entitysystems.BoundsRemoveSystem;
 import dc.longshot.entitysystems.CityDamageSystem;
 import dc.longshot.entitysystems.CollisionDamageSystem;
+import dc.longshot.entitysystems.ColorChangeSystem;
 import dc.longshot.entitysystems.CurvedMovementSystem;
 import dc.longshot.entitysystems.DrawableUpdaterSystem;
 import dc.longshot.entitysystems.EmitSystem;
@@ -57,7 +59,10 @@ import dc.longshot.entitysystems.ShooterInputSystem;
 import dc.longshot.entitysystems.SpinSystem;
 import dc.longshot.entitysystems.TargetShooterSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
+import dc.longshot.entitysystems.TranslateSystem;
+import dc.longshot.entitysystems.WanderMovementSystem;
 import dc.longshot.entitysystems.WaypointsSystem;
+import dc.longshot.entitysystems.WeaponSystem;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityAddedListener;
 import dc.longshot.epf.EntityManager;
@@ -267,6 +272,10 @@ public final class LevelScreen implements Screen {
 		return new EntityAddedListener() {
 			@Override
 			public void created(final Entity entity) {
+				for (EntitySystem entitySystem : entitySystems) {
+					entitySystem.initialize(entity);
+				}
+				
 				if (entity.hasActive(HealthPart.class)) {
 					entity.get(HealthPart.class).addNoHealthListener(noHealth(entity));
 				}
@@ -302,6 +311,9 @@ public final class LevelScreen implements Screen {
 		return new EntityRemovedListener() {
 			@Override
 			public void removed(final Entity entity) {
+				for (EntitySystem entitySystem : entitySystems) {
+					entitySystem.cleanup(entity);
+				}
 				if (entity.hasActive(SpawnOnDeathPart.class)) {
 					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
 					entityManager.add(spawn);
@@ -416,12 +428,16 @@ public final class LevelScreen implements Screen {
 	
 	private void setupSystems() {
 		entitySystems = new ArrayList<EntitySystem>();
+		entitySystems.add(new TranslateSystem());
 		entitySystems.add(new GravitySystem());
+		entitySystems.add(new AutoRotateSystem());
 		entitySystems.add(new BounceSystem(level.getBoundsBox()));
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
 		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
 		entitySystems.add(new EmitSystem(entityManager));
+		entitySystems.add(new WanderMovementSystem());
+		entitySystems.add(new WeaponSystem());
 		entitySystems.add(new TargetShooterSystem(entityManager));
 		entitySystems.add(new GroundShooterSystem(entityManager, level.getBoundsBox()));
 		entitySystems.add(new InputMovementSystem(inputActions));
@@ -435,6 +451,7 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new FollowerSystem());
 		entitySystems.add(new DrawableUpdaterSystem());
 		entitySystems.add(new SpinSystem());
+		entitySystems.add(new ColorChangeSystem());
 		entitySystems.add(new LightSystem());
 		entitySystems.add(new GhostSystem(soundCache));
 	}
@@ -501,7 +518,6 @@ public final class LevelScreen implements Screen {
 	
 	private void updateEntities(final float delta) {
 		for (Entity entity : entityManager.getManaged()) {
-			entity.update(delta);
 			for (EntitySystem entitySystem : entitySystems) {
 				entitySystem.update(delta, entity);
 			}

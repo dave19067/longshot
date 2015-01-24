@@ -7,7 +7,7 @@ import dc.longshot.epf.EntitySystem;
 import dc.longshot.parts.GravityPart;
 import dc.longshot.parts.TranslatePart;
 
-public final class GravitySystem implements EntitySystem {
+public final class GravitySystem extends EntitySystem {
 
 	/**
 	 * Gravity acceleration in world units/s^2.
