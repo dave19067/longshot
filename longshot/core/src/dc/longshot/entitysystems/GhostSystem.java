@@ -24,7 +24,7 @@ public final class GhostSystem extends EntitySystem {
 
 	@Override
 	public void update(final float delta, final Entity entity) {
-		if (entity.has(GhostPart.class)) {
+		if (entity.hasActive(GhostPart.class)) {
 			GhostPart ghostPart = entity.get(GhostPart.class);
 			if (ghostPart.ghostMode()) {
 				Timer ghostTimer = ghostPart.getGhostTimer();

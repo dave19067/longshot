@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
-import dc.longshot.game.LevelUtils;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.EntityType;
@@ -104,6 +103,8 @@ public final class LevelController {
 		case UFO:
 			placeInSpace(spawn);
 			break;
+		default:
+			throw new IllegalArgumentException("Could not spawn unsupported entity type " + spawnInfo.entityType);
 		}
 		entityManager.add(spawn);
 	}

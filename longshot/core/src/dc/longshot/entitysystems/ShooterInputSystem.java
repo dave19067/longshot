@@ -9,6 +9,8 @@ import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.level.EntityFactory;
+import dc.longshot.level.LevelUtils;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
@@ -17,9 +19,11 @@ import dc.longshot.parts.WeaponPart;
 public final class ShooterInputSystem extends EntitySystem {
 	
 	private final EntityManager entityManager;
+	private final EntityFactory entityFactory;
 	
-	public ShooterInputSystem(final EntityManager entityManager) {
+	public ShooterInputSystem(final EntityManager entityManager, final EntityFactory entityFactory) {
 		this.entityManager = entityManager;
+		this.entityFactory = entityFactory;
 	}
 
 	@Override
@@ -28,7 +32,7 @@ public final class ShooterInputSystem extends EntitySystem {
 			if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
-					Entity bullet = weaponPart.createSpawn();
+					Entity bullet =  LevelUtils.createWeaponSpawn(entity, entityFactory);
 					Entity cannon = entity.get(AttachmentPart.class).getAttachedEntity();
 					Vector2 spawnPosition = getMiddleOfCannonMouth(cannon, bullet);
 					bullet.get(TransformPart.class).setPosition(spawnPosition);

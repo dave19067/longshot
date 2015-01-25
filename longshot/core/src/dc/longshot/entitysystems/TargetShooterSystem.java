@@ -6,6 +6,8 @@ import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.level.EntityFactory;
+import dc.longshot.level.LevelUtils;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TargetShooterPart;
 import dc.longshot.parts.TransformPart;
@@ -15,9 +17,11 @@ import dc.longshot.parts.WeaponPart;
 public final class TargetShooterSystem extends EntitySystem {
 	
 	private final EntityManager entityManager;
+	private final EntityFactory entityFactory;
 	
-	public TargetShooterSystem(final EntityManager entityManager) {
+	public TargetShooterSystem(final EntityManager entityManager, final EntityFactory entityFactory) {
 		this.entityManager = entityManager;
+		this.entityFactory = entityFactory;
 	}
 
 	@Override
@@ -39,10 +43,10 @@ public final class TargetShooterSystem extends EntitySystem {
 		}
 	}
 	
-	private void spawn(final Entity entity, final Entity other) {
-		Entity spawn = entity.get(WeaponPart.class).createSpawn();
+	private void spawn(final Entity entity, final Entity target) {
+		Entity spawn = LevelUtils.createWeaponSpawn(entity, entityFactory);
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
-		TransformPart otherTransform = other.get(TransformPart.class);
+		TransformPart otherTransform = target.get(TransformPart.class);
 		spawn.get(TranslatePart.class).setDirection(VectorUtils.offset(spawnTransform.getCenter(), 
 				otherTransform.getCenter()));
 		entityManager.add(spawn);

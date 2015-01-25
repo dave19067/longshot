@@ -44,7 +44,7 @@ import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
-import dc.longshot.parts.EmitterPart;
+import dc.longshot.parts.EmitPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.GhostPart;
@@ -82,6 +82,9 @@ public final class EntityFactory {
 	public final Entity create(final EntityType entityType) {
 		Entity entity;
 		switch (entityType) {
+			case SHOOTER_BULLET:
+				entity = createShooterBullet();
+				break;
 			case MISSILE:
 				entity = createMissile();
 				break;
@@ -91,11 +94,25 @@ public final class EntityFactory {
 			case UFO:
 				entity = createUFOGlow();
 				break;
+			case LASER:
+				entity = createEnemyBullet(new Vector3(0.3f, 0.1f, 0.1f), SpriteKey.GREEN, 
+						new PointLight(rayHandler, 8, Color.GREEN, 100, 0, 0));
+				break;
 			case SAW:
 				entity = createSaw();
 				break;
 			case CATERPILLAR:
 				entity = createCaterpillar();
+				break;
+			case PELLET:
+				entity = createEnemyBullet(new Vector3(0.2f, 0.2f, 0.2f), SpriteKey.PELLET, 
+						new PointLight(rayHandler, 8, Color.ORANGE, 50, 0, 0));
+				break;
+			case SMOKE_SMALL:
+				entity = createTrailParticle(new Vector3(0.1f, 0.1f, 0.1f), Color.GRAY.cpy(), Color.CLEAR.cpy());
+				break;
+			case SMOKE_BIG:
+				entity = createTrailParticle(new Vector3(0.5f, 0.5f, 0.5f), Color.GRAY.cpy(), Color.CLEAR.cpy());
 				break;
 			default:
 				throw new IllegalArgumentException(entityType + " is not a valid entity type to create");
@@ -114,7 +131,7 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
-		entity.attach(new WeaponPart(createShooterBullet(), 2, 0.5f));
+		entity.attach(new WeaponPart(EntityType.SHOOTER_BULLET, 2, 0.5f));
 		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
 		PolygonRegion region = RegionFactory.createPolygonRegion(outlineTexture);
 		entity.attach(new AttachmentPart(cannon));
@@ -160,19 +177,15 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createMissile() {
-		Entity trailParticle = createTrailParticle(new Vector3(0.1f, 0.1f, 0.1f), Color.GRAY.cpy(), Color.CLEAR.cpy());
-		Entity entity = createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 0.5f, SpriteKey.MISSILE, trailParticle);
-		return entity;
+		return createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 0.5f, SpriteKey.MISSILE, EntityType.SMOKE_SMALL);
 	}
 	
 	public final Entity createNuke() {
-		Entity trailParticle = createTrailParticle(new Vector3(0.5f, 0.5f, 0.5f), Color.GRAY.cpy(), Color.CLEAR.cpy());
-		Entity entity = createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 2, SpriteKey.NUKE, trailParticle);
-		return entity;
+		return createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 2, SpriteKey.NUKE, EntityType.SMOKE_BIG);
 	}
 	
 	public final Entity createProjectile(final Vector3 size, final float damage, final float explosionRadius, 
-			final SpriteKey spriteKey, final Entity trailParticle) {
+			final SpriteKey spriteKey, final EntityType entityType) {
 		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));
@@ -188,7 +201,7 @@ public final class EntityFactory {
 		List<CollisionType> collisionTypes = new ArrayList<CollisionType>();
 		collisionTypes.add(CollisionType.PLAYER);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, damage));
-		entity.attach(new EmitterPart(trailParticle, new Vector2(size.x / 2, size.y / 2), 0.2f));
+		entity.attach(new EmitPart(entityType, new Vector2(size.x / 2, size.y / 2), 0.2f));
 		entity.attach(new SpawnOnDeathPart(createExplosion(explosionRadius, 3, 1)));
 		entity.attach(new CityDamagePart());
 		Light light = new PointLight(rayHandler, 8, Color.YELLOW, 100, 0, 0);
@@ -223,8 +236,7 @@ public final class EntityFactory {
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 1)));
 		entity.attach(new WanderMovementPart(3, 1));
-		entity.attach(new WeaponPart(createEnemyBullet(new Vector3(0.3f, 0.1f, 0.1f), SpriteKey.GREEN, 
-				new PointLight(rayHandler, 8, Color.GREEN, 100, 0, 0)), 1, 0));
+		entity.attach(new WeaponPart(EntityType.LASER, 1, 0));
 		entity.attach(new TargetShooterPart(3, Alliance.PLAYER));
 		entity.attach(new FragsPart());
 		return entity;
@@ -318,8 +330,7 @@ public final class EntityFactory {
 		entity.attach(new SpawnOnDeathPart(createExplosion(1, 3, 0)));
 		entity.attach(new WaypointsPart());
 		entity.attach(new FragsPart());
-		entity.attach(new WeaponPart(createEnemyBullet(new Vector3(0.2f, 0.2f, 0.2f), SpriteKey.PELLET, 
-				new PointLight(rayHandler, 8, Color.ORANGE, 50, 0, 0)), 1, 10));
+		entity.attach(new WeaponPart(EntityType.PELLET, 1, 10));
 		entity.attach(new GroundShooterPart());
 		return entity;
 	}

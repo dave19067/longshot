@@ -76,7 +76,7 @@ public final class EntityManager {
 		Iterator<Entity> it = entities.iterator();
 		while (it.hasNext()) {
 			Entity entity = it.next();
-			entity.cleanup();
+			entity.setActive(false);
 			it.remove();
 		}
 	}
@@ -95,7 +95,7 @@ public final class EntityManager {
 		while (!entitiesToRemove.isEmpty()) {
 			Entity entityToRemove = entitiesToRemove.remove(0);
 			if (entities.remove(entityToRemove)) {
-				entityToRemove.cleanup();
+				entityToRemove.setActive(false);
 				entityRemovedDelegate.notify(new EntityRemovedEvent(entityToRemove));
 			}
 		}

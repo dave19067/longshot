@@ -106,11 +106,4 @@ public class Entity {
 		parts.remove(partClass);
 	}
 	
-	public final void cleanup() {
-		isActive = false;
-		for (Part part : parts.values()) {
-			part.cleanup();
-		}
-	}
-	
 }

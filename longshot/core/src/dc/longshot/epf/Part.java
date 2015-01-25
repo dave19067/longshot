@@ -8,6 +8,7 @@ package dc.longshot.epf;
 public abstract class Part {
 
 	private boolean isActive = true;
+	// TODO: Remove
 	protected Entity entity;
 	
 	/**
@@ -34,10 +35,6 @@ public abstract class Part {
 	 */
 	public final void setEntity(final Entity entity) {
 		this.entity = entity;
-	}
-	
-	// TODO: Remove
-	public void cleanup() {
 	}
 	
 }

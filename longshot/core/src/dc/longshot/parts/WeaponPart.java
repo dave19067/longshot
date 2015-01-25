@@ -6,46 +6,36 @@ import java.util.List;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.Part;
-import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.util.Cloning;
+import dc.longshot.models.EntityType;
 import dc.longshot.util.Timer;
 
 public final class WeaponPart extends Part {
 	
-	private final Entity original;
+	private final EntityType entityType;
 	private final List<Entity> spawns = new ArrayList<Entity>();
 	private final int maxSpawns;
 	private final Timer spawnTimer;
 
-	public WeaponPart(final Entity original, final int maxSpawns, final float maxSpawnTime) {
-		this.original = original;
+	public WeaponPart(final EntityType entityType, final int maxSpawns, final float maxSpawnTime) {
+		this.entityType = entityType;
 		this.maxSpawns = maxSpawns;
 		spawnTimer = new Timer(maxSpawnTime);
+	}
+	
+	public final EntityType getEntityType() {
+		return entityType;
+	}
+	
+	public final void addSpawn(final Entity spawn) {
+		spawns.add(spawn);
 	}
 	
 	public final boolean canSpawn() {
 		return spawnTimer.isElapsed() && spawns.size() < maxSpawns;
 	}
 	
-	public final Entity createSpawn() {
-		if (canSpawn()) {
-			spawnTimer.reset();
-			Entity spawn = Cloning.clone(original);
-			TransformPart spawnTransform = spawn.get(TransformPart.class);
-			TransformPart transform = entity.get(TransformPart.class);
-			spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
-					spawnTransform.getBoundingSize()));
-			spawns.add(spawn);
-			return spawn;
-		}
-		else {
-			throw new IllegalStateException("Cannot create spawn");
-		}
-	}
-
-	@Override
-	public final void cleanup() {
-		original.cleanup();
+	public final void reset() {
+		spawnTimer.reset();
 	}
 	
 	public final void update(final float delta) {

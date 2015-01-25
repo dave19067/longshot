@@ -24,10 +24,4 @@ public final class LightPart extends Part {
 		return local;
 	}
 	
-	@Override
-	public final void cleanup() {
-		light.remove();
-		light.dispose();
-	}
-	
 }

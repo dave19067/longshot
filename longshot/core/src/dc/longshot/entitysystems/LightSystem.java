@@ -1,5 +1,7 @@
 package dc.longshot.entitysystems;
 
+import box2dLight.Light;
+
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
@@ -15,6 +17,15 @@ public final class LightSystem extends EntitySystem {
 	public final void initialize(final Entity entity) {
 		if (entity.hasActive(LightPart.class)) {
 			entity.get(LightPart.class).getLight().setActive(true);
+		}
+	}
+	
+	@Override
+	public final void cleanup(final Entity entity) {
+		if (entity.hasActive(LightPart.class)) {
+			Light light = entity.get(LightPart.class).getLight();
+			light.remove();
+			light.dispose();
 		}
 	}
 
