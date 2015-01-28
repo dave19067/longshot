@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.game.EntityUtils;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.InputAction;
 import dc.longshot.parts.AlliancePart;
@@ -30,8 +31,8 @@ public final class InputMovementSystem extends EntitySystem {
 				}
 				if (isPerformed(InputAction.RIGHT)) {
 					moveDirection.x += 1;
-				}	
-				entity.get(TranslatePart.class).setDirection(moveDirection);
+				}
+				EntityUtils.setDirection(entity, moveDirection);
 			}
 		}
 	}

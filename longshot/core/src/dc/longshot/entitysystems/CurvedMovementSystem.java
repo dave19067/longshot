@@ -13,6 +13,7 @@ import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.LinearUtils;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.level.LevelUtils;
 import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
@@ -34,11 +35,12 @@ public final class CurvedMovementSystem extends EntitySystem {
 			WaypointsPart waypointsPart = entity.get(WaypointsPart.class);
 			TransformPart transformPart = entity.get(TransformPart.class);
 			float maxDistanceCovered = LinearUtils.distance(entity.get(SpeedPart.class).getSpeed(), delta);
-			if (!waypointsPart.hasWaypoints()) {
+			List<Vector2> waypoints = waypointsPart.getWaypoints();
+			if (waypoints.isEmpty()) {
 				setCurveWaypoints(entity, transformPart.getCenter());
 			}
-			else if (maxDistanceCovered >= waypointsPart.getPathDistance()) {
-				Vector2 lastWaypoint = waypointsPart.getWaypoints().get(waypointsPart.getWaypoints().size() - 1);
+			else if (maxDistanceCovered >= LevelUtils.getPathDistance(entity)) {
+				Vector2 lastWaypoint = waypoints.get(waypoints.size() - 1);
 				setCurveWaypoints(entity, lastWaypoint);
 			}
 		}

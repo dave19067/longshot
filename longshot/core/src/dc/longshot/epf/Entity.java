@@ -90,9 +90,7 @@ public class Entity {
 		if (has(part.getClass())) {
 			throw new IllegalArgumentException("Part of type " + part.getClass().getName() + " is already attached.");
 		}
-		
 		parts.put(part.getClass(), part);
-		part.setEntity(this);
 	}
 	
 	/**

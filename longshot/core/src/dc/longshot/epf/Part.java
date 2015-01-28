@@ -8,9 +8,7 @@ package dc.longshot.epf;
 public abstract class Part {
 
 	private boolean isActive = true;
-	// TODO: Remove
-	protected Entity entity;
-	
+
 	/**
 	 * @return If the part will be updated.
 	 */
@@ -20,21 +18,6 @@ public abstract class Part {
 	
 	public final void setActive(final boolean isActive) {
 		this.isActive = isActive;
-	}
-	
-	/**
-	 * @return The entity the part is attached to.
-	 */
-	public final Entity getEntity() {
-		return entity;
-	}
-	
-	/**
-	 * Sets the entity the part is attached to.
-	 * @param entity The entity.
-	 */
-	public final void setEntity(final Entity entity) {
-		this.entity = entity;
 	}
 	
 }

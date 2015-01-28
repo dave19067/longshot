@@ -92,6 +92,8 @@ import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsRemovePart;
+import dc.longshot.parts.CollisionTypePart;
+import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
@@ -104,12 +106,14 @@ import dc.longshot.parts.SoundOnDeathPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.WaypointsPart;
+import dc.longshot.parts.WeaponPart;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
+import dc.longshot.util.Cloning;
 import dc.longshot.util.ColorUtils;
 
 public final class LevelScreen implements Screen {
@@ -314,10 +318,7 @@ public final class LevelScreen implements Screen {
 				for (EntitySystem entitySystem : entitySystems) {
 					entitySystem.cleanup(entity);
 				}
-				if (entity.hasActive(SpawnOnDeathPart.class)) {
-					Entity spawn = entity.get(SpawnOnDeathPart.class).createSpawn();
-					entityManager.add(spawn);
-				}
+				spawnOnDeath(entity);
 				if (entity.hasActive(FragsPart.class)) {
 					DrawablePart drawablePart = entity.get(DrawablePart.class);
 					Polygon polygon = entity.get(TransformPart.class).getPolygon();
@@ -346,6 +347,18 @@ public final class LevelScreen implements Screen {
 		};
 	}
 	
+	private void spawnOnDeath(final Entity entity) {
+		if (entity.hasActive(SpawnOnDeathPart.class)) {
+			Entity original = entity.get(SpawnOnDeathPart.class).getOriginal();
+			Entity spawn = Cloning.clone(original);
+			TransformPart spawnTransform = spawn.get(TransformPart.class);
+			Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
+					spawnTransform.getBoundingSize());
+			spawnTransform.setPosition(position);
+			entityManager.add(spawn);
+		}
+	}
+	
 	private NoArgsListener noHealth(final Entity entity) {
 		return new NoArgsListener() {
 			@Override
@@ -355,13 +368,23 @@ public final class LevelScreen implements Screen {
 					soundCache.play(soundKey);
 				}
 				if (entity.hasActive(GhostPart.class)) {
-					entity.get(GhostPart.class).activate();
+					activateGhostMode(entity);
 				}
 				else {
 					entityManager.remove(entity);
 				}
 			}
 		};
+	}
+	
+	private void activateGhostMode(final Entity entity) {
+		GhostPart ghostPart = entity.get(GhostPart.class);
+		ghostPart.setGhostMode(true);
+		PolygonRegion ghostRegion = ghostPart.getGhostRegion();
+		entity.get(DrawablePart.class).getSprite().setRegion(ghostRegion);
+		entity.get(CollisionTypePart.class).setActive(false);
+		entity.get(DamageOnCollisionPart.class).setActive(false);
+		entity.get(WeaponPart.class).setActive(false);
 	}
 	
 	private void setupCamera() {

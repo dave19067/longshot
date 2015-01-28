@@ -6,7 +6,6 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Part;
-import dc.longshot.geometry.VectorUtils;
 
 public final class WaypointsPart extends Part {
 
@@ -28,19 +27,15 @@ public final class WaypointsPart extends Part {
 		this.endBuffer = endBuffer;
 	}
 	
-	public final boolean hasWaypoints() {
-		return waypoints.size() > 0;
-	}
-	
 	public final Vector2 getCurrentWaypoint() {
-		if (!hasWaypoints()) {
+		if (waypoints.isEmpty()) {
 			throw new UnsupportedOperationException("Could not get current waypoint because there are no waypoints");
 		}
 		return waypoints.get(0);
 	}
 	
 	public final void removeCurrentWaypoint() {
-		if (!hasWaypoints()) {
+		if (waypoints.isEmpty()) {
 			throw new UnsupportedOperationException("Could not remove current waypoint because there are no waypoints");
 		}
 		waypoints.remove(0);
@@ -56,18 +51,6 @@ public final class WaypointsPart extends Part {
 	
 	public final void addWaypoints(final List<Vector2> waypoints) {
 		this.waypoints.addAll(waypoints);
-	}
-	
-	public final float getPathDistance() {
-		float distance = 0;
-		Vector2 start = entity.get(TransformPart.class).getCenter();
-		if (waypoints.size() > 0) {
-			distance += VectorUtils.offset(start, waypoints.get(0)).len();
-			for (int i = 1; i < waypoints.size(); i++) {
-				distance += VectorUtils.offset(waypoints.get(i - 1), waypoints.get(i)).len();
-			}
-		}
-		return distance;
 	}
 	
 }

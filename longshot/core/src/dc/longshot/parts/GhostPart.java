@@ -24,33 +24,28 @@ public final class GhostPart extends Part {
 		return ghostMode;
 	}
 	
+	public final void setGhostMode(final boolean ghostMode) {
+		this.ghostMode = ghostMode;
+	}
+	
 	public final Timer getGhostTimer() {
 		return ghostTimer;
 	}
 	
+	public final PolygonRegion getNormalRegion() {
+		return normalRegion;
+	}
+	
+	public final void setNormalRegion(final PolygonRegion normalRegion) {
+		this.normalRegion = normalRegion;
+	}
+	
+	public final PolygonRegion getGhostRegion() {
+		return ghostRegion;
+	}
+	
 	public final SoundKey getDeactivateSound() {
 		return deactivateSound;
-	}
-	
-	public final void activate() {
-		ghostMode = true;
-		entity.get(DrawablePart.class).getSprite().setRegion(ghostRegion);
-		entity.get(CollisionTypePart.class).setActive(false);
-		entity.get(DamageOnCollisionPart.class).setActive(false);
-		entity.get(WeaponPart.class).setActive(false);
-	}
-	
-	public final void deactivate() {
-		ghostMode = false;
-		entity.get(DrawablePart.class).getSprite().setRegion(normalRegion);
-		entity.get(HealthPart.class).reset();
-		entity.get(CollisionTypePart.class).setActive(true);
-		entity.get(DamageOnCollisionPart.class).setActive(true);
-		entity.get(WeaponPart.class).setActive(true);
-	}
-	
-	public final void initialize() {
-		normalRegion = entity.get(DrawablePart.class).getSprite().getRegion();
 	}
 
 }

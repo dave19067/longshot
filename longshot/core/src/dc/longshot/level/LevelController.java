@@ -46,7 +46,7 @@ public final class LevelController {
 				break;
 			}
 		}
-		return !enemiesExist && spawnInfos.size() <= 0;
+		return !enemiesExist && spawnInfos.isEmpty();
 	}
 	
 	public final void update(final float delta) {

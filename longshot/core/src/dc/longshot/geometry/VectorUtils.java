@@ -37,7 +37,7 @@ public final class VectorUtils {
 		return new Vector2(MathUtils.cosDeg(degrees), MathUtils.sinDeg(degrees));
 	}
 	
-	public static float relativeMiddle(final float pivotMiddle, final float objectLength) {
+	public static final float relativeMiddle(final float pivotMiddle, final float objectLength) {
 		return pivotMiddle - objectLength / 2;
 	}
 	

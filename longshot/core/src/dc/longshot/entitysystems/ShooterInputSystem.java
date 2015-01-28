@@ -7,13 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.level.EntityFactory;
 import dc.longshot.level.LevelUtils;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.TransformPart;
-import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WeaponPart;
 
 public final class ShooterInputSystem extends EntitySystem {
@@ -38,7 +38,7 @@ public final class ShooterInputSystem extends EntitySystem {
 					bullet.get(TransformPart.class).setPosition(spawnPosition);
 					Vector2 direction = VectorUtils.fromAngle(
 							cannon.get(TransformPart.class).getRotation());
-					bullet.get(TranslatePart.class).setDirection(direction);
+					EntityUtils.setDirection(bullet, direction);
 					entityManager.add(bullet);
 				}
 			}
