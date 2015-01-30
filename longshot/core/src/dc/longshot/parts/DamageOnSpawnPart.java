@@ -1,8 +1,6 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
-
-public final class DamageOnSpawnPart extends Part {
+public final class DamageOnSpawnPart {
 
 	private final float radius;
 	private final float damage;

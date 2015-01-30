@@ -382,9 +382,9 @@ public final class LevelScreen implements Screen {
 		ghostPart.setGhostMode(true);
 		PolygonRegion ghostRegion = ghostPart.getGhostRegion();
 		entity.get(DrawablePart.class).getSprite().setRegion(ghostRegion);
-		entity.get(CollisionTypePart.class).setActive(false);
-		entity.get(DamageOnCollisionPart.class).setActive(false);
-		entity.get(WeaponPart.class).setActive(false);
+		entity.setActive(CollisionTypePart.class, false);
+		entity.setActive(DamageOnCollisionPart.class, false);
+		entity.setActive(WeaponPart.class, false);
 	}
 	
 	private void setupCamera() {
@@ -541,8 +541,10 @@ public final class LevelScreen implements Screen {
 	
 	private void updateEntities(final float delta) {
 		for (Entity entity : entityManager.getManaged()) {
-			for (EntitySystem entitySystem : entitySystems) {
-				entitySystem.update(delta, entity);
+			if (entity.isActive()) {
+				for (EntitySystem entitySystem : entitySystems) {
+					entitySystem.update(delta, entity);
+				}
 			}
 		}
 	}

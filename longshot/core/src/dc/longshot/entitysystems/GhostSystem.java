@@ -51,9 +51,9 @@ public final class GhostSystem extends EntitySystem {
 		PolygonRegion normalRegion = ghostPart.getNormalRegion();
 		entity.get(DrawablePart.class).getSprite().setRegion(normalRegion);
 		entity.get(HealthPart.class).reset();
-		entity.get(CollisionTypePart.class).setActive(true);
-		entity.get(DamageOnCollisionPart.class).setActive(true);
-		entity.get(WeaponPart.class).setActive(true);
+		entity.setActive(CollisionTypePart.class, true);
+		entity.setActive(DamageOnCollisionPart.class, true);
+		entity.setActive(WeaponPart.class, true);
 		soundCache.play(ghostPart.getDeactivateSound());
 	}
 

@@ -3,9 +3,8 @@ package dc.longshot.parts;
 import java.util.List;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.epf.Part;
 
-public final class FollowerPart extends Part {
+public final class FollowerPart {
 
 	private final List<Entity> followers;
 	

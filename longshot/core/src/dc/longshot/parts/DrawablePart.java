@@ -2,9 +2,7 @@ package dc.longshot.parts;
 
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 
-import dc.longshot.epf.Part;
-
-public final class DrawablePart extends Part {
+public final class DrawablePart {
 
 	private final PolygonSprite sprite;
 	private final float z;

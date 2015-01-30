@@ -1,11 +1,10 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 
-public final class HealthPart extends Part {
+public final class HealthPart {
 
 	private final EventDelegate<NoArgsListener> noHealthDelegate = new EventDelegate<NoArgsListener>();
 	

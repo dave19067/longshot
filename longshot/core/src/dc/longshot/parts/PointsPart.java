@@ -1,8 +1,6 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
-
-public final class PointsPart extends Part {
+public final class PointsPart {
 
 	private final int points;
 	

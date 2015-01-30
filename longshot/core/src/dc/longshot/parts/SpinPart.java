@@ -1,8 +1,6 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
-
-public final class SpinPart extends Part {
+public final class SpinPart {
 	
 	private final float rotationSpeed;
 	

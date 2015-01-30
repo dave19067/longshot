@@ -1,9 +1,8 @@
 package dc.longshot.parts;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.epf.Part;
 
-public final class SpawnOnDeathPart extends Part {
+public final class SpawnOnDeathPart {
 
 	private final Entity original;
 	

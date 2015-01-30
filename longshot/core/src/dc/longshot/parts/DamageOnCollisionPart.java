@@ -2,10 +2,9 @@ package dc.longshot.parts;
 
 import java.util.List;
 
-import dc.longshot.epf.Part;
 import dc.longshot.models.CollisionType;
 
-public final class DamageOnCollisionPart extends Part {
+public final class DamageOnCollisionPart {
 
 	private final List<CollisionType> collisionTypes;
 	private final float damage;

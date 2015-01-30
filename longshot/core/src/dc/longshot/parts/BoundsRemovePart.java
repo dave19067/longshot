@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import dc.longshot.epf.Part;
 import dc.longshot.geometry.Bound;
 
-public final class BoundsRemovePart extends Part {
+public final class BoundsRemovePart {
 	
 	private final List<Bound> bounds;
 	private final boolean isPartial;

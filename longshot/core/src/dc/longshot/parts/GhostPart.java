@@ -2,11 +2,10 @@ package dc.longshot.parts;
 
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 
-import dc.longshot.epf.Part;
 import dc.longshot.models.SoundKey;
 import dc.longshot.util.Timer;
 
-public final class GhostPart extends Part {
+public final class GhostPart {
 
 	private boolean ghostMode = false;
 	private final Timer ghostTimer;

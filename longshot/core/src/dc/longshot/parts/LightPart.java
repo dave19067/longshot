@@ -4,9 +4,7 @@ import box2dLight.Light;
 
 import com.badlogic.gdx.math.Vector2;
 
-import dc.longshot.epf.Part;
-
-public final class LightPart extends Part {
+public final class LightPart {
 
 	private final Light light;
 	private final Vector2 local;

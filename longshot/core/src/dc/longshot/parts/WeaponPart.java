@@ -5,11 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.epf.Part;
 import dc.longshot.models.EntityType;
 import dc.longshot.util.Timer;
 
-public final class WeaponPart extends Part {
+public final class WeaponPart {
 	
 	private final EntityType entityType;
 	private final List<Entity> spawns = new ArrayList<Entity>();

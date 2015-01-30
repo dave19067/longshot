@@ -1,8 +1,6 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
-
-public final class SpeedPart extends Part {
+public final class SpeedPart {
 
 	private float speed;
 	

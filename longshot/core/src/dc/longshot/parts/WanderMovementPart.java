@@ -1,8 +1,6 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
-
-public final class WanderMovementPart extends Part {
+public final class WanderMovementPart {
 
 	private final float decisionRate;
 	private final float idleToMoveRatio;

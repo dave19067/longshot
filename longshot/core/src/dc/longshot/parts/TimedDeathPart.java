@@ -1,9 +1,8 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
 import dc.longshot.util.Timer;
 
-public final class TimedDeathPart extends Part {
+public final class TimedDeathPart {
 
 	private final Timer deathTimer;
 	

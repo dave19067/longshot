@@ -2,11 +2,10 @@ package dc.longshot.parts;
 
 import com.badlogic.gdx.math.Vector2;
 
-import dc.longshot.epf.Part;
 import dc.longshot.models.EntityType;
 import dc.longshot.util.Timer;
 
-public final class EmitPart extends Part {
+public final class EmitPart {
 	
 	private final EntityType entityType;
 	private final Vector2 localSpawnPosition;

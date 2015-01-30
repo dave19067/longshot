@@ -1,9 +1,8 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
 import dc.longshot.models.CollisionType;
 
-public final class CollisionTypePart extends Part {
+public final class CollisionTypePart {
 
 	private final CollisionType collisionType;
 	

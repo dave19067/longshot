@@ -1,8 +1,6 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
-
-public final class CurvedMovementPart extends Part {
+public final class CurvedMovementPart {
 	
 	private final float curveSize;
 	

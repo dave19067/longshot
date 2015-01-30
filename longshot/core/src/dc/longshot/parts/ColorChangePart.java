@@ -2,10 +2,9 @@ package dc.longshot.parts;
 
 import com.badlogic.gdx.graphics.Color;
 
-import dc.longshot.epf.Part;
 import dc.longshot.util.Timer;
 
-public final class ColorChangePart extends Part {
+public final class ColorChangePart {
 
 	private final Color startColor;
 	private final Color endColor;

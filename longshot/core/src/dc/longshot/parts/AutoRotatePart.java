@@ -2,9 +2,7 @@ package dc.longshot.parts;
 
 import com.badlogic.gdx.math.Vector2;
 
-import dc.longshot.epf.Part;
-
-public final class AutoRotatePart extends Part {
+public final class AutoRotatePart {
 
 	// TODO: move oldposition to a new part
 	private Vector2 oldPosition;

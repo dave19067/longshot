@@ -5,9 +5,7 @@ import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 
-import dc.longshot.epf.Part;
-
-public final class WaypointsPart extends Part {
+public final class WaypointsPart {
 
 	private float endBuffer = 0;
 	private final List<Vector2> waypoints = new ArrayList<Vector2>();

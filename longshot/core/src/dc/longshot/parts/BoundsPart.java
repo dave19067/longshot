@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import dc.longshot.epf.Part;
 import dc.longshot.geometry.Bound;
 
-public final class BoundsPart extends Part {
+public final class BoundsPart {
 
 	private final List<Bound> bounds;
 	

@@ -4,12 +4,11 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import dc.longshot.epf.Part;
 import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
 
-public final class TransformPart extends Part {
+public final class TransformPart {
 
 	private final Polygon polygon;
 	

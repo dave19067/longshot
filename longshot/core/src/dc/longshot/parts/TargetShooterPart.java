@@ -1,9 +1,8 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
 import dc.longshot.models.Alliance;
 
-public final class TargetShooterPart extends Part {
+public final class TargetShooterPart {
 	
 	private final float shootRate;
 	private final Alliance targetAlliance;

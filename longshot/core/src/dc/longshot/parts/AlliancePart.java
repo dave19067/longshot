@@ -1,9 +1,8 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Part;
 import dc.longshot.models.Alliance;
 
-public final class AlliancePart extends Part {
+public final class AlliancePart {
 
 	private final Alliance alliance;
 	
