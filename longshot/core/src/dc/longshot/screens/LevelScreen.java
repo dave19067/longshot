@@ -13,7 +13,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -72,14 +71,12 @@ import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.BackdropManager;
-import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.Fragmenter;
 import dc.longshot.game.Skins;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
-import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.level.EntityFactory;
 import dc.longshot.level.LevelController;
@@ -88,6 +85,7 @@ import dc.longshot.models.InputAction;
 import dc.longshot.models.Level;
 import dc.longshot.models.LevelSession;
 import dc.longshot.models.PlaySession;
+import dc.longshot.models.RectangleGradient;
 import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
@@ -114,12 +112,10 @@ import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
 import dc.longshot.util.Cloning;
-import dc.longshot.util.ColorUtils;
 
 public final class LevelScreen implements Screen {
 
 	private static final float MAX_UPDATE_DELTA = 0.01f;
-	private static final Color MIDNIGHT_BLUE = ColorUtils.toGdxColor(0, 6, 18);
 	private static final int FRAG_WIDTH = 8;
 	private static final int FRAG_HEIGHT = 8;
 	private static final float FRAG_SPEED_MULTIPLIER = 50;
@@ -237,10 +233,10 @@ public final class LevelScreen implements Screen {
 		stage = new Stage(new ScreenViewport());
 		levelSession = new LevelSession();
 		levelController = new LevelController(entityManager, entityFactory, level);
+		backdropManager = new BackdropManager(entityManager, Bound.LEFT, level.getDecorationProfiles());
 		
 		Gdx.input.setCursorCatched(true);
 		setupCamera();
-		setupBackdropManager();
 		addInputProcessors();
 		setupStage();
 		setupSystems();
@@ -394,24 +390,6 @@ public final class LevelScreen implements Screen {
 		camera.position.set(levelBoundsBox.x + camera.viewportWidth / 2, 
 				levelBoundsBox.y + camera.viewportHeight / 2, 0);
 		camera.update();
-	}
-	
-	private void setupBackdropManager() {
-		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
-		
-		PolygonRegion starRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.STAR));
-		DecorationProfile starProfile = new DecorationProfile(level.getBoundsBox(), true, 1, 0.02f, 0.1f, -1000, -500, 
-				0.3f, 0.7f, starRegion);
-		decorationProfiles.add(starProfile);
-		
-		PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.CLOUD));
-		Rectangle cloudBoundsBox = level.getBoundsBox();
-		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
-		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 4, 3, 6, 1f, 2, 
-				-200, -100, 0.75f, 1.25f, cloudRegion);
-		decorationProfiles.add(cloudProfile);
-		
-		backdropManager = new BackdropManager(entityManager, Bound.LEFT, decorationProfiles);
 	}
 	
 	private void addInputProcessors() {
@@ -572,7 +550,7 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void clearScreen() {
-		Gdx.gl.glClearColor(MIDNIGHT_BLUE.r, MIDNIGHT_BLUE.g, MIDNIGHT_BLUE.b, MIDNIGHT_BLUE.a);
+		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	}
 	
@@ -585,6 +563,20 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void drawWorld() {
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeType.Filled);
+		Rectangle boundsBox = level.getBoundsBox();
+		RectangleGradient skyGradient = level.getSkyGradient();
+		shapeRenderer.rect(boundsBox.x * UnitConvert.PIXELS_PER_UNIT, 
+				boundsBox.y * UnitConvert.PIXELS_PER_UNIT, 
+				boundsBox.width * UnitConvert.PIXELS_PER_UNIT, 
+				boundsBox.height * UnitConvert.PIXELS_PER_UNIT, 
+				skyGradient.getBottomLeftColor(), 
+				skyGradient.getBottomRightColor(), 
+				skyGradient.getTopRightColor(), 
+				skyGradient.getTopLeftColor());
+		shapeRenderer.end();
+		
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
 		List<Entity> entities = entityManager.getManaged();

@@ -1,17 +1,25 @@
 package dc.longshot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 
 import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.Skins;
+import dc.longshot.geometry.PolygonUtils;
+import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.SpriteCache;
 import dc.longshot.graphics.TextureFactory;
 import dc.longshot.models.DebugSettings;
@@ -20,6 +28,7 @@ import dc.longshot.models.GameSettings;
 import dc.longshot.models.Level;
 import dc.longshot.models.Paths;
 import dc.longshot.models.PlaySession;
+import dc.longshot.models.RectangleGradient;
 import dc.longshot.models.SoundKey;
 import dc.longshot.models.SpriteKey;
 import dc.longshot.screens.HighScoresScreen;
@@ -31,11 +40,14 @@ import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.ui.controls.ScoreEntryDialog;
+import dc.longshot.util.ColorUtils;
 import dc.longshot.util.InputUtils;
 import dc.longshot.util.XmlUtils;
 
 public final class LongshotGame extends Game {
 	
+	private static final Color DUSK_COLOR = ColorUtils.toGdxColor(162, 129, 133);
+	private static final Color NIGHT_COLOR = ColorUtils.toGdxColor(15, 16, 26);
 	private static final String LEVELS_PATH = "levels/";
 	
 	private final ScreenManager screenManager = new ScreenManager();
@@ -152,7 +164,8 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelPreviewScreen createLevelPreviewScreen(final Level level) {
-		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(level.getName(), 1);
+		String levelName = "Wave " + (playSession.getLevelNum());
+		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(levelName, 1);
 		levelPreviewScreen.addNextScreenRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -236,8 +249,32 @@ public final class LongshotGame extends Game {
 	}
 	
 	private Level loadNextLevel() {
+		float nightRatio = (float)playSession.getLevelNum() / (playSession.getLevelCount() - 1);
+		Color lerpedDuskColor = DUSK_COLOR.cpy().lerp(NIGHT_COLOR, nightRatio);
 		String levelName = playSession.advanceLevel();
-		return XmlUtils.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName), new Class[] { Level.class });
+		Level level = XmlUtils.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName), new Class[] { Level.class });
+		RectangleGradient rectangleGradient = new RectangleGradient(NIGHT_COLOR, NIGHT_COLOR, lerpedDuskColor, 
+				lerpedDuskColor);
+		level.setSkyGradient(rectangleGradient);
+		level.setDecorationProfiles(createDecorationProfiles(level.getBoundsBox(), nightRatio));
+		return level;
+	}
+	
+	private List<DecorationProfile> createDecorationProfiles(final Rectangle boundsBox, final float nightRatio) {
+		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
+		if (nightRatio > 0.5f) {
+			PolygonRegion starRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.STAR));
+			DecorationProfile starProfile = new DecorationProfile(boundsBox, true, 1, 0.02f, 0.1f, -1000, -500, 
+					0.3f, 0.7f, starRegion);
+			decorationProfiles.add(starProfile);
+		}
+		PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.CLOUD));
+		Rectangle cloudBoundsBox = new Rectangle(boundsBox);
+		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
+		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, 3, 6, 1f, 2, 
+				-200, -100, 0.75f, 1.25f, cloudRegion);
+		decorationProfiles.add(cloudProfile);
+		return decorationProfiles;
 	}
 	
 }

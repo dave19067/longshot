@@ -1,15 +1,15 @@
 package dc.longshot.models;
 
-import java.util.Iterator;
 import java.util.List;
 
 public final class PlaySession {
 
 	private int score = 0;
-	private final Iterator<String> levelNames;
+	private int levelNum = 0;
+	private final List<String> levelNames;
 	
-	public PlaySession(List<String> levelNames) {
-		this.levelNames = levelNames.iterator();
+	public PlaySession(final List<String> levelNames) {
+		this.levelNames = levelNames;
 	}
 	
 	public final int getScore() {
@@ -20,15 +20,25 @@ public final class PlaySession {
 		score += points;
 	}
 	
+	public final int getLevelNum() {
+		return levelNum;
+	}
+	
+	public final int getLevelCount() {
+		return levelNames.size();
+	}
+	
 	public final boolean hasNextLevel() {
-		return levelNames.hasNext();
+		return levelNum < levelNames.size();
 	}
 	
 	public final String advanceLevel() {
 		if (!hasNextLevel()) {
 			throw new IllegalArgumentException("Could not advance level because there is not a next level.");
 		}
-		return levelNames.next();
+		String levelName = levelNames.get(levelNum);
+		levelNum++;
+		return levelName;
 	}
 	
 }

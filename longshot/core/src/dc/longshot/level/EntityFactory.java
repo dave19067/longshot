@@ -361,7 +361,7 @@ public final class EntityFactory {
 		Texture texture = spriteCache.getTexture(spriteKey);
 		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture), vertices);
 		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region), position.z);
-		Color color = Color.DARK_GRAY.cpy().lerp(Color.BLACK, position.z / minZ);
+		Color color = Color.WHITE.cpy().lerp(Color.DARK_GRAY, position.z / minZ);
 		drawablePart.getSprite().setColor(color);
 		entity.attach(drawablePart);
 		float[] shiftedVertices = region.getVertices();
