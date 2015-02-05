@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
-import dc.longshot.game.Skins;
+import dc.longshot.game.SkinPack;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.ScoreEntry;
 import dc.longshot.system.Input;
@@ -36,11 +36,11 @@ public class HighScoresScreen implements Screen {
 	private Stage stage;
 	private InputProcessor highScoresInputProcessor;
 
-	public HighScoresScreen(final GameSession gameSession) {
+	public HighScoresScreen(final SkinPack skinPack, final GameSession gameSession) {
 		this.gameSession = gameSession;
-		skin = Skins.defaultSkin;
-		font = Skins.ocrFont;
-		smallFont = Skins.ocrSmallFont;
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
+		smallFont = skinPack.getSmallFont();
 	}
 	
 	public final void addNextScreenRequestedListener(final NoArgsListener listener) {

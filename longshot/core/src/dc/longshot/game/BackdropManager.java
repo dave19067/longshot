@@ -131,8 +131,11 @@ public final class BackdropManager {
 	}
 	
 	private void place(final DecorationProfile decorationProfile, final Entity decoration, final float startX) {
-		float startY = MathUtils.random(decorationProfile.area.y, PolygonUtils.top(decorationProfile.area));
-		decoration.get(TransformPart.class).setPosition(new Vector2(startX, startY));
+		TransformPart transformPart = decoration.get(TransformPart.class);
+		float offsetY = transformPart.getPosition().y - transformPart.getBoundingBox().y;
+		float startY = MathUtils.random(decorationProfile.area.y + offsetY, 
+				PolygonUtils.top(decorationProfile.area) + offsetY);
+		transformPart.setPosition(new Vector2(startX, startY));
 		entityManager.add(decoration);
 	}
 	

@@ -30,7 +30,7 @@ import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.GameSettingsApplier;
-import dc.longshot.game.Skins;
+import dc.longshot.game.SkinPack;
 import dc.longshot.models.GameSettings;
 import dc.longshot.models.InputAction;
 import dc.longshot.models.Paths;
@@ -59,9 +59,9 @@ public final class OptionsScreen implements Screen {
 	private final Map<InputAction, Label> inputActionLabels = new HashMap<InputAction, Label>();
 	private final InputProcessor optionsInputProcessor = new OptionsInputProcessor();
 	
-	public OptionsScreen(final GameSettings gameSettings) {
-		skin = Skins.defaultSkin;
-		font = Skins.ocrFont;
+	public OptionsScreen(final SkinPack skinPack, final GameSettings gameSettings) {
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
 		this.gameSettings = gameSettings;
 	}
 	

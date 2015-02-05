@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
-import dc.longshot.game.Skins;
+import dc.longshot.game.SkinPack;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIFactory;
 
@@ -27,14 +27,14 @@ public final class LevelPreviewScreen implements Screen {
 	private final BitmapFont font;
 	private Stage stage;
 	
-	public LevelPreviewScreen(final String levelName, final float duration) {
+	public LevelPreviewScreen(final SkinPack skinPack, final String levelName, final float duration) {
 		this.levelName = levelName;
 		this.duration = duration;
-		skin = Skins.defaultSkin;
-		font = Skins.ocrFont;
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
 	}
 	
-	public final void addNextScreenRequestedListener(NoArgsListener listener) {
+	public final void addNextScreenRequestedListener(final NoArgsListener listener) {
 		nextScreenRequestedDelegate.listen(listener);
 	}
 	

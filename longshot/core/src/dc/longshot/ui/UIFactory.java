@@ -28,11 +28,16 @@ public final class UIFactory {
 		return label;
 	}
 	
-	public static final Button button(final Skin skin, final BitmapFont font, final String text, 
-			final EventListener listener) {
+	public static final Button button(final Skin skin, final BitmapFont font, final String text) {
 		TextButton button = new TextButton(text, skin);
 		button.getStyle().font = font;
 		button.setStyle(button.getStyle());
+		return button;
+	}
+	
+	public static final Button button(final Skin skin, final BitmapFont font, final String text, 
+			final EventListener listener) {
+		Button button = button(skin, font, text);
 		button.addListener(listener);
 		return button;
 	}

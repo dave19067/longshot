@@ -2,7 +2,6 @@ package dc.longshot.ui.controls;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -13,9 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import dc.longshot.game.SkinPack;
 import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
-import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
@@ -25,24 +24,20 @@ public final class PauseMenu {
 	private final Skin skin;
 	private final BitmapFont font;
 	private final Stage stage;
-	private final ScreenManager screenManager;
 	private final LevelSession levelSession;
-	private final Screen currentScreen;
-	private final Screen mainMenuScreen;
 	private Dialog dialog;
+	private Button mainMenuButton;
 
-	public PauseMenu(final Skin skin, final BitmapFont font, final Stage stage, 
-			final ScreenManager screenManager, final LevelSession levelSession, final Screen currentScreen, 
-			final Screen mainMenuScreen) {
-		this.skin = skin;
-		this.font = font;
+	public PauseMenu(final SkinPack skinPack, final Stage stage, final LevelSession levelSession) {
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
 		this.stage = stage;
-		this.screenManager = screenManager;
 		this.levelSession = levelSession;
-		this.currentScreen = currentScreen;
-		this.mainMenuScreen = mainMenuScreen;
-		
 		setupDialog();
+	}
+	
+	public final void addMainMenuButtonClickListener(final ClickListener listener) {
+		mainMenuButton.addListener(listener);
 	}
 	
 	public final void showDialog() {
@@ -61,7 +56,7 @@ public final class PauseMenu {
 		table.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		Button resumeButton = UIFactory.button(skin, font, "Resume", resumeButtonClicked(dialog));
 		table.add(resumeButton).row();
-		Button mainMenuButton = UIFactory.button(skin, font, "Main Menu", mainMenuButtonClicked());
+		mainMenuButton = UIFactory.button(skin, font, "Main Menu");
 		table.add(mainMenuButton).row();
 		Button quitButton = UIFactory.button(skin, font, "Quit", quitButtonClicked());
 		table.add(quitButton);
@@ -77,15 +72,6 @@ public final class PauseMenu {
 				levelSession.setExecutionState(ExecutionState.RUNNING);
 				dialog.hide();
 				return true;
-			}
-		};
-	}
-	
-	private ClickListener mainMenuButtonClicked() {
-		return new ClickListener() {
-			@Override
-			public final void clicked(final InputEvent event, final float x, final float y) {
-				screenManager.swap(currentScreen, mainMenuScreen);
 			}
 		};
 	}

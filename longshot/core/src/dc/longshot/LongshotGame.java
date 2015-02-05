@@ -9,15 +9,18 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.GameSettingsApplier;
-import dc.longshot.game.Skins;
+import dc.longshot.game.SkinPack;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.SpriteCache;
@@ -48,12 +51,15 @@ public final class LongshotGame extends Game {
 	
 	private static final Color DUSK_COLOR = ColorUtils.toGdxColor(162, 129, 133);
 	private static final Color NIGHT_COLOR = ColorUtils.toGdxColor(15, 16, 26);
+	private static final String SKIN_PATH = "ui/test/uiskin.json";
+	private static final String DEFAULT_FONT_PATH = "ui/ocr/ocr_32.fnt";
+	private static final String SMALL_FONT_PATH = "ui/ocr/ocr_24.fnt";
 	private static final String LEVELS_PATH = "levels/";
 	
 	private final ScreenManager screenManager = new ScreenManager();
+	private SkinPack skinPack;
 	private SpriteCache<SpriteKey> spriteCache;
 	private SoundCache<SoundKey> soundCache;
-	private PolygonSpriteBatch spriteBatch;
 	private GameSettings gameSettings;
 	private DebugSettings debugSettings;
 	private GameSession gameSession;
@@ -61,9 +67,9 @@ public final class LongshotGame extends Game {
 	
 	@Override
 	public final void create() {
+		skinPack = createSkinPack();
 		spriteCache = createSpriteCache();
 		soundCache = createSoundCache();
-		spriteBatch = new PolygonSpriteBatch();
 		gameSettings = XmlUtils.unmarshal(Gdx.files.local(Paths.GAME_SETTINGS_PATH), 
 				new Class[] { GameSettings.class });
 		GameSettingsApplier.apply(gameSettings);
@@ -90,7 +96,14 @@ public final class LongshotGame extends Game {
 	public final void dispose() {
 		spriteCache.dispose();
 		screenManager.dispose();
-		Skins.dispose();
+		skinPack.dispose();
+	}
+	
+	private SkinPack createSkinPack() {
+		Skin skin = new Skin(Gdx.files.internal(SKIN_PATH));
+		BitmapFont defaultFont = new BitmapFont(Gdx.files.internal(DEFAULT_FONT_PATH));
+		BitmapFont smallFont = new BitmapFont(Gdx.files.internal(SMALL_FONT_PATH));
+		return new SkinPack(skin, defaultFont, smallFont);
 	}
 	
 	private SpriteCache<SpriteKey> createSpriteCache() {
@@ -135,7 +148,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private MainMenuScreen createMainMenuScreen() {
-		final MainMenuScreen mainMenuScreen = new MainMenuScreen(spriteCache.getTexture(SpriteKey.LOGO));
+		final MainMenuScreen mainMenuScreen = new MainMenuScreen(skinPack, spriteCache.getTexture(SpriteKey.LOGO));
 		mainMenuScreen.addNewGameRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -165,7 +178,7 @@ public final class LongshotGame extends Game {
 	
 	private LevelPreviewScreen createLevelPreviewScreen(final Level level) {
 		String levelName = "Wave " + (playSession.getLevelNum());
-		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(levelName, 1);
+		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(skinPack, levelName, 1);
 		levelPreviewScreen.addNextScreenRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -177,7 +190,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private OptionsScreen createOptionsScreen() {
-		final OptionsScreen optionsScreen = new OptionsScreen(gameSettings);
+		final OptionsScreen optionsScreen = new OptionsScreen(skinPack, gameSettings);
 		final Screen previousScreen = screenManager.getCurrentScreen();
 		optionsScreen.addBackRequestedListener(new NoArgsListener() {
 			@Override
@@ -189,7 +202,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private HighScoresScreen createHighScoresScreen() {
-		final HighScoresScreen highScoresScreen = new HighScoresScreen(gameSession);
+		final HighScoresScreen highScoresScreen = new HighScoresScreen(skinPack, gameSession);
 		highScoresScreen.addNextScreenRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -201,14 +214,21 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(spriteCache, soundCache, spriteBatch, 
+		final LevelScreen levelScreen = new LevelScreen(skinPack, spriteCache, soundCache, 
 				gameSettings.getInputActions(), debugSettings, playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
-				MainMenuScreen mainMenuScreen = createMainMenuScreen();
-				PauseMenu pauseMenu = new PauseMenu(Skins.defaultSkin, Skins.ocrFont, levelScreen.getStage(), 
-						screenManager, levelScreen.getLevelSession(), levelScreen, mainMenuScreen);
+				final MainMenuScreen mainMenuScreen = createMainMenuScreen();
+				PauseMenu pauseMenu = new PauseMenu(skinPack, levelScreen.getStage(), levelScreen.getLevelSession());
+				pauseMenu.addMainMenuButtonClickListener(new ClickListener() {
+					@Override
+					public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
+							final int button) {
+						screenManager.swap(levelScreen, mainMenuScreen);
+						return true;
+					}
+				});
 				pauseMenu.showDialog();
 			}
 		});
@@ -236,11 +256,19 @@ public final class LongshotGame extends Game {
 	}
 	
 	private void endGame(final LevelScreen levelScreen) {
-		HighScoresScreen highScoresScreen = createHighScoresScreen();
+		final HighScoresScreen highScoresScreen = createHighScoresScreen();
 		int score = playSession.getScore();
 		if (gameSession.canAddHighScore(score)) {
-			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(Skins.defaultSkin, Skins.ocrFont, 
-					levelScreen.getStage(), screenManager, levelScreen, highScoresScreen, gameSession, score);
+			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(skinPack, levelScreen.getStage(), gameSession, 
+					score);
+			scoreEntryDialog.addOkButtonClickListener(new ClickListener() {
+				@Override
+				public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
+						final int button) {
+					screenManager.swap(levelScreen, highScoresScreen);
+					return true;
+				}
+			});
 			scoreEntryDialog.showDialog();
 		}
 		else {

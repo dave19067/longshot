@@ -72,7 +72,7 @@ import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.Fragmenter;
-import dc.longshot.game.Skins;
+import dc.longshot.game.SkinPack;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
@@ -124,10 +124,11 @@ public final class LevelScreen implements Screen {
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> completeDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> gameOverDelegate = new EventDelegate<NoArgsListener>();
-	
+
+	private final Skin skin;
+	private final BitmapFont font;
 	private final SpriteCache<SpriteKey> spriteCache;
 	private final SoundCache<SoundKey> soundCache;
-	private final PolygonSpriteBatch spriteBatch;
 	private  final Map<InputAction, Integer> inputActions;
 	private final DebugSettings debugSettings;
 	private LevelSession levelSession;
@@ -135,6 +136,7 @@ public final class LevelScreen implements Screen {
 	private final Level level;
 	
 	private Camera camera;
+	private final PolygonSpriteBatch spriteBatch;
 	private final ShapeRenderer shapeRenderer;
 	private World world;
 	private RayHandler rayHandler;
@@ -158,16 +160,18 @@ public final class LevelScreen implements Screen {
 
 	private final Texture cursorTexture;
 	
-	public LevelScreen(final SpriteCache<SpriteKey> spriteCache, final SoundCache<SoundKey> soundCache, 
-			final PolygonSpriteBatch spriteBatch, final Map<InputAction, Integer> inputActions, 
+	public LevelScreen(final SkinPack skinPack, final SpriteCache<SpriteKey> spriteCache, 
+			final SoundCache<SoundKey> soundCache, final Map<InputAction, Integer> inputActions, 
 			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
 		this.spriteCache = spriteCache;
 		this.soundCache = soundCache;
-		this.spriteBatch = spriteBatch;
 		this.inputActions = inputActions;
 		this.debugSettings = debugSettings;
 		this.playSession = playSession;
 		this.level = level;
+		spriteBatch = new PolygonSpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
 	}
@@ -399,15 +403,13 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private void setupStage() {
-		Skin skin = Skins.defaultSkin;
 		worldTable = new Table(skin);
-		BitmapFont font = Skins.ocrFont;
-		Table statusTable = createStatusTable(skin, font);
-		Table mainTable = createMainTable(skin, worldTable, statusTable);
+		Table statusTable = createStatusTable();
+		Table mainTable = createMainTable(worldTable, statusTable);
 		stage.addActor(mainTable);
 	}
 	
-	private Table createStatusTable(final Skin skin, final BitmapFont font) {
+	private Table createStatusTable() {
 		statusTable = new Table(skin);
 		statusTable.add(UIFactory.label(skin, font, "HEALTH: ")).right();
 		TextureRegion healthBarRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.HEALTH_BAR));
@@ -419,7 +421,7 @@ public final class LevelScreen implements Screen {
 		return statusTable;
 	}
 	
-	private Table createMainTable(final Skin skin, final Table worldTable, final Table statusTable) {
+	private Table createMainTable(final Table worldTable, final Table statusTable) {
 		Table mainTable = new Table(skin).top().left();
 		mainTable.setFillParent(true);
 		mainTable.add(worldTable).expand().fill().row();

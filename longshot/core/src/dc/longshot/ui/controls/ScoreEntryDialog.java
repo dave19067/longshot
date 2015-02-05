@@ -1,20 +1,20 @@
 package dc.longshot.ui.controls;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import dc.longshot.game.SkinPack;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.Paths;
 import dc.longshot.models.ScoreEntry;
-import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.util.XmlUtils;
 
@@ -25,27 +25,24 @@ public final class ScoreEntryDialog {
 	private final Skin skin;
 	private final BitmapFont font;
 	private final Stage stage;
-	private final ScreenManager screenManager;
-	private final Screen currentScreen;
-	private final Screen nextScreen;
 	private final GameSession gameSession;
 	private final int score;
 	private Dialog dialog;
 	private TextField nameTextField;
+	private Button okButton;
 
-	public ScoreEntryDialog(final Skin skin, final BitmapFont font, final Stage stage, 
-			final ScreenManager screenManager, final Screen currentScreen, final Screen nextScreen, 
-			final GameSession gameSession, final int score) {
-		this.skin = skin;
-		this.font = font;
+	public ScoreEntryDialog(final SkinPack skinPack, final Stage stage, final GameSession gameSession, 
+			final int score) {
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
 		this.stage = stage;
-		this.screenManager = screenManager;
-		this.currentScreen = currentScreen;
-		this.nextScreen = nextScreen;
 		this.gameSession = gameSession;
 		this.score = score;
-		
 		setupDialog();
+	}
+	
+	public final void addOkButtonClickListener(final ClickListener listener) {
+		okButton.addListener(listener);
 	}
 	
 	public final void showDialog() {
@@ -64,7 +61,8 @@ public final class ScoreEntryDialog {
 		table.row();
 		table.add(createNameEntryTable());
 		table.row();
-		table.add(UIFactory.button(skin, font, "OK", okButtonClicked(dialog)));
+		okButton = UIFactory.button(skin, font, "OK", okButtonClicked(dialog));
+		table.add(okButton);
 		table.row();
 		return table;
 	}
@@ -83,7 +81,6 @@ public final class ScoreEntryDialog {
 			@Override
 			public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, final int button) {
 				saveHighScore();
-				screenManager.swap(currentScreen, nextScreen);
 				dialog.hide();
 				return true;
 			}
