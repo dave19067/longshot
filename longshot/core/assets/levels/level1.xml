@@ -12,5 +12,21 @@
             <key>MISSILE</key>
             <value>1</value>
         </entry>
+        <entry>
+            <key>CATERPILLAR</key>
+            <value>3</value>
+        </entry>
+        <entry>
+            <key>SAW</key>
+            <value>2</value>
+        </entry>
+        <entry>
+            <key>NUKE</key>
+            <value>3</value>
+        </entry>
+        <entry>
+            <key>UFO</key>
+            <value>2</value>
+        </entry>
     </spawns>
 </level>

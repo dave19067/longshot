@@ -24,13 +24,13 @@ import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VertexUtils;
 import dc.longshot.graphics.RegionFactory;
-import dc.longshot.graphics.SpriteCache;
+import dc.longshot.graphics.TextureCache;
+import dc.longshot.graphics.TextureFactory;
 import dc.longshot.graphics.TextureGeometry;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.CollisionType;
 import dc.longshot.models.EntityType;
 import dc.longshot.models.SoundKey;
-import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.AutoRotatePart;
@@ -69,16 +69,18 @@ import dc.longshot.parts.WeaponPart;
 
 public final class EntityFactory {
 	
-	private final SpriteCache<SpriteKey> spriteCache;
+	private final TextureCache textureCache;
 	private final RayHandler rayHandler;
-	private final Map<SpriteKey, float[]> convexHullCache = new HashMap<SpriteKey, float[]>(); 
+	private final Map<String, float[]> convexHulls = new HashMap<String, float[]>();
 	
-	public EntityFactory(final SpriteCache<SpriteKey> spriteCache, final RayHandler rayHandler) {
-		this.spriteCache = spriteCache;
+	public EntityFactory(final TextureCache textureCache, final RayHandler rayHandler) {
+		this.textureCache = textureCache;
 		this.rayHandler = rayHandler;
-		generateConvexHulls(spriteCache);
+		addShooterOutlineTexture();
+		addColorizedUFOTexture();
+		generateConvexHulls(textureCache);
 	}
-	
+
 	public final Entity create(final EntityType entityType) {
 		Entity entity;
 		switch (entityType) {
@@ -95,7 +97,7 @@ public final class EntityFactory {
 				entity = createUFOGlow();
 				break;
 			case LASER:
-				entity = createEnemyBullet(new Vector3(0.3f, 0.1f, 0.1f), SpriteKey.GREEN, 
+				entity = createEnemyBullet(new Vector3(0.3f, 0.1f, 0.1f), "objects/green", 
 						new PointLight(rayHandler, 8, Color.GREEN, 100, 0, 0));
 				break;
 			case SAW:
@@ -105,7 +107,7 @@ public final class EntityFactory {
 				entity = createCaterpillar();
 				break;
 			case PELLET:
-				entity = createEnemyBullet(new Vector3(0.2f, 0.2f, 0.2f), SpriteKey.PELLET, 
+				entity = createEnemyBullet(new Vector3(0.2f, 0.2f, 0.2f), "objects/pellet", 
 						new PointLight(rayHandler, 8, Color.ORANGE, 50, 0, 0));
 				break;
 			case SMOKE_SMALL:
@@ -121,7 +123,7 @@ public final class EntityFactory {
 	}
 
 	public final Entity createShooter(final Vector3 size, final Vector2 position, final Entity cannon) {
-		Entity entity = createBaseEntity(size, position, SpriteKey.SHOOTER);
+		Entity entity = createBaseEntity(size, position, "objects/tank");
 		entity.attach(new SpeedPart(7));
 		entity.attach(new HealthPart(1));
 		entity.attach(new AlliancePart(Alliance.PLAYER));
@@ -132,8 +134,8 @@ public final class EntityFactory {
 		collisionTypes.add(CollisionType.ENEMY);
 		entity.attach(new DamageOnCollisionPart(collisionTypes, 1));
 		entity.attach(new WeaponPart(EntityType.SHOOTER_BULLET, 2, 0.5f));
-		Texture outlineTexture = spriteCache.getTexture(SpriteKey.SHOOTER_OUTLINE);
-		PolygonRegion region = RegionFactory.createPolygonRegion(outlineTexture);
+		TextureRegion textureRegion = textureCache.getRegion("objects/tank_outline");
+		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion);
 		entity.attach(new AttachmentPart(cannon));
 		entity.attach(new GhostPart(5, region, SoundKey.POWER_UP));
 		entity.attach(new SoundOnDeathPart(SoundKey.POWER_DOWN));
@@ -142,14 +144,14 @@ public final class EntityFactory {
 
 	public final Entity createShooterCannon() {
 		Vector3 size = new Vector3(1.5f, 0.3f, 0.3f);
-		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.CANNON);
+		Entity entity = createBaseEntity(size, new Vector2(), "objects/cannon");
 		entity.get(TransformPart.class).setOrigin(new Vector2(0, size.y / 2));
 		entity.attach(new RotateToCursorPart());
 		return entity;
 	}
 	
 	public final Entity createShooterBullet() {
-		Entity entity = createBaseEntity(new Vector3(0.6f, 0.1f, 0.1f), new Vector2(), SpriteKey.BULLET);
+		Entity entity = createBaseEntity(new Vector3(0.6f, 0.1f, 0.1f), new Vector2(), "objects/bullet");
 		entity.attach(new SpeedPart(20));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.PLAYER));
@@ -177,16 +179,16 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createMissile() {
-		return createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 0.5f, SpriteKey.MISSILE, EntityType.SMOKE_SMALL);
+		return createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 0.5f, "objects/missile", EntityType.SMOKE_SMALL);
 	}
 	
 	public final Entity createNuke() {
-		return createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 2, SpriteKey.NUKE, EntityType.SMOKE_BIG);
+		return createProjectile(new Vector3(1, 0.75f, 0.75f), 3, 2, "objects/nuke", EntityType.SMOKE_BIG);
 	}
 	
 	public final Entity createProjectile(final Vector3 size, final float damage, final float explosionRadius, 
-			final SpriteKey spriteKey, final EntityType entityType) {
-		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
+			final String regionName, final EntityType entityType) {
+		Entity entity = createBaseEntity(size, new Vector2(), regionName);
 		float speed = MathUtils.random(1, 3);
 		entity.attach(new SpeedPart(speed));
 		entity.attach(new HealthPart(1));
@@ -212,7 +214,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createUFOGlow() {
-		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), SpriteKey.UFO_GLOW);
+		Entity entity = createBaseEntity(new Vector3(1, 0.5f, 1), new Vector2(), "objects/ufo_shadow");
 		entity.attach(new AlliancePart(Alliance.ENEMY));
 		entity.attach(new SpawnOnDeathPart(createUFO(new Vector3(1, 0.5f, 1))));
 		float maxLifeTime = 3;
@@ -222,7 +224,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createUFO(final Vector3 size) {
-		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.UFO);
+		Entity entity = createBaseEntity(size, new Vector2(), "objects/ufo");
 		entity.attach(new SpeedPart(3));
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(300));
@@ -242,8 +244,8 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	public final Entity createEnemyBullet(final Vector3 size, final SpriteKey spriteKey, final PointLight light) {
-		Entity entity = createBaseEntity(size, new Vector2(), spriteKey);
+	public final Entity createEnemyBullet(final Vector3 size, final String regionName, final PointLight light) {
+		Entity entity = createBaseEntity(size, new Vector2(), regionName);
 		entity.attach(new SpeedPart(10));
 		entity.attach(new HealthPart(1));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
@@ -265,7 +267,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createSaw() {
-		Entity entity = createBaseEntity(new Vector3(2, 2, 0.1f), new Vector2(), SpriteKey.SAW);
+		Entity entity = createBaseEntity(new Vector3(2, 2, 0.1f), new Vector2(), "objects/sawblades");
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(100));
 		entity.attach(new CollisionTypePart(CollisionType.ENEMY));
@@ -287,7 +289,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createCaterpillar() {
-		Entity entity = createBaseEntity(new Vector3(0.8f, 0.8f, 0.8f), new Vector2(), SpriteKey.BUG_HEAD);
+		Entity entity = createBaseEntity(new Vector3(0.8f, 0.8f, 0.8f), new Vector2(), "objects/bug_head");
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(100));
@@ -314,7 +316,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createCaterpillarSegment() {
-		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), SpriteKey.BUG_BODY);
+		Entity entity = createBaseEntity(new Vector3(1, 1, 1), new Vector2(), "objects/bug_body");
 		entity.attach(new SpeedPart(5));
 		entity.attach(new HealthPart(1));
 		entity.attach(new PointsPart(100));
@@ -337,7 +339,7 @@ public final class EntityFactory {
 	
 	public final Entity createExplosion(final float radius, final float maxLifeTime, final float damage) {
 		float diameter = radius * 2;
-		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), SpriteKey.CIRCLE);
+		Entity entity = createBaseEntity(new Vector3(diameter, diameter, diameter), new Vector2(), "objects/circle");
 		entity.attach(new DamageOnSpawnPart(radius, damage));
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		Color endColor = Color.ORANGE.cpy();
@@ -348,7 +350,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createTrailParticle(final Vector3 size, final Color startColor, final Color endColor) {
-		Entity entity = createBaseEntity(size, new Vector2(), SpriteKey.WHITE);
+		Entity entity = createBaseEntity(size, new Vector2(), "objects/white");
 		float maxLifeTime = 3;
 		entity.attach(new TimedDeathPart(maxLifeTime));
 		entity.attach(new ColorChangePart(maxLifeTime, startColor, endColor));
@@ -356,10 +358,10 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, final float minZ, 
-			final SpriteKey spriteKey) {
+			final String regionName) {
 		Entity entity = new Entity();
-		Texture texture = spriteCache.getTexture(spriteKey);
-		PolygonRegion region = RegionFactory.createPolygonRegion(new TextureRegion(texture), vertices);
+		TextureRegion textureRegion = textureCache.getRegion(regionName);
+		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion, vertices);
 		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region), position.z);
 		Color color = Color.WHITE.cpy().lerp(Color.DARK_GRAY, position.z / minZ);
 		drawablePart.getSprite().setColor(color);
@@ -373,28 +375,40 @@ public final class EntityFactory {
 		return entity;
 	}
 	
-	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final SpriteKey spriteKey) {
+	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final String regionName) {
 		Entity entity = new Entity();
-		Polygon convexHull = createConvexHull(spriteKey, size);
+		Polygon convexHull = createConvexHull(regionName, size);
 		entity.attach(new TransformPart(convexHull, position));
-		Texture texture = spriteCache.getTexture(spriteKey);
-		PolygonRegion region = RegionFactory.createPolygonRegion(texture);
+		TextureRegion textureRegion = textureCache.getRegion(regionName);
+		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion);
 		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));
 		return entity;
 	}
 	
-	private void generateConvexHulls(final SpriteCache<SpriteKey> spriteCache) {
-		for (SpriteKey spriteKey : spriteCache.getKeys()) {
-			TextureRegion textureRegion = new TextureRegion(spriteCache.getTexture(spriteKey));
+	private void addShooterOutlineTexture() {
+		TextureRegion region = textureCache.getRegion("objects/tank");
+		Texture texture = TextureFactory.createOutline(region);
+		textureCache.addRegion("objects/", "tank_outline", new TextureRegion(texture));
+	}
+
+	private void addColorizedUFOTexture() {
+		TextureRegion region = textureCache.getRegion("objects/ufo");
+		Texture texture = TextureFactory.createShadow(region, Color.WHITE);
+		textureCache.addRegion("objects/", "ufo_shadow", new TextureRegion(texture));
+	}
+	
+	private void generateConvexHulls(final TextureCache textureCache) {
+		for (String regionName : textureCache.getRegionNames()) {
+			TextureRegion textureRegion = textureCache.getRegion(regionName);
 			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
 			// libgdx y-axis is flipped
 			VertexUtils.flipY(convexHull);
-			convexHullCache.put(spriteKey, convexHull);
+			convexHulls.put(regionName, convexHull);
 		}
 	}
 	
-	private Polygon createConvexHull(final SpriteKey spriteKey, final Vector3 size) {
-		float[] vertices = sizedVertices(convexHullCache.get(spriteKey), size);
+	private Polygon createConvexHull(final String regionName, final Vector3 size) {
+		float[] vertices = sizedVertices(convexHulls.get(regionName), size);
 		return new Polygon(vertices);
 	}
 	

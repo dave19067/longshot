@@ -21,9 +21,8 @@ public final class TextureFactory {
 		return texture;
 	}
 	
-	public static final Texture createShadow(final Texture texture, final Color color) {
-		TextureRegion textureRegion = new TextureRegion(texture);
-		Pixmap pixmap = TextureUtils.toPixmap(textureRegion);
+	public static final Texture createShadow(final TextureRegion region, final Color color) {
+		Pixmap pixmap = TextureUtils.toPixmap(region);
 		Pixmap shadowPixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), pixmap.getFormat());
 		for (int x = 0; x < pixmap.getWidth(); x++) {
 			for (int y = 0; y < pixmap.getHeight(); y++) {
@@ -38,8 +37,8 @@ public final class TextureFactory {
 		return shadowTexture;
 	}
 	
-	public static final Texture createOutline(final TextureRegion textureRegion) {
-		Pixmap pixmap = TextureUtils.toPixmap(textureRegion);
+	public static final Texture createOutline(final TextureRegion region) {
+		Pixmap pixmap = TextureUtils.toPixmap(region);
 		Pixmap outlinePixmap = new Pixmap(pixmap.getWidth(), pixmap.getHeight(), pixmap.getFormat());
 		for (int x = 0; x < pixmap.getWidth(); x++) {
 			for (int y = 0; y < pixmap.getHeight(); y++) {

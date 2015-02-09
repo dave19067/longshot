@@ -11,5 +11,9 @@
             <name>dav</name>
             <score>400</score>
         </highScores>
+        <highScores>
+            <name>d</name>
+            <score>800</score>
+        </highScores>
     </highScores>
 </gameSession>

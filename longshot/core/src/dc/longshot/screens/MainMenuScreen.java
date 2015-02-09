@@ -3,8 +3,8 @@ package dc.longshot.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -31,14 +31,14 @@ public final class MainMenuScreen implements Screen {
 	
 	private final Skin skin;
 	private final BitmapFont font;
-	private final Texture logoTexture;
+	private final TextureRegion logoRegion;
 	
 	private Stage stage;
 	
-	public MainMenuScreen(final SkinPack skinPack, final Texture logoTexture) {
+	public MainMenuScreen(final SkinPack skinPack, final TextureRegion logoRegion) {
 		skin = skinPack.getSkin();
 		font = skinPack.getDefaultFont();
-		this.logoTexture = logoTexture;
+		this.logoRegion = logoRegion;
 	}
 	
 	public final void addNewGameRequestedListener(final NoArgsListener listener) {
@@ -119,7 +119,7 @@ public final class MainMenuScreen implements Screen {
 		Table mainTable = new Table(skin);
 		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
-		mainTable.add(new Image(logoTexture)).row();
+		mainTable.add(new Image(logoRegion)).row();
 		Button newGameButton = UIFactory.button(skin, font, "New Game", requestButtonClicked(newGameRequestedDelegate));
 		mainTable.add(newGameButton).row();
 		Button optionsButton = UIFactory.button(skin, font, "Options", requestButtonClicked(optionsRequestedDelegate));

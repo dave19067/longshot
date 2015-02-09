@@ -7,11 +7,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -24,8 +21,7 @@ import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.SkinPack;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.RegionFactory;
-import dc.longshot.graphics.SpriteCache;
-import dc.longshot.graphics.TextureFactory;
+import dc.longshot.graphics.TextureCache;
 import dc.longshot.models.DebugSettings;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.GameSettings;
@@ -34,7 +30,6 @@ import dc.longshot.models.Paths;
 import dc.longshot.models.PlaySession;
 import dc.longshot.models.RectangleGradient;
 import dc.longshot.models.SoundKey;
-import dc.longshot.models.SpriteKey;
 import dc.longshot.screens.HighScoresScreen;
 import dc.longshot.screens.LevelPreviewScreen;
 import dc.longshot.screens.LevelScreen;
@@ -53,18 +48,20 @@ public final class LongshotGame extends Game {
 	
 	private static final Color DUSK_COLOR = ColorUtils.toGdxColor(162, 129, 133);
 	private static final Color NIGHT_COLOR = ColorUtils.toGdxColor(15, 16, 26);
+	private static final String TEMPORARY_PATH = "temp/";
 	private static final String SKIN_PATH = "ui/test/uiskin.json";
 	private static final String DEFAULT_FONT_PATH = "ui/ocr/ocr_32.fnt";
 	private static final String SMALL_FONT_PATH = "ui/ocr/ocr_24.fnt";
 	private static final String LEVELS_PATH = "levels/";
+	private static final String ATLAS_EXTENSION = ".atlas";
 	private static final String TEXTURES_PATH = "textures/";
-	private static final String OBJECT_TEXTURES_PATH = TEXTURES_PATH + "objects/";
-	private static final String[] TEXTURE_PACK_PATHS = new String[] { OBJECT_TEXTURES_PATH };
+	private static final String[] TEXTURE_PATHS = new String[] { TEXTURES_PATH + "backgrounds/", TEXTURES_PATH + "ui/" };
+	private static final String[] TEXTURE_PACK_PATHS = new String[] { TEXTURES_PATH + "objects/" };
 	private static final String SOUNDS_PATH = "sounds/";
 	
 	private final ScreenManager screenManager = new ScreenManager();
 	private SkinPack skinPack;
-	private SpriteCache<SpriteKey> spriteCache;
+	private TextureCache textureCache;
 	private SoundCache<SoundKey> soundCache;
 	private GameSettings gameSettings;
 	private DebugSettings debugSettings;
@@ -73,9 +70,8 @@ public final class LongshotGame extends Game {
 	
 	@Override
 	public final void create() {
-		packTextures();
 		skinPack = createSkinPack();
-		spriteCache = createSpriteCache();
+		textureCache = createTextureCache();
 		soundCache = createSoundCache();
 		gameSettings = XmlUtils.unmarshal(Gdx.files.local(Paths.GAME_SETTINGS_PATH), 
 				new Class[] { GameSettings.class });
@@ -101,17 +97,31 @@ public final class LongshotGame extends Game {
 
 	@Override
 	public final void dispose() {
-		spriteCache.dispose();
+		textureCache.dispose();
 		screenManager.dispose();
 		skinPack.dispose();
 	}
 	
-	private void packTextures() {
+	private TextureCache createTextureCache() {
+		TextureCache textureCache = new TextureCache();
+		for (String path : TEXTURE_PATHS) {
+			String namespace = createTextureNamespace(path);
+			String absolutePath = PathUtils.internalToAbsolutePath(path);
+			textureCache.addTextures(Gdx.files.absolute(absolutePath), namespace);
+		}
 		for (String path : TEXTURE_PACK_PATHS) {
 			String inputDir = PathUtils.internalToAbsolutePath(path);
-			String outputDir = Gdx.files.local("").file().getAbsolutePath();
-			TexturePacker.process(inputDir, outputDir, path.replace("/", "_"));
+			String outputDir = Gdx.files.local(TEMPORARY_PATH).file().getAbsolutePath();
+			String name = path.replace("/", "_");
+			TexturePacker.process(inputDir, outputDir, name);
+			String namespace = createTextureNamespace(path);
+			textureCache.addTextureAtlas(Gdx.files.local(TEMPORARY_PATH + name + ATLAS_EXTENSION), namespace);
 		}
+		return textureCache;
+	}
+	
+	private String createTextureNamespace(final String path) {
+		return path.replaceFirst(TEXTURES_PATH, "");
 	}
 	
 	private SkinPack createSkinPack() {
@@ -119,38 +129,6 @@ public final class LongshotGame extends Game {
 		BitmapFont defaultFont = new BitmapFont(Gdx.files.internal(DEFAULT_FONT_PATH));
 		BitmapFont smallFont = new BitmapFont(Gdx.files.internal(SMALL_FONT_PATH));
 		return new SkinPack(skin, defaultFont, smallFont);
-	}
-	
-	private SpriteCache<SpriteKey> createSpriteCache() {
-		SpriteCache<SpriteKey> spriteCache = new SpriteCache<SpriteKey>();
-		// TODO: Remove redundant images/ portion of file path
-		spriteCache.add(SpriteKey.LOGO, TEXTURES_PATH + "logo.png");
-		Texture texture = new Texture(TEXTURES_PATH + "rock02.png");
-		texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		spriteCache.add(SpriteKey.ROCK, texture);
-		spriteCache.add(SpriteKey.CROSSHAIRS, OBJECT_TEXTURES_PATH + "crosshairs.png");
-		spriteCache.add(SpriteKey.HEALTH_BAR, OBJECT_TEXTURES_PATH + "health_bar.png");
-		spriteCache.add(SpriteKey.STAR, OBJECT_TEXTURES_PATH + "star.png");
-		spriteCache.add(SpriteKey.CIRCLE, OBJECT_TEXTURES_PATH + "circle.png");
-		spriteCache.add(SpriteKey.CLOUD, OBJECT_TEXTURES_PATH + "cloud.png");
-		spriteCache.add(SpriteKey.WHITE, OBJECT_TEXTURES_PATH + "white.png");
-		spriteCache.add(SpriteKey.GREEN, OBJECT_TEXTURES_PATH + "green.png");
-		spriteCache.add(SpriteKey.SHOOTER, OBJECT_TEXTURES_PATH + "tank.png");
-		Texture shooterOutlineTexture = TextureFactory.createOutline(
-				new TextureRegion(spriteCache.getTexture(SpriteKey.SHOOTER)));
-		spriteCache.add(SpriteKey.SHOOTER_OUTLINE, shooterOutlineTexture);
-		spriteCache.add(SpriteKey.CANNON, OBJECT_TEXTURES_PATH + "cannon.png");
-		spriteCache.add(SpriteKey.PELLET, OBJECT_TEXTURES_PATH + "pellet.png");
-		spriteCache.add(SpriteKey.BULLET, OBJECT_TEXTURES_PATH + "bullet.png");
-		spriteCache.add(SpriteKey.MISSILE, OBJECT_TEXTURES_PATH + "missile.png");
-		spriteCache.add(SpriteKey.NUKE, OBJECT_TEXTURES_PATH + "nuke.png");
-		spriteCache.add(SpriteKey.UFO, OBJECT_TEXTURES_PATH + "ufo.png");
-		Texture colorizedUFOTexture = TextureFactory.createShadow(spriteCache.getTexture(SpriteKey.UFO), Color.WHITE);
-		spriteCache.add(SpriteKey.UFO_GLOW, colorizedUFOTexture);
-		spriteCache.add(SpriteKey.SAW, OBJECT_TEXTURES_PATH + "sawblades.png");
-		spriteCache.add(SpriteKey.BUG_BODY, OBJECT_TEXTURES_PATH + "bug_body.png");
-		spriteCache.add(SpriteKey.BUG_HEAD, OBJECT_TEXTURES_PATH + "bug_head.png");
-		return spriteCache;
 	}
 	
 	private SoundCache<SoundKey> createSoundCache() {
@@ -163,7 +141,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private MainMenuScreen createMainMenuScreen() {
-		final MainMenuScreen mainMenuScreen = new MainMenuScreen(skinPack, spriteCache.getTexture(SpriteKey.LOGO));
+		final MainMenuScreen mainMenuScreen = new MainMenuScreen(skinPack, textureCache.getRegion("ui/logo"));
 		mainMenuScreen.addNewGameRequestedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -229,7 +207,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(skinPack, spriteCache, soundCache, 
+		final LevelScreen levelScreen = new LevelScreen(skinPack, textureCache, soundCache, 
 				gameSettings.getInputActions(), debugSettings, playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
@@ -306,12 +284,12 @@ public final class LongshotGame extends Game {
 	private List<DecorationProfile> createDecorationProfiles(final Rectangle boundsBox, final float nightRatio) {
 		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
 		if (nightRatio > 0.5f) {
-			PolygonRegion starRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.STAR));
+			PolygonRegion starRegion = RegionFactory.createPolygonRegion(textureCache.getRegion("objects/star"));
 			DecorationProfile starProfile = new DecorationProfile(boundsBox, true, 1, 0.02f, 0.1f, -1000, -500, 
 					0.3f, 0.7f, starRegion);
 			decorationProfiles.add(starProfile);
 		}
-		PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(spriteCache.getTexture(SpriteKey.CLOUD));
+		PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(textureCache.getRegion("objects/cloud"));
 		Rectangle cloudBoundsBox = new Rectangle(boundsBox);
 		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
 		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, 3, 6, 1f, 2, 

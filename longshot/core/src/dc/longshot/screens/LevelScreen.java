@@ -15,7 +15,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -77,7 +76,7 @@ import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
-import dc.longshot.graphics.SpriteCache;
+import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.EntityFactory;
 import dc.longshot.level.LevelController;
 import dc.longshot.models.DebugSettings;
@@ -87,7 +86,6 @@ import dc.longshot.models.LevelSession;
 import dc.longshot.models.PlaySession;
 import dc.longshot.models.RectangleGradient;
 import dc.longshot.models.SoundKey;
-import dc.longshot.models.SpriteKey;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsRemovePart;
 import dc.longshot.parts.CollisionTypePart;
@@ -127,7 +125,7 @@ public final class LevelScreen implements Screen {
 
 	private final Skin skin;
 	private final BitmapFont font;
-	private final SpriteCache<SpriteKey> spriteCache;
+	private final TextureCache textureCache;
 	private final SoundCache<SoundKey> soundCache;
 	private  final Map<InputAction, Integer> inputActions;
 	private final DebugSettings debugSettings;
@@ -158,14 +156,14 @@ public final class LevelScreen implements Screen {
 	private final Fragmenter fragmenter = new Fragmenter(FRAG_WIDTH, FRAG_HEIGHT, FRAG_SPEED_MULTIPLIER);
 	private InputProcessor levelInputProcessor;
 
-	private final Texture cursorTexture;
+	private final TextureRegion cursorRegion;
 	
-	public LevelScreen(final SkinPack skinPack, final SpriteCache<SpriteKey> spriteCache, 
+	public LevelScreen(final SkinPack skinPack, final TextureCache textureCache, 
 			final SoundCache<SoundKey> soundCache, final Map<InputAction, Integer> inputActions, 
 			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
 		skin = skinPack.getSkin();
 		font = skinPack.getDefaultFont();
-		this.spriteCache = spriteCache;
+		this.textureCache = textureCache;
 		this.soundCache = soundCache;
 		this.inputActions = inputActions;
 		this.debugSettings = debugSettings;
@@ -173,7 +171,7 @@ public final class LevelScreen implements Screen {
 		this.level = level;
 		spriteBatch = new PolygonSpriteBatch();
 		shapeRenderer = new ShapeRenderer();
-		cursorTexture = spriteCache.getTexture(SpriteKey.CROSSHAIRS);
+		cursorRegion = textureCache.getRegion("objects/crosshairs");
 	}
 
 	public final void addPausedListener(final NoArgsListener listener) {
@@ -229,7 +227,7 @@ public final class LevelScreen implements Screen {
 		rayHandler = new RayHandler(world);
 		rayHandler.setShadows(false);
 		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
-		entityFactory = new EntityFactory(spriteCache, rayHandler);
+		entityFactory = new EntityFactory(textureCache, rayHandler);
 		entityManager = new EntityManager();
 		entityManager.addEntityAddedListener(entityAdded());
 		entityManager.addEntityRemovedListener(entityRemoved());
@@ -412,7 +410,7 @@ public final class LevelScreen implements Screen {
 	private Table createStatusTable() {
 		statusTable = new Table(skin);
 		statusTable.add(UIFactory.label(skin, font, "HEALTH: ")).right();
-		TextureRegion healthBarRegion = new TextureRegion(spriteCache.getTexture(SpriteKey.HEALTH_BAR));
+		TextureRegion healthBarRegion = new TextureRegion(textureCache.getRegion("objects/health_bar"));
 		healthDisplay = new HealthDisplay(healthBarRegion);
 		statusTable.add(healthDisplay.getTable()).left().row();
 		statusTable.add(UIFactory.label(skin, font, "SCORE: ")).right();
@@ -463,7 +461,7 @@ public final class LevelScreen implements Screen {
 		List<Entity> entities = new ArrayList<Entity>();
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
-				new Vector2(boundsBox.x, boundsBox.y), SpriteKey.GREEN);
+				new Vector2(boundsBox.x, boundsBox.y), "objects/green");
 		entities.add(ground);
 		Vector3 shooterSize = new Vector3(2, 1, 1);
 		TransformPart groundTransform = ground.get(TransformPart.class);
@@ -485,9 +483,9 @@ public final class LevelScreen implements Screen {
 		float minHeightRatio = 0.5f;
 		float minZ = -100;
 		for (int i = 0; i < MathUtils.random(minNum, maxNum); i++) {
-			Texture texture = spriteCache.getTexture(SpriteKey.ROCK);
-			int textureX = MathUtils.random(0, texture.getWidth() - 1);
-			int textureY = MathUtils.random(0, texture.getHeight() - 1);
+			TextureRegion region = textureCache.getRegion("backgrounds/rock02");
+			int textureX = MathUtils.random(0, region.getRegionWidth() - 1);
+			int textureY = MathUtils.random(0, region.getRegionHeight() - 1);
 			int width = MathUtils.random(minWidth, maxWidth);
 			int height = (int)(width * minHeightRatio);
 			float[] vertices = new float[] { textureX, textureY, textureX + width, textureY, textureX + width / 2, 
@@ -495,7 +493,7 @@ public final class LevelScreen implements Screen {
 			float x = MathUtils.random(-width / UnitConvert.PIXELS_PER_UNIT, PolygonUtils.right(level.getBoundsBox()));
 			float y = 0;
 			float z = MathUtils.random(minZ, 0);
-			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, SpriteKey.ROCK);
+			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, "backgrounds/rock02");
 			entities.add(entity);
 		}
 		return entities;
@@ -637,8 +635,8 @@ public final class LevelScreen implements Screen {
 	private void drawCursor() {
 		spriteBatch.setProjectionMatrix(getUIMatrix());
 		spriteBatch.begin();
-		spriteBatch.draw(cursorTexture, Gdx.input.getX() - cursorTexture.getWidth() / 2, 
-				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorTexture.getHeight() / 2);
+		spriteBatch.draw(cursorRegion, Gdx.input.getX() - cursorRegion.getRegionWidth() / 2, 
+				Gdx.graphics.getHeight() - Gdx.input.getY() - cursorRegion.getRegionHeight() / 2);
 		spriteBatch.end();
 	}
 	
