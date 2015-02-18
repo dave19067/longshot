@@ -68,9 +68,8 @@ public final class MainMenuScreen implements Screen {
 
 	@Override
 	public final void show() {
-		stage = new Stage(new ScreenViewport());
+		stage = createStage();
 		Gdx.input.setCursorCatched(false);
-		setupStage();
 		Input.addProcessor(stage);
 	}
 
@@ -110,9 +109,11 @@ public final class MainMenuScreen implements Screen {
 		};
 	}
 		
-	private void setupStage() {
+	private Stage createStage() {
+		Stage stage = new Stage(new ScreenViewport());
 		Table mainTable = createMainTable();
 		stage.addActor(mainTable);
+		return stage;
 	}
 	
 	private Table createMainTable() {

@@ -27,7 +27,7 @@ public final class ScoreEntryDialog {
 	private final Stage stage;
 	private final GameSession gameSession;
 	private final int score;
-	private Dialog dialog;
+	private final Dialog dialog;
 	private TextField nameTextField;
 	private Button okButton;
 
@@ -38,7 +38,7 @@ public final class ScoreEntryDialog {
 		this.stage = stage;
 		this.gameSession = gameSession;
 		this.score = score;
-		setupDialog();
+		dialog = createDialog();
 	}
 	
 	public final void addOkButtonClickListener(final ClickListener listener) {
@@ -49,10 +49,11 @@ public final class ScoreEntryDialog {
 		dialog.show(stage);
 	}
 	
-	private void setupDialog() {
-		dialog = new Dialog("Menu", skin);
+	private Dialog createDialog() {
+		Dialog dialog = new Dialog("Menu", skin);
 		Table table = createTable(dialog);
 		dialog.add(table);
+		return dialog;
 	}
 	
 	private Table createTable(final Dialog dialog) {

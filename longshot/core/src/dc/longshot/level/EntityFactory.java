@@ -179,7 +179,7 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createMissile() {
-		return createProjectile(new Vector3(1, 0.25f, 0.25f), 1, 0.5f, "objects/missile", EntityType.SMOKE_SMALL);
+		return createProjectile(new Vector3(1.5f, 0.5f, 0.5f), 1, 0.5f, "objects/missile", EntityType.SMOKE_SMALL);
 	}
 	
 	public final Entity createNuke() {

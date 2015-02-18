@@ -62,12 +62,11 @@ public class HighScoresScreen implements Screen {
 
 	@Override
 	public void show() {
-		stage = new Stage(new ScreenViewport());
+		stage = createStage();
 		Input.addProcessor(stage);
 		highScoresInputProcessor = new HighScoresInputProcessor();
 		Input.addProcessor(highScoresInputProcessor);
 		Gdx.input.setCursorCatched(false);
-		setupStage();
 	}
 
 	@Override
@@ -89,9 +88,11 @@ public class HighScoresScreen implements Screen {
 		stage.dispose();
 	}
 	
-	private void setupStage() {
+	private Stage createStage() {
+		Stage stage = new Stage(new ScreenViewport());
 		Table mainTable = createMainTable();
 		stage.addActor(mainTable);
+		return stage;
 	}
 	
 	private Table createMainTable() {

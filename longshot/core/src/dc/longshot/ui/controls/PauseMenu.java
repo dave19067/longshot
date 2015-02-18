@@ -25,7 +25,7 @@ public final class PauseMenu {
 	private final BitmapFont font;
 	private final Stage stage;
 	private final LevelSession levelSession;
-	private Dialog dialog;
+	private final Dialog dialog;
 	private Button mainMenuButton;
 
 	public PauseMenu(final SkinPack skinPack, final Stage stage, final LevelSession levelSession) {
@@ -33,7 +33,7 @@ public final class PauseMenu {
 		font = skinPack.getDefaultFont();
 		this.stage = stage;
 		this.levelSession = levelSession;
-		setupDialog();
+		dialog = createDialog();
 	}
 	
 	public final void addMainMenuButtonClickListener(final ClickListener listener) {
@@ -45,10 +45,11 @@ public final class PauseMenu {
 		dialog.show(stage);
 	}
 	
-	private void setupDialog() {
-		dialog = new Dialog("Menu", skin);
+	private Dialog createDialog() {
+		Dialog dialog = new Dialog("Menu", skin);
 		dialog.add(createTable(dialog));
 		dialog.addListener(dialogInput(dialog));
+		return dialog;
 	}
 	
 	private Table createTable(final Dialog dialog) {

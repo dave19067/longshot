@@ -15,5 +15,41 @@
             <name>d</name>
             <score>800</score>
         </highScores>
+        <highScores>
+            <name>d</name>
+            <score>2400</score>
+        </highScores>
+        <highScores>
+            <name>dc</name>
+            <score>8800</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>1400</score>
+        </highScores>
+        <highScores>
+            <name>d</name>
+            <score>25900</score>
+        </highScores>
+        <highScores>
+            <name>d</name>
+            <score>2100</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>2100</score>
+        </highScores>
+        <highScores>
+            <name>sa</name>
+            <score>800</score>
+        </highScores>
+        <highScores>
+            <name>d</name>
+            <score>1200</score>
+        </highScores>
+        <highScores>
+            <name>d</name>
+            <score>1400</score>
+        </highScores>
     </highScores>
 </gameSession>

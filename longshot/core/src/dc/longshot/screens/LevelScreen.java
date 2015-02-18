@@ -232,7 +232,7 @@ public final class LevelScreen implements Screen {
 		entityManager.addEntityAddedListener(entityAdded());
 		entityManager.addEntityRemovedListener(entityRemoved());
 		collisionManager = new CollisionManager();
-		stage = new Stage(new ScreenViewport());
+		stage = createStage();
 		levelSession = new LevelSession();
 		levelController = new LevelController(entityManager, entityFactory, level);
 		backdropManager = new BackdropManager(entityManager, Bound.LEFT, level.getDecorationProfiles());
@@ -240,7 +240,6 @@ public final class LevelScreen implements Screen {
 		Gdx.input.setCursorCatched(true);
 		setupCamera();
 		addInputProcessors();
-		setupStage();
 		setupSystems();
 		entityManager.addAll(createInitialEntities());
 	}
@@ -400,11 +399,13 @@ public final class LevelScreen implements Screen {
 		Input.addProcessor(levelInputProcessor);
 	}
 	
-	private void setupStage() {
+	private Stage createStage() {
+		Stage stage = new Stage(new ScreenViewport());
 		worldTable = new Table(skin);
 		Table statusTable = createStatusTable();
 		Table mainTable = createMainTable(worldTable, statusTable);
 		stage.addActor(mainTable);
+		return stage;
 	}
 	
 	private Table createStatusTable() {
@@ -463,7 +464,7 @@ public final class LevelScreen implements Screen {
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
 				new Vector2(boundsBox.x, boundsBox.y), "objects/green");
 		entities.add(ground);
-		Vector3 shooterSize = new Vector3(2, 1, 1);
+		Vector3 shooterSize = new Vector3(2, 1.5f, 1.5f);
 		TransformPart groundTransform = ground.get(TransformPart.class);
 		Entity shooterCannon = entityFactory.createShooterCannon();
 		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);

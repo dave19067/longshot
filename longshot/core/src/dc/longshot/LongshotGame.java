@@ -283,18 +283,20 @@ public final class LongshotGame extends Game {
 	
 	private List<DecorationProfile> createDecorationProfiles(final Rectangle boundsBox, final float nightRatio) {
 		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
+		if (nightRatio < 0.66f) {
+			PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(textureCache.getRegion("objects/cloud"));
+			Rectangle cloudBoundsBox = new Rectangle(boundsBox);
+			PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
+			DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, 3, 6, 1f, 2, 
+					-200, -100, 0.75f, 1.25f, cloudRegion);
+			decorationProfiles.add(cloudProfile);
+		}
 		if (nightRatio > 0.5f) {
 			PolygonRegion starRegion = RegionFactory.createPolygonRegion(textureCache.getRegion("objects/star"));
 			DecorationProfile starProfile = new DecorationProfile(boundsBox, true, 1, 0.02f, 0.1f, -1000, -500, 
 					0.3f, 0.7f, starRegion);
 			decorationProfiles.add(starProfile);
 		}
-		PolygonRegion cloudRegion = RegionFactory.createPolygonRegion(textureCache.getRegion("objects/cloud"));
-		Rectangle cloudBoundsBox = new Rectangle(boundsBox);
-		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
-		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, 3, 6, 1f, 2, 
-				-200, -100, 0.75f, 1.25f, cloudRegion);
-		decorationProfiles.add(cloudProfile);
 		return decorationProfiles;
 	}
 	

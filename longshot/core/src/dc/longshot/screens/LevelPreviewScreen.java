@@ -53,10 +53,9 @@ public final class LevelPreviewScreen implements Screen {
 
 	@Override
 	public final void show() {
-		stage = new Stage(new ScreenViewport());
+		stage = createStage();
 		Input.addProcessor(stage);
 		Gdx.input.setCursorCatched(false);
-		setupStage();
 	}
 
 	@Override
@@ -77,7 +76,8 @@ public final class LevelPreviewScreen implements Screen {
 		stage.dispose();
 	}
 	
-	private void setupStage() {
+	private Stage createStage() {
+		Stage stage = new Stage(new ScreenViewport());
 		Table mainTable = createMainTable();
 		stage.addActor(mainTable);
 		stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(duration / 2), Actions.fadeOut(duration / 2), 
@@ -87,6 +87,7 @@ public final class LevelPreviewScreen implements Screen {
 				nextScreenRequestedDelegate.notify(new NoArgsEvent());
 			}
 		})));
+		return stage;
 	}
 
 	private Table createMainTable() {

@@ -84,11 +84,10 @@ public final class OptionsScreen implements Screen {
 
 	@Override
 	public final void show() {
-		stage = new Stage(new ScreenViewport());
+		stage = createStage();
 		Input.addProcessor(optionsInputProcessor);
 		Input.addProcessor(stage);
 		Gdx.input.setCursorCatched(false);
-		setupStage();
 	}
 
 	@Override
@@ -137,9 +136,11 @@ public final class OptionsScreen implements Screen {
 		};
 	}
 	
-	private void setupStage() {
+	private Stage createStage() {
+		Stage stage = new Stage(new ScreenViewport());
 		Table mainTable = createMainTable();
 		stage.addActor(mainTable);
+		return stage;
 	}
 	
 	private Table createMainTable() {
