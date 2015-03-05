@@ -1,17 +1,19 @@
 package dc.longshot.parts;
 
-import dc.longshot.epf.Entity;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public final class SpawnOnDeathPart {
 
-	private final Entity original;
+	@XmlElement
+	private String entityType;
 	
-	public SpawnOnDeathPart(final Entity original) {
-		this.original = original;
+	public SpawnOnDeathPart() {
 	}
 	
-	public final Entity getOriginal() {
-		return original;
+	public final String getEntityType() {
+		return entityType;
 	}
 	
 }

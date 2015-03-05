@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import com.badlogic.gdx.files.FileHandle;
 
@@ -25,6 +26,17 @@ public final class XmlUtils {
 		return unmarshal(fileHandle.read(), boundClasses);
 	}
 	
+	public static <TAdapted, T> T unmarshal(final InputStream inputStream, final XmlAdapter<TAdapted, T> xmlAdapter, 
+			final Class<?>[] boundClasses) {
+		TAdapted adaptedObject = unmarshal(inputStream, boundClasses);
+		try {
+			return xmlAdapter.unmarshal(adaptedObject);
+		}
+		catch (Exception e) {
+			throw new IllegalArgumentException("Could not unmarshal stream", e);
+		}
+	}
+	
 	/**
 	 * Reads an xml file to an object.
 	 * @param path path to the xml file
@@ -36,11 +48,10 @@ public final class XmlUtils {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(boundClasses);
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-			T object = (T)unmarshaller.unmarshal(inputStream);
-			return object;
+			return (T)unmarshaller.unmarshal(inputStream);
 		}
 		catch (JAXBException e) {
-			throw new IllegalArgumentException("Could not unmarshal " + inputStream.toString(), e);
+			throw new IllegalArgumentException("Could not unmarshal stream", e);
 		}
 	}
 	

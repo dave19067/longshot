@@ -1,10 +1,18 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.util.Timer;
 
+@XmlRootElement
 public final class TimedDeathPart {
 
-	private final Timer deathTimer;
+	@XmlElement
+	private Timer deathTimer;
+	
+	public TimedDeathPart() {
+	}
 	
 	public TimedDeathPart(final float deathTime) {
 		deathTimer = new Timer(deathTime);

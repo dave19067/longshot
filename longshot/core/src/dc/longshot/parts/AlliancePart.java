@@ -1,13 +1,17 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.models.Alliance;
 
+@XmlRootElement
 public final class AlliancePart {
 
-	private final Alliance alliance;
+	@XmlElement
+	private Alliance alliance;
 	
-	public AlliancePart(final Alliance alliance) {
-		this.alliance = alliance;
+	public AlliancePart() {
 	}
 	
 	public final Alliance getAlliance() {

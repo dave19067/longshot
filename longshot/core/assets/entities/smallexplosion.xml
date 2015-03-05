@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity>
+   <parts>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
+      	<startingSize>
+      	    <x>1.5</x>
+      	    <y>1.5</y>
+      	</startingSize>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      	<textureName>objects/circle</textureName>
+		<z>1.5</z>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnSpawnPart">
+      	<radius>0.75</radius>
+		<damage>1</damage>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="colorChangePart">
+      	<startColor>
+      	    <r>1</r>
+      	    <g>0</g>
+      	    <b>0</b>
+      	    <a>1</a>
+      	</startColor>
+		<endColor>
+      	    <r>1</r>
+      	    <g>0.78</g>
+      	    <b>0</b>
+      	    <a>0</a>
+		</endColor>
+		<changeTimer>
+		    <maxTime>3</maxTime>
+		</changeTimer>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="timedDeathPart">
+          <deathTimer>
+              <maxTime>3</maxTime>
+          </deathTimer>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="playSoundOnSpawnPart">
+      	<soundKey>EXPLOSION</soundKey>
+      </part>
+   </parts>
+</entity>

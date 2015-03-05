@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity>
+   <parts>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
+      	<startingSize>
+      	    <x>0.6</x>
+      	    <y>0.1</y>
+      	</startingSize>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      	<textureName>objects/bullet</textureName>
+		<z>0.3</z>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="speedPart">
+      	<speed>20</speed>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="healthPart">
+      	<maxHealth>1</maxHealth>
+      	<health>1</health>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="bouncePart">
+          <bounds>
+              <bounds>LEFT</bounds>
+              <bounds>RIGHT</bounds>
+          </bounds>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="boundsPart">
+          <bounds>
+              <bounds>LEFT</bounds>
+              <bounds>RIGHT</bounds>
+          </bounds>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="boundsRemovePart">
+          <bounds>
+              <bounds>TOP</bounds>
+              <bounds>BOTTOM</bounds>
+          </bounds>
+          <isPartial>false</isPartial>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="lightPart">
+          <color>
+              <r>1</r>
+              <g>0.78</g>
+              <b>0</b>
+              <a>1</a>
+          </color>
+          <distance>70</distance>
+          <local>
+              <x>0.3</x>
+              <y>0.05</y>
+          </local>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="timedDeathPart">
+	  	<deathTimer>
+	  	    <maxTime>4</maxTime>
+	  	</deathTimer>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="translatePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="autoRotatePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="collisionTypePart">
+      	<collisionType>PLAYER</collisionType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnCollisionPart">
+          <collisionTypes>
+              <collisionTypes>ENEMY</collisionTypes>
+          </collisionTypes>
+          <damage>1</damage>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawnOnDeathPart">
+      	<entityType>shooterbulletexplosion</entityType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="playSoundOnSpawnPart">
+      	<soundKey>LASER</soundKey>
+      </part>
+   </parts>
+</entity>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity>
+   <parts>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
+      	<startingSize>
+      	    <x>1</x>
+      	    <y>0.5</y>
+      	</startingSize>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      	<textureName>objects/ufo</textureName>
+		<z>1</z>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="speedPart">
+      	<speed>3</speed>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="healthPart">
+      	<maxHealth>1</maxHealth>
+      	<health>1</health>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="alliancePart">
+      	<alliance>ENEMY</alliance>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="pointsPart">
+      	<points>100</points>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="bouncePart">
+          <bounds>
+              <bounds>TOP</bounds>
+              <bounds>LEFT</bounds>
+              <bounds>BOTTOM</bounds>
+              <bounds>RIGHT</bounds>
+          </bounds>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="boundsPart">
+          <bounds>
+              <bounds>TOP</bounds>
+              <bounds>LEFT</bounds>
+              <bounds>BOTTOM</bounds>
+              <bounds>RIGHT</bounds>
+          </bounds>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="translatePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="collisionTypePart">
+      	<collisionType>ENEMY</collisionType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnCollisionPart">
+          <collisionTypes>
+              <collisionTypes>PLAYER</collisionTypes>
+          </collisionTypes>
+          <damage>1</damage>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weaponPart">
+      	<entityType>greenlaser</entityType>
+      	<maxSpawns>1</maxSpawns>
+        <spawnTimer>
+            <maxTime>0</maxTime>
+        </spawnTimer>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="wanderMovementPart">
+      	<decisionRate>3</decisionRate>
+      	<idleToMoveRatio>1</idleToMoveRatio>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="targetShooterPart">
+		<shootRate>3</shootRate>
+		<targetAlliance>PLAYER</targetAlliance>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fragsPart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawnOnDeathPart">
+      	<entityType>smallexplosion</entityType>
+      </part>
+   </parts>
+</entity>

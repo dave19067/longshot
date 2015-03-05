@@ -1,5 +1,8 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -7,10 +10,21 @@ import com.badlogic.gdx.math.Vector2;
 import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.xmladapters.Vector2Adapter;
 
+@XmlRootElement
 public final class TransformPart {
 
-	private final Polygon polygon;
+	private Polygon polygon = new Polygon();
+	// TODO: separate this
+	@XmlJavaTypeAdapter(Vector2Adapter.class)
+	private Vector2 startingSize;
+	// TODO: separate this
+	@XmlJavaTypeAdapter(Vector2Adapter.class)
+	private Vector2 startingOrigin;
+	
+	public TransformPart() {
+	}
 	
 	public TransformPart(final Polygon polygon) {
 		this(polygon, new Vector2());
@@ -24,6 +38,18 @@ public final class TransformPart {
 	
 	public final Polygon getPolygon() {
 		return PolygonFactory.copy(polygon);
+	}
+	
+	public final void setPolygon(final Polygon polygon) {
+		this.polygon = polygon;
+	}
+	
+	public final void setVertices(final float[] vertices) {
+		polygon.setVertices(vertices);
+	}
+	
+	public final Vector2 getStartingSize() {
+		return startingSize;
 	}
 	
 	public final Vector2 getSize() {
@@ -49,6 +75,10 @@ public final class TransformPart {
 	public final void setCenter(final Vector2 center) {
 		Vector2 offset = VectorUtils.offset(getCenter(), center);
 		setPosition(getPosition().add(offset));
+	}
+	
+	public final Vector2 getStartingOrigin() {
+		return startingOrigin;
 	}
 	
 	public final Vector2 getOrigin() {

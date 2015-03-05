@@ -1,13 +1,17 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public final class DamageOnSpawnPart {
 
-	private final float radius;
-	private final float damage;
+	@XmlElement
+	private float radius;
+	@XmlElement
+	private float damage;
 	
-	public DamageOnSpawnPart(final float radius, final float damage) {
-		this.radius = radius;
-		this.damage = damage;
+	public DamageOnSpawnPart() {
 	}
 	
 	public float getRadius() {

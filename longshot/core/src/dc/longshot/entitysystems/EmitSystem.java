@@ -3,21 +3,21 @@ package dc.longshot.entitysystems;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
+import dc.longshot.epf.EntityCache;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.PolygonUtils;
-import dc.longshot.level.EntityFactory;
 import dc.longshot.parts.EmitPart;
 import dc.longshot.parts.TransformPart;
 
 public final class EmitSystem extends EntitySystem {
 
+	private final EntityCache entityCache;
 	private final EntityManager entityManager;
-	private final EntityFactory entityFactory;
 	
-	public EmitSystem(final EntityManager entityManager, final EntityFactory entityFactory) {
+	public EmitSystem(final EntityCache entityCache, final EntityManager entityManager) {
+		this.entityCache = entityCache;
 		this.entityManager = entityManager;
-		this.entityFactory = entityFactory;
 	}
 	
 	@Override
@@ -35,13 +35,14 @@ public final class EmitSystem extends EntitySystem {
 	private Entity emit(final Entity entity) {
 		EmitPart emitPart = entity.get(EmitPart.class);
 		emitPart.reset();
-		Entity spawn = entityFactory.create(emitPart.getEntityType());
+		Entity spawn = entityCache.create(emitPart.getEntityType());
 		TransformPart transformPart = entity.get(TransformPart.class);
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		spawnTransform.setRotation(transformPart.getRotation());
 		Vector2 localSpawnPosition = emitPart.getLocalSpawnPosition();
 		Vector2 spawnPosition = PolygonUtils.toGlobal(localSpawnPosition, transformPart.getPolygon());
-		spawnTransform.setCenter(spawnPosition);
+		spawnTransform.setPosition(spawnPosition);
+		//TODO: spawnTransform.setCenter(spawnPosition);
 		return spawn;
 	}
 

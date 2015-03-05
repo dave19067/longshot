@@ -4,11 +4,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
+import dc.longshot.epf.EntityCache;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.VectorUtils;
-import dc.longshot.level.EntityFactory;
 import dc.longshot.level.LevelUtils;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.TargetShooterPart;
@@ -17,12 +17,12 @@ import dc.longshot.parts.WeaponPart;
 
 public final class TargetShooterSystem extends EntitySystem {
 	
+	private final EntityCache entityLoader;
 	private final EntityManager entityManager;
-	private final EntityFactory entityFactory;
 	
-	public TargetShooterSystem(final EntityManager entityManager, final EntityFactory entityFactory) {
+	public TargetShooterSystem(final EntityCache entityLoader, final EntityManager entityManager) {
+		this.entityLoader = entityLoader;
 		this.entityManager = entityManager;
-		this.entityFactory = entityFactory;
 	}
 
 	@Override
@@ -45,10 +45,10 @@ public final class TargetShooterSystem extends EntitySystem {
 	}
 	
 	private void spawn(final Entity entity, final Entity target) {
-		Entity spawn = LevelUtils.createWeaponSpawn(entity, entityFactory);
-		TransformPart spawnTransform = spawn.get(TransformPart.class);
+		Entity spawn = LevelUtils.createWeaponSpawn(entity, entityLoader);
+		TransformPart entityTransform = entity.get(TransformPart.class);
 		TransformPart otherTransform = target.get(TransformPart.class);
-		Vector2 direction = VectorUtils.offset(spawnTransform.getCenter(), otherTransform.getCenter());
+		Vector2 direction = VectorUtils.offset(entityTransform.getCenter(), otherTransform.getCenter());
 		EntityUtils.setDirection(spawn, direction);
 		entityManager.add(spawn);
 	}

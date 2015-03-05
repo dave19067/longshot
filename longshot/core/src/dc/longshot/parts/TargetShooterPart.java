@@ -1,15 +1,19 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.models.Alliance;
 
+@XmlRootElement
 public final class TargetShooterPart {
+
+	@XmlElement
+	private float shootRate;
+	@XmlElement
+	private Alliance targetAlliance;
 	
-	private final float shootRate;
-	private final Alliance targetAlliance;
-	
-	public TargetShooterPart(final float shootRate, final Alliance targetAlliance) {
-		this.shootRate = shootRate;
-		this.targetAlliance = targetAlliance;
+	public TargetShooterPart() {
 	}
 	
 	public final float getShootRate() {

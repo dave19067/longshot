@@ -52,6 +52,7 @@ public final class TextureCache {
 		textureRegions.put(namespace + name, region);
 	}
 	
+	// TODO: Add method to return PolygonRegion
 	public final TextureRegion getRegion(final String name) {
 		if (!textureRegions.containsKey(name)) {
 			throw new IllegalArgumentException("Could not get texture region " + name + " because it does not exist");

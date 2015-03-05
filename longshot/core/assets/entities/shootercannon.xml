@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity>
+   <parts>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
+      	<startingSize>
+      	    <x>1.5</x>
+      	    <y>0.3</y>
+      	</startingSize>
+      	<startingOrigin>
+      	    <x>0</x>
+      	    <y>0.15</y>
+      	</startingOrigin>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      	<textureName>objects/cannon</textureName>
+		<z>0.3</z>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="rotateToCursorPart" />
+   </parts>
+</entity>

@@ -1,18 +1,23 @@
 package dc.longshot.parts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import dc.longshot.geometry.Bound;
 
+@XmlRootElement
 public final class BoundsRemovePart {
-	
-	private final List<Bound> bounds;
-	private final boolean isPartial;
+
+	@XmlElementWrapper
+	private List<Bound> bounds;
+	@XmlElement
+	private boolean isPartial;
 	
 	public BoundsRemovePart() {
-		this(new ArrayList<Bound>(Arrays.asList(Bound.BOTTOM, Bound.LEFT, Bound.RIGHT, Bound.TOP)), true);
 	}
 	
 	public BoundsRemovePart(final List<Bound> bounds, final boolean isPartial) {

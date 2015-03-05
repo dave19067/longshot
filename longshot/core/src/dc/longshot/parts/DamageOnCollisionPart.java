@@ -2,16 +2,21 @@ package dc.longshot.parts;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.models.CollisionType;
 
+@XmlRootElement
 public final class DamageOnCollisionPart {
 
-	private final List<CollisionType> collisionTypes;
-	private final float damage;
+	@XmlElementWrapper
+	private List<CollisionType> collisionTypes;
+	@XmlElement
+	private float damage;
 	
-	public DamageOnCollisionPart(final List<CollisionType> collisionTypes, final float damage) {
-		this.collisionTypes = collisionTypes;
-		this.damage = damage;
+	public DamageOnCollisionPart() {
 	}
 	
 	public final List<CollisionType> getCollisionTypes() {

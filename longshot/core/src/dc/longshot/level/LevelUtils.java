@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
+import dc.longshot.epf.EntityCache;
 import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
@@ -34,14 +35,14 @@ public final class LevelUtils {
 		return distance;
 	}
 	
-	public static final Entity createWeaponSpawn(final Entity entity, final EntityFactory entityFactory) {
+	public static final Entity createWeaponSpawn(final Entity entity, final EntityCache entityLoader) {
 		WeaponPart weaponPart = entity.get(WeaponPart.class);
 		weaponPart.reset();
-		Entity spawn = entityFactory.create(weaponPart.getEntityType());
+		Entity spawn = entityLoader.create(weaponPart.getEntityType());
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		TransformPart transform = entity.get(TransformPart.class);
 		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
-				spawnTransform.getBoundingSize()));
+				spawnTransform.getStartingSize()));
 		weaponPart.addSpawn(spawn);
 		return spawn;
 	}
@@ -50,7 +51,7 @@ public final class LevelUtils {
 		TransformPart transformPart = entity.get(TransformPart.class);
 		
 		// Get the destination, which is a random point on the ground
-		float destX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - transformPart.getSize().x);
+		float destX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - transformPart.getStartingSize().x);
 		Vector2 destPosition = new Vector2(destX, 0);
 		
 		// Find the direction to get from the entity spawn position to the destination

@@ -78,8 +78,12 @@ public class Entity {
 	/**
 	 * @return A copy of the list of all parts the entity is composed of.
 	 */
-	public final List<Part> getAll() {
-		return new ArrayList<Part>(parts.values());
+	public final List<Object> getAll() {
+		List<Object> partObjects = new ArrayList<Object>();
+		for (Part part : parts.values()) {
+			partObjects.add(part.object);
+		}
+		return partObjects;
 	}
 	
 	/**

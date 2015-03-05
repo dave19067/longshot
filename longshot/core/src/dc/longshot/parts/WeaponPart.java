@@ -4,24 +4,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.epf.Entity;
-import dc.longshot.models.EntityType;
 import dc.longshot.util.Timer;
 
+@XmlRootElement
 public final class WeaponPart {
-	
-	private final EntityType entityType;
-	private final List<Entity> spawns = new ArrayList<Entity>();
-	private final int maxSpawns;
-	private final Timer spawnTimer;
 
-	public WeaponPart(final EntityType entityType, final int maxSpawns, final float maxSpawnTime) {
-		this.entityType = entityType;
-		this.maxSpawns = maxSpawns;
-		spawnTimer = new Timer(maxSpawnTime);
+	@XmlElement
+	private String entityType;
+	private final List<Entity> spawns = new ArrayList<Entity>();
+	@XmlElement
+	private int maxSpawns;
+	@XmlElement
+	private Timer spawnTimer;
+	
+	public WeaponPart() {
 	}
 	
-	public final EntityType getEntityType() {
+	public final String getEntityType() {
 		return entityType;
 	}
 	

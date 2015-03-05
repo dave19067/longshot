@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity>
+   <parts>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
+      	<startingSize>
+      	    <x>1</x>
+      	    <y>0.75</y>
+      	</startingSize>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      	<textureName>objects/nuke</textureName>
+		<z>0.75</z>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="speedPart">
+      	<speed>2</speed>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="healthPart">
+      	<maxHealth>1</maxHealth>
+      	<health>1</health>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="pointsPart">
+      	<points>100</points>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="alliancePart">
+      	<alliance>ENEMY</alliance>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="translatePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="cityDamagePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="autoRotatePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="boundsRemovePart">
+          <bounds>
+              <bounds>BOTTOM</bounds>
+          </bounds>
+          <isPartial>true</isPartial>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="collisionTypePart">
+      	<collisionType>ENEMY</collisionType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnCollisionPart">
+          <collisionTypes>
+              <collisionTypes>PLAYER</collisionTypes>
+          </collisionTypes>
+          <damage>3</damage>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="lightPart">
+          <color>
+              <r>1</r>
+              <g>1</g>
+              <b>0</b>
+              <a>1</a>
+          </color>
+          <distance>100</distance>
+          <local>
+              <x>0</x>
+              <y>0.37</y>
+          </local>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="emitPart">
+          <entityType>largetrailsmoke</entityType>
+          <localSpawnPosition>
+              <x>0.5</x>
+              <y>0.37</y>
+          </localSpawnPosition>
+          <emitTimer>
+              <maxTime>0.2</maxTime>
+          </emitTimer>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fragsPart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawnOnDeathPart">
+      	<entityType>largeexplosion</entityType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawningPart">
+          <spawningType>DOWNWARD</spawningType>
+      </part>
+   </parts>
+</entity>

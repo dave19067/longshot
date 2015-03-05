@@ -1,13 +1,17 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.models.SoundKey;
 
+@XmlRootElement
 public final class SoundOnDeathPart {
 
-	private final SoundKey soundKey;
+	@XmlElement
+	private SoundKey soundKey;
 	
-	public SoundOnDeathPart(final SoundKey soundKey) {
-		this.soundKey = soundKey;
+	public SoundOnDeathPart() {
 	}
 	
 	public SoundKey getSoundKey() {

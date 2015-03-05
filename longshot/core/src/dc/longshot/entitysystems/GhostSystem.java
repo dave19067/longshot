@@ -1,9 +1,12 @@
 package dc.longshot.entitysystems;
 
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
+import dc.longshot.graphics.RegionFactory;
+import dc.longshot.graphics.TextureCache;
 import dc.longshot.models.SoundKey;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.DamageOnCollisionPart;
@@ -16,17 +19,23 @@ import dc.longshot.util.Timer;
 
 public final class GhostSystem extends EntitySystem {
 
+	private final TextureCache textureCache;
 	private final SoundCache<SoundKey> soundCache;
 	
-	public GhostSystem(final SoundCache<SoundKey> soundCache) {
+	public GhostSystem(final TextureCache textureCache, final SoundCache<SoundKey> soundCache) {
+		this.textureCache = textureCache;
 		this.soundCache = soundCache;
 	}
 
 	@Override
 	public final void initialize(final Entity entity) {
 		if (entity.hasActive(GhostPart.class)) {
+			GhostPart ghostPart = entity.get(GhostPart.class);
 			PolygonRegion normalRegion = entity.get(DrawablePart.class).getSprite().getRegion();
-			entity.get(GhostPart.class).setNormalRegion(normalRegion);
+			ghostPart.setNormalRegion(normalRegion);
+			TextureRegion ghostTextureRegion = textureCache.getRegion(ghostPart.getGhostRegionName());
+			PolygonRegion ghostRegion = RegionFactory.createPolygonRegion(ghostTextureRegion);
+			ghostPart.setGhostRegion(ghostRegion);
 		}
 	}
 

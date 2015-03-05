@@ -3,12 +3,23 @@ package dc.longshot.parts;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.badlogic.gdx.math.Vector2;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public final class WaypointsPart {
 
+	@XmlElement
 	private float endBuffer = 0;
 	private final List<Vector2> waypoints = new ArrayList<Vector2>();
+	
+	public WaypointsPart() {
+	}
 
 	/**
 	 * @return the minimum distance that must be kept between the center and the last waypoint

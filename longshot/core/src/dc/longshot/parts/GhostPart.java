@@ -1,22 +1,28 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 
 import dc.longshot.models.SoundKey;
 import dc.longshot.util.Timer;
 
+@XmlRootElement
 public final class GhostPart {
 
 	private boolean ghostMode = false;
-	private final Timer ghostTimer;
+	@XmlElement
+	private Timer ghostTimer;
 	private PolygonRegion normalRegion;
-	private final PolygonRegion ghostRegion;
-	private final SoundKey deactivateSound;
+	// TODO: separate this
+	@XmlElement
+	private String ghostRegionName;
+	private PolygonRegion ghostRegion;
+	@XmlElement
+	private SoundKey deactivateSound;
 	
-	public GhostPart(final float maxGhostTime, final PolygonRegion ghostTexture, final SoundKey deactivateSound) {
-		ghostTimer = new Timer(maxGhostTime);
-		this.ghostRegion = ghostTexture;
-		this.deactivateSound = deactivateSound;
+	public GhostPart() {
 	}
 	
 	public final boolean ghostMode() {
@@ -39,8 +45,16 @@ public final class GhostPart {
 		this.normalRegion = normalRegion;
 	}
 	
+	public final String getGhostRegionName() {
+		return ghostRegionName;
+	}
+	
 	public final PolygonRegion getGhostRegion() {
 		return ghostRegion;
+	}
+	
+	public final void setGhostRegion(final PolygonRegion ghostRegion) {
+		this.ghostRegion = ghostRegion;
 	}
 	
 	public final SoundKey getDeactivateSound() {

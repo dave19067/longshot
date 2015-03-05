@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity>
+   <parts>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
+      	<startingSize>
+      	    <x>2</x>
+      	    <y>1.5</y>
+      	</startingSize>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      	<textureName>objects/tank</textureName>
+		<z>1.5</z>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="speedPart">
+      	<speed>7</speed>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="healthPart">
+      	<maxHealth>1</maxHealth>
+      	<health>1</health>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="alliancePart">
+      	<alliance>PLAYER</alliance>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="boundsPart">
+          <bounds>
+              <bounds>TOP</bounds>
+              <bounds>LEFT</bounds>
+              <bounds>BOTTOM</bounds>
+              <bounds>RIGHT</bounds>
+          </bounds>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="translatePart" />
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="collisionTypePart">
+      	<collisionType>PLAYER</collisionType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnCollisionPart">
+          <collisionTypes>
+              <collisionTypes>ENEMY</collisionTypes>
+          </collisionTypes>
+          <damage>1</damage>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weaponPart">
+          <entityType>shooterbullet</entityType>
+          <maxSpawns>2</maxSpawns>
+          <spawnTimer>
+              <maxTime>0.5</maxTime>
+          </spawnTimer>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="attachmentPart">
+          <attachedEntityType>shootercannon</attachedEntityType>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ghostPart">
+          <ghostTimer>
+              <maxTime>5</maxTime>
+          </ghostTimer>
+          <ghostRegionName>objects/tank_outline</ghostRegionName>
+          <deactivateSound>POWER_UP</deactivateSound>
+      </part>
+      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="soundOnDeathPart">
+          <soundKey>POWER_DOWN</soundKey>
+      </part>
+   </parts>
+</entity>

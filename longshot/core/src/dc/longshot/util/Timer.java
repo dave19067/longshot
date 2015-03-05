@@ -1,9 +1,18 @@
 package dc.longshot.util;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+// TODO: Create adapter for timer
+@XmlRootElement
 public final class Timer {
 
-	private final float maxTime;
+	@XmlElement
+	private float maxTime;
 	private float time = 0;
+	
+	public Timer() {
+	}
 	
 	public Timer(final float maxTime) {
 		this.maxTime = maxTime;

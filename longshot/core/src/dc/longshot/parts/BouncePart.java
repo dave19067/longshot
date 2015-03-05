@@ -1,21 +1,20 @@
 package dc.longshot.parts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import dc.longshot.geometry.Bound;
 
+@XmlRootElement
 public final class BouncePart {
 
-	private final List<Bound> bounds;
+	@XmlElementWrapper
+	private List<Bound> bounds;
 	
 	public BouncePart() {
-		this(new ArrayList<Bound>(Arrays.asList(Bound.BOTTOM, Bound.LEFT, Bound.RIGHT, Bound.TOP)));
-	}
-	
-	public BouncePart(final List<Bound> bounds) {
-		this.bounds = bounds;
 	}
 	
 	public final List<Bound> getBounds() {

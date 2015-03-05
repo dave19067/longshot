@@ -1,11 +1,15 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public final class PointsPart {
 
-	private final int points;
+	@XmlElement
+	private int points;
 	
-	public PointsPart(final int points) {
-		this.points = points;
+	public PointsPart() {
 	}
 	
 	public final int getPoints() {

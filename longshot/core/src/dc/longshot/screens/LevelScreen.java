@@ -44,7 +44,7 @@ import dc.longshot.entitysystems.CityDamageSystem;
 import dc.longshot.entitysystems.CollisionDamageSystem;
 import dc.longshot.entitysystems.ColorChangeSystem;
 import dc.longshot.entitysystems.CurvedMovementSystem;
-import dc.longshot.entitysystems.DrawableUpdaterSystem;
+import dc.longshot.entitysystems.DrawableSystem;
 import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.FollowerSystem;
 import dc.longshot.entitysystems.GhostSystem;
@@ -57,12 +57,14 @@ import dc.longshot.entitysystems.ShooterInputSystem;
 import dc.longshot.entitysystems.SpinSystem;
 import dc.longshot.entitysystems.TargetShooterSystem;
 import dc.longshot.entitysystems.TimedDeathSystem;
+import dc.longshot.entitysystems.TransformSystem;
 import dc.longshot.entitysystems.TranslateSystem;
 import dc.longshot.entitysystems.WanderMovementSystem;
 import dc.longshot.entitysystems.WaypointsSystem;
 import dc.longshot.entitysystems.WeaponSystem;
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityAddedListener;
+import dc.longshot.epf.EntityCache;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedListener;
 import dc.longshot.epf.EntitySystem;
@@ -72,7 +74,9 @@ import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.BackdropManager;
 import dc.longshot.game.Fragmenter;
 import dc.longshot.game.SkinPack;
+import dc.longshot.game.XmlBindings;
 import dc.longshot.geometry.Bound;
+import dc.longshot.geometry.ConvexHullCache;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
@@ -109,7 +113,7 @@ import dc.longshot.system.Input;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
-import dc.longshot.util.Cloning;
+import dc.longshot.util.PathUtils;
 
 public final class LevelScreen implements Screen {
 
@@ -127,7 +131,9 @@ public final class LevelScreen implements Screen {
 	private final BitmapFont font;
 	private final TextureCache textureCache;
 	private final SoundCache<SoundKey> soundCache;
-	private  final Map<InputAction, Integer> inputActions;
+	private final ConvexHullCache convexHullCache;
+	private final EntityCache entityLoader;
+	private final Map<InputAction, Integer> inputActions;
 	private final DebugSettings debugSettings;
 	private LevelSession levelSession;
 	private final PlaySession playSession;
@@ -161,14 +167,17 @@ public final class LevelScreen implements Screen {
 	public LevelScreen(final SkinPack skinPack, final TextureCache textureCache, 
 			final SoundCache<SoundKey> soundCache, final Map<InputAction, Integer> inputActions, 
 			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
 		this.textureCache = textureCache;
 		this.soundCache = soundCache;
 		this.inputActions = inputActions;
 		this.debugSettings = debugSettings;
 		this.playSession = playSession;
 		this.level = level;
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
+		convexHullCache = new ConvexHullCache(textureCache);
+		String entitiesPath = PathUtils.internalToAbsolutePath("entities") + "/";
+		entityLoader = new EntityCache(entitiesPath, XmlBindings.BOUND_CLASSES);
 		spriteBatch = new PolygonSpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 		cursorRegion = textureCache.getRegion("objects/crosshairs");
@@ -227,14 +236,14 @@ public final class LevelScreen implements Screen {
 		rayHandler = new RayHandler(world);
 		rayHandler.setShadows(false);
 		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
-		entityFactory = new EntityFactory(textureCache, rayHandler);
+		entityFactory = new EntityFactory(textureCache, convexHullCache);
 		entityManager = new EntityManager();
 		entityManager.addEntityAddedListener(entityAdded());
 		entityManager.addEntityRemovedListener(entityRemoved());
 		collisionManager = new CollisionManager();
 		stage = createStage();
 		levelSession = new LevelSession();
-		levelController = new LevelController(entityManager, entityFactory, level);
+		levelController = new LevelController(entityLoader, entityManager, level);
 		backdropManager = new BackdropManager(entityManager, Bound.LEFT, level.getDecorationProfiles());
 		
 		Gdx.input.setCursorCatched(true);
@@ -281,7 +290,9 @@ public final class LevelScreen implements Screen {
 					entity.get(HealthPart.class).addNoHealthListener(noHealth(entity));
 				}
 				if (entity.hasActive(AttachmentPart.class)) {
-					Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
+					AttachmentPart attachmentPart = entity.get(AttachmentPart.class);
+					Entity attachedEntity = entityLoader.create(attachmentPart.getAttachedEntityType());
+					attachmentPart.setAttachedEntity(attachedEntity);
 					entityManager.add(attachedEntity);
 				}
 				if (entity.hasActive(FollowerPart.class)) {
@@ -346,11 +357,11 @@ public final class LevelScreen implements Screen {
 	
 	private void spawnOnDeath(final Entity entity) {
 		if (entity.hasActive(SpawnOnDeathPart.class)) {
-			Entity original = entity.get(SpawnOnDeathPart.class).getOriginal();
-			Entity spawn = Cloning.clone(original);
+			String entityTypeName = entity.get(SpawnOnDeathPart.class).getEntityType();
+			Entity spawn = entityLoader.create(entityTypeName);
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
 			Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
-					spawnTransform.getBoundingSize());
+					spawnTransform.getStartingSize());
 			spawnTransform.setPosition(position);
 			entityManager.add(spawn);
 		}
@@ -430,6 +441,7 @@ public final class LevelScreen implements Screen {
 	
 	private void setupSystems() {
 		entitySystems = new ArrayList<EntitySystem>();
+		entitySystems.add(new TransformSystem(convexHullCache));
 		entitySystems.add(new TranslateSystem());
 		entitySystems.add(new GravitySystem());
 		entitySystems.add(new AutoRotateSystem());
@@ -437,25 +449,25 @@ public final class LevelScreen implements Screen {
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
 		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
-		entitySystems.add(new EmitSystem(entityManager, entityFactory));
+		entitySystems.add(new EmitSystem(entityLoader, entityManager));
 		entitySystems.add(new WanderMovementSystem());
 		entitySystems.add(new WeaponSystem());
-		entitySystems.add(new TargetShooterSystem(entityManager, entityFactory));
-		entitySystems.add(new GroundShooterSystem(entityManager, entityFactory, level.getBoundsBox()));
+		entitySystems.add(new TargetShooterSystem(entityLoader, entityManager));
+		entitySystems.add(new GroundShooterSystem(entityLoader, entityManager, level.getBoundsBox()));
 		entitySystems.add(new InputMovementSystem(inputActions));
 		entitySystems.add(new RotateToCursorSystem(camera, worldTable));
 		entitySystems.add(new BoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
-		entitySystems.add(new ShooterInputSystem(entityManager, entityFactory));
+		entitySystems.add(new ShooterInputSystem(entityLoader, entityManager));
 		entitySystems.add(new CurvedMovementSystem(level.getBoundsBox()));
 		entitySystems.add(new WaypointsSystem());
 		entitySystems.add(new AttachmentSystem());
-		entitySystems.add(new FollowerSystem());
-		entitySystems.add(new DrawableUpdaterSystem());
+		entitySystems.add(new FollowerSystem(entityLoader));
+		entitySystems.add(new DrawableSystem(textureCache));
 		entitySystems.add(new SpinSystem());
 		entitySystems.add(new ColorChangeSystem());
-		entitySystems.add(new LightSystem());
-		entitySystems.add(new GhostSystem(soundCache));
+		entitySystems.add(new LightSystem(rayHandler));
+		entitySystems.add(new GhostSystem(textureCache, soundCache));
 	}
 	
 	private List<Entity> createInitialEntities() {
@@ -464,17 +476,16 @@ public final class LevelScreen implements Screen {
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
 				new Vector2(boundsBox.x, boundsBox.y), "objects/green");
 		entities.add(ground);
-		Vector3 shooterSize = new Vector3(2, 1.5f, 1.5f);
-		TransformPart groundTransform = ground.get(TransformPart.class);
-		Entity shooterCannon = entityFactory.createShooterCannon();
-		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterSize.x);
-		Vector2 shooterPosition = new Vector2(shooterX, PolygonUtils.top(groundTransform.getBoundingBox()));
-		Entity shooter = entityFactory.createShooter(shooterSize, shooterPosition, shooterCannon);
+		Entity shooter = entityLoader.create("shooter");
+		TransformPart shooterTransformPart = shooter.get(TransformPart.class);
+		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterTransformPart.getStartingSize().x);
+		Vector2 shooterPosition = new Vector2(shooterX, 0);
+		shooterTransformPart.setPosition(shooterPosition);
 		entities.add(shooter);
 		entities.addAll(createBackgroundEntities());
 		return entities;
 	}
-	
+
 	private List<Entity> createBackgroundEntities() {
 		List<Entity> entities = new ArrayList<Entity>();
 		int minWidth = (int)(5 * UnitConvert.PIXELS_PER_UNIT);

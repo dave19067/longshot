@@ -1,17 +1,23 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+/**
+ * Rotates the entity continuously.
+ */
+@XmlRootElement
 public final class SpinPart {
 	
-	private final float rotationSpeed;
+	@XmlElement
+	private float rotationSpeed;
 	
-	/**
-	 * Rotates the entity continuously.
-	 * @param rotationSpeed number of degrees to add to rotation per second
-	 */
-	public SpinPart(final float rotationSpeed) {
-		this.rotationSpeed = rotationSpeed;
+	public SpinPart() {
 	}
 	
+	/**
+	 * @return number of degrees to add to rotation per second
+	 */
 	public final float getRotationSpeed() {
 		return rotationSpeed;
 	}

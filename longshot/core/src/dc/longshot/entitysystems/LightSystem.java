@@ -1,6 +1,8 @@
 package dc.longshot.entitysystems;
 
 import box2dLight.Light;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,11 +14,22 @@ import dc.longshot.parts.LightPart;
 import dc.longshot.parts.TransformPart;
 
 public final class LightSystem extends EntitySystem {
+	
+	private static final int RAY_NUM = 8;
+	
+	private final RayHandler rayHandler;
+	
+	public LightSystem(final RayHandler rayHandler) {
+		this.rayHandler = rayHandler;
+	}
 
 	@Override
 	public final void initialize(final Entity entity) {
 		if (entity.hasActive(LightPart.class)) {
-			entity.get(LightPart.class).getLight().setActive(true);
+			LightPart lightPart = entity.get(LightPart.class);
+			Light light = new PointLight(rayHandler, RAY_NUM, lightPart.getColor(), lightPart.getDistance(), 0, 0);
+			light.setActive(true);
+			lightPart.setLight(light);
 		}
 	}
 	

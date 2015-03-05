@@ -1,19 +1,23 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 
+@XmlRootElement
 public final class HealthPart {
 
 	private final EventDelegate<NoArgsListener> noHealthDelegate = new EventDelegate<NoArgsListener>();
-	
-	private final float maxHealth;
+
+	@XmlElement
+	private float maxHealth;
+	@XmlElement
 	private float health;
 	
-	public HealthPart(final float maxHealth) {
-		this.maxHealth = maxHealth;
-		this.health = maxHealth;
+	public HealthPart() {
 	}
 	
 	public final void addNoHealthListener(final NoArgsListener listener) {
