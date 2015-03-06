@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import dc.longshot.util.Cloning;
 import dc.longshot.util.XmlUtils;
 
-// TODO: Dispose cached entities
 public final class EntityCache {
 
 	private static final String ENTITY_EXTENSION = ".xml";

@@ -23,7 +23,7 @@ public final class ColorAdapter extends XmlAdapter<ColorAdapter.ColorAdapted, Co
 	}
 
 	@XmlRootElement
-	public static final class ColorAdapted {
+	static final class ColorAdapted {
 		public float r;
 		public float g;
 		public float b;

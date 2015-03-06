@@ -2,17 +2,19 @@ package dc.longshot.parts;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 
 import dc.longshot.models.SoundKey;
 import dc.longshot.util.Timer;
+import dc.longshot.xmladapters.TimerAdapter;
 
 @XmlRootElement
 public final class GhostPart {
 
 	private boolean ghostMode = false;
-	@XmlElement
+	@XmlJavaTypeAdapter(TimerAdapter.class)
 	private Timer ghostTimer;
 	private PolygonRegion normalRegion;
 	// TODO: separate this

@@ -6,9 +6,11 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.util.Timer;
+import dc.longshot.xmladapters.TimerAdapter;
 
 @XmlRootElement
 public final class WeaponPart {
@@ -18,7 +20,7 @@ public final class WeaponPart {
 	private final List<Entity> spawns = new ArrayList<Entity>();
 	@XmlElement
 	private int maxSpawns;
-	@XmlElement
+	@XmlJavaTypeAdapter(TimerAdapter.class)
 	private Timer spawnTimer;
 	
 	public WeaponPart() {

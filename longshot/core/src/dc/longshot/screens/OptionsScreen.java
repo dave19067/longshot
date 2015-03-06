@@ -39,7 +39,6 @@ import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.util.XmlUtils;
 
-// TODO: Clean up using MVVM
 public final class OptionsScreen implements Screen {
 
 	private static final Color KEY_ENTRY_COLOR = Color.YELLOW;

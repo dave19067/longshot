@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.util.Timer;
+import dc.longshot.xmladapters.TimerAdapter;
 import dc.longshot.xmladapters.Vector2Adapter;
 
 @XmlRootElement
@@ -17,7 +18,7 @@ public final class EmitPart {
 	private String entityType;
 	@XmlJavaTypeAdapter(Vector2Adapter.class)
 	private Vector2 localSpawnPosition;
-	@XmlElement
+	@XmlJavaTypeAdapter(TimerAdapter.class)
 	private Timer emitTimer;
 	
 	public EmitPart() {

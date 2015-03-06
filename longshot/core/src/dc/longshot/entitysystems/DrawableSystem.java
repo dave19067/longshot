@@ -2,13 +2,11 @@ package dc.longshot.entitysystems;
 
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.UnitConvert;
-import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.TransformPart;
@@ -27,8 +25,7 @@ public final class DrawableSystem extends EntitySystem {
 			DrawablePart drawablePart = entity.get(DrawablePart.class);
 			// TODO: NULL CHECK BAD!
 			if (drawablePart.getTextureName() != null) {
-				TextureRegion textureRegion = textureCache.getRegion(drawablePart.getTextureName());
-				PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion);
+				PolygonRegion region = textureCache.getPolygonRegion(drawablePart.getTextureName());
 				drawablePart.setSprite(new PolygonSprite(region));
 			}
 		}

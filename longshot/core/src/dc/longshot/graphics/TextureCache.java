@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -52,8 +53,12 @@ public final class TextureCache {
 		textureRegions.put(namespace + name, region);
 	}
 	
-	// TODO: Add method to return PolygonRegion
-	public final TextureRegion getRegion(final String name) {
+	public final PolygonRegion getPolygonRegion(final String name) {
+		TextureRegion textureRegion = getTextureRegion(name);
+		return RegionFactory.createPolygonRegion(textureRegion);
+	}
+	
+	public final TextureRegion getTextureRegion(final String name) {
 		if (!textureRegions.containsKey(name)) {
 			throw new IllegalArgumentException("Could not get texture region " + name + " because it does not exist");
 		}

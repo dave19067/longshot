@@ -51,7 +51,7 @@
       </part>
       <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ghostPart">
           <ghostTimer>
-              <maxTime>5</maxTime>
+              <maxTime>3</maxTime>
           </ghostTimer>
           <ghostRegionName>objects/tank_outline</ghostRegionName>
           <deactivateSound>POWER_UP</deactivateSound>

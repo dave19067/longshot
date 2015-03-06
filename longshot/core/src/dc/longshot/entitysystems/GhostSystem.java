@@ -1,11 +1,9 @@
 package dc.longshot.entitysystems;
 
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
-import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.models.SoundKey;
 import dc.longshot.parts.CollisionTypePart;
@@ -33,8 +31,7 @@ public final class GhostSystem extends EntitySystem {
 			GhostPart ghostPart = entity.get(GhostPart.class);
 			PolygonRegion normalRegion = entity.get(DrawablePart.class).getSprite().getRegion();
 			ghostPart.setNormalRegion(normalRegion);
-			TextureRegion ghostTextureRegion = textureCache.getRegion(ghostPart.getGhostRegionName());
-			PolygonRegion ghostRegion = RegionFactory.createPolygonRegion(ghostTextureRegion);
+			PolygonRegion ghostRegion = textureCache.getPolygonRegion(ghostPart.getGhostRegionName());
 			ghostPart.setGhostRegion(ghostRegion);
 		}
 	}

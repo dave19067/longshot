@@ -29,7 +29,7 @@ public final class EntityFactory {
 	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, final float minZ, 
 			final String regionName) {
 		Entity entity = new Entity();
-		TextureRegion textureRegion = textureCache.getRegion(regionName);
+		TextureRegion textureRegion = textureCache.getTextureRegion(regionName);
 		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion, vertices);
 		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region), position.z);
 		Color color = Color.WHITE.cpy().lerp(Color.DARK_GRAY, position.z / minZ);
@@ -48,8 +48,7 @@ public final class EntityFactory {
 		Entity entity = new Entity();
 		Polygon convexHull = convexHullCache.create(regionName, new Vector2(size.x, size.y));
 		entity.attach(new TransformPart(convexHull, position));
-		TextureRegion textureRegion = textureCache.getRegion(regionName);
-		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion);
+		PolygonRegion region = textureCache.getPolygonRegion(regionName);
 		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));
 		return entity;
 	}

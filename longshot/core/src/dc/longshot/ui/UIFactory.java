@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 
-// TODO: Make this a non-static class to avoid having to pass in skin and font?
 public final class UIFactory {
 	
 	private UIFactory() {

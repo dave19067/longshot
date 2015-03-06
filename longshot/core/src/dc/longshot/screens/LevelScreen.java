@@ -180,7 +180,7 @@ public final class LevelScreen implements Screen {
 		entityLoader = new EntityCache(entitiesPath, XmlBindings.BOUND_CLASSES);
 		spriteBatch = new PolygonSpriteBatch();
 		shapeRenderer = new ShapeRenderer();
-		cursorRegion = textureCache.getRegion("objects/crosshairs");
+		cursorRegion = textureCache.getTextureRegion("objects/crosshairs");
 	}
 
 	public final void addPausedListener(final NoArgsListener listener) {
@@ -422,7 +422,7 @@ public final class LevelScreen implements Screen {
 	private Table createStatusTable() {
 		statusTable = new Table(skin);
 		statusTable.add(UIFactory.label(skin, font, "HEALTH: ")).right();
-		TextureRegion healthBarRegion = new TextureRegion(textureCache.getRegion("objects/health_bar"));
+		TextureRegion healthBarRegion = textureCache.getTextureRegion("objects/health_bar");
 		healthDisplay = new HealthDisplay(healthBarRegion);
 		statusTable.add(healthDisplay.getTable()).left().row();
 		statusTable.add(UIFactory.label(skin, font, "SCORE: ")).right();
@@ -495,7 +495,7 @@ public final class LevelScreen implements Screen {
 		float minHeightRatio = 0.5f;
 		float minZ = -100;
 		for (int i = 0; i < MathUtils.random(minNum, maxNum); i++) {
-			TextureRegion region = textureCache.getRegion("backgrounds/rock02");
+			TextureRegion region = textureCache.getTextureRegion("backgrounds/rock02");
 			int textureX = MathUtils.random(0, region.getRegionWidth() - 1);
 			int textureY = MathUtils.random(0, region.getRegionHeight() - 1);
 			int width = MathUtils.random(minWidth, maxWidth);

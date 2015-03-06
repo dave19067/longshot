@@ -21,7 +21,7 @@ public final class ConvexHullCache {
 	
 	public final Polygon create(final String regionName, final Vector2 size) {
 		if (!convexHulls.containsKey(regionName)) {
-			TextureRegion textureRegion = textureCache.getRegion(regionName);
+			TextureRegion textureRegion = textureCache.getTextureRegion(regionName);
 			float[] convexHull = TextureGeometry.createConvexHull(textureRegion);
 			// libgdx y-axis is flipped
 			VertexUtils.flipY(convexHull);

@@ -1,14 +1,15 @@
 package dc.longshot.parts;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import dc.longshot.util.Timer;
+import dc.longshot.xmladapters.TimerAdapter;
 
 @XmlRootElement
 public final class TimedDeathPart {
 
-	@XmlElement
+	@XmlJavaTypeAdapter(TimerAdapter.class)
 	private Timer deathTimer;
 	
 	public TimedDeathPart() {

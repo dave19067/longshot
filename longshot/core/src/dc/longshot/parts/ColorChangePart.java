@@ -1,6 +1,5 @@
 package dc.longshot.parts;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -8,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 
 import dc.longshot.util.Timer;
 import dc.longshot.xmladapters.ColorAdapter;
+import dc.longshot.xmladapters.TimerAdapter;
 
 @XmlRootElement
 public final class ColorChangePart {
@@ -16,7 +16,7 @@ public final class ColorChangePart {
 	private Color startColor;
 	@XmlJavaTypeAdapter(ColorAdapter.class)
 	private Color endColor;
-	@XmlElement
+	@XmlJavaTypeAdapter(TimerAdapter.class)
 	private Timer changeTimer;
 	
 	public ColorChangePart() {

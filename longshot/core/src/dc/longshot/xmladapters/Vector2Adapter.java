@@ -21,7 +21,7 @@ public final class Vector2Adapter extends XmlAdapter<Vector2Adapter.Vector2Adapt
 	}
 
 	@XmlRootElement
-	public static final class Vector2Adapted {
+	static final class Vector2Adapted {
 		public float x;
 		public float y;
 	}
