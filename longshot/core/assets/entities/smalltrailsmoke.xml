@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity>
+<entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
-      	<startingSize>
+      <part xsi:type="transformPart">
+      	<size>
       	    <x>0.1</x>
       	    <y>0.1</y>
-      	</startingSize>
+      	</size>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      <part xsi:type="drawablePart">
       	<textureName>objects/white</textureName>
 		<z>0.1</z>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="colorChangePart">
+      <part xsi:type="colorChangePart">
       	<startColor>
       	    <r>0.5</r>
       	    <g>0.5</g>
@@ -28,7 +28,7 @@
 		    <maxTime>3</maxTime>
 		</changeTimer>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="timedDeathPart">
+      <part xsi:type="timedDeathPart">
           <deathTimer>
               <maxTime>3</maxTime>
           </deathTimer>

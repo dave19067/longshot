@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity>
+<entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
-      	<startingSize>
+      <part xsi:type="transformPart">
+      	<size>
       	    <x>2</x>
       	    <y>2</y>
-      	</startingSize>
+      	</size>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      <part xsi:type="drawablePart">
       	<textureName>objects/sawblades</textureName>
 		<z>0.1</z>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="speedPart">
+      <part xsi:type="speedPart">
       	<speed>2</speed>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="gravityPart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spinPart">
+      <part xsi:type="gravityPart" />
+      <part xsi:type="spinPart">
       	<rotationSpeed>-360</rotationSpeed>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="healthPart">
+      <part xsi:type="healthPart">
       	<maxHealth>1</maxHealth>
       	<health>1</health>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="pointsPart">
+      <part xsi:type="pointsPart">
       	<points>100</points>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="alliancePart">
+      <part xsi:type="alliancePart">
       	<alliance>ENEMY</alliance>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="translatePart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="bouncePart">
+      <part xsi:type="translatePart" />
+      <part xsi:type="bouncePart">
           <bounds>
               <bounds>TOP</bounds>
               <bounds>LEFT</bounds>
@@ -37,20 +37,20 @@
               <bounds>RIGHT</bounds>
           </bounds>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="collisionTypePart">
+      <part xsi:type="collisionTypePart">
       	<collisionType>ENEMY</collisionType>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnCollisionPart">
+      <part xsi:type="damageOnCollisionPart">
           <collisionTypes>
               <collisionTypes>PLAYER</collisionTypes>
           </collisionTypes>
           <damage>1</damage>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fragsPart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawnOnDeathPart">
+      <part xsi:type="fragsPart" />
+      <part xsi:type="spawnOnDeathPart">
       	<entityType>smallexplosion</entityType>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawningPart">
+      <part xsi:type="spawningPart">
           <spawningType>SIDE_BOUNCE</spawningType>
       </part>
    </parts>

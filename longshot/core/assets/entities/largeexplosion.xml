@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity>
+<entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
-      	<startingSize>
+      <part xsi:type="transformPart">
+      	<size>
       	    <x>3</x>
       	    <y>3</y>
-      	</startingSize>
+      	</size>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      <part xsi:type="drawablePart">
       	<textureName>objects/circle</textureName>
 		<z>3</z>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnSpawnPart">
+      <part xsi:type="damageOnSpawnPart">
       	<radius>0.75</radius>
 		<damage>1</damage>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="colorChangePart">
+      <part xsi:type="colorChangePart">
       	<startColor>
       	    <r>1</r>
       	    <g>0</g>
@@ -32,12 +32,12 @@
 		    <maxTime>3</maxTime>
 		</changeTimer>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="timedDeathPart">
+      <part xsi:type="timedDeathPart">
           <deathTimer>
               <maxTime>3</maxTime>
           </deathTimer>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="playSoundOnSpawnPart">
+      <part xsi:type="playSoundOnSpawnPart">
       	<soundKey>EXPLOSION</soundKey>
       </part>
    </parts>

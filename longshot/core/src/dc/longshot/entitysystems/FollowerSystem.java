@@ -31,12 +31,12 @@ public final class FollowerSystem extends EntitySystem {
 				followers.add(entityCache.create(followerTypeName));
 			}
 			followerPart.setFollowers(followers);
-			float followerSizeY = followers.get(0).get(TransformPart.class).getStartingSize().y;
+			float followerSizeY = followers.get(0).get(TransformPart.class).getSize().y;
 			float offsetY = followerSizeY / 2 + entity.get(TransformPart.class).getSize().y / 2;
 			for (Entity follower : followers) {
 				Vector2 entityCenter = entity.get(TransformPart.class).getCenter();
 				TransformPart followerTransformPart = follower.get(TransformPart.class);
-				Vector2 followerSize = followerTransformPart.getStartingSize();
+				Vector2 followerSize = followerTransformPart.getSize();
 				Vector2 followerPosition = PolygonUtils.relativeCenter(entityCenter, followerSize);
 				followerPosition.add(0, offsetY);
 				followerTransformPart.setPosition(followerPosition);

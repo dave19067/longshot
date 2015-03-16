@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity>
+<entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="transformPart">
-      	<startingSize>
+      <part xsi:type="transformPart">
+      	<size>
       	    <x>1</x>
       	    <y>1</y>
-      	</startingSize>
+      	</size>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="drawablePart">
+      <part xsi:type="drawablePart">
       	<textureName>objects/bug_body</textureName>
 		<z>1</z>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="speedPart">
+      <part xsi:type="speedPart">
       	<speed>5</speed>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="healthPart">
+      <part xsi:type="healthPart">
       	<maxHealth>1</maxHealth>
       	<health>1</health>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="pointsPart">
+      <part xsi:type="pointsPart">
       	<points>100</points>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="alliancePart">
+      <part xsi:type="alliancePart">
       	<alliance>ENEMY</alliance>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="translatePart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="cityDamagePart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="autoRotatePart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="waypointsPart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="groundShooterPart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="boundsRemovePart">
+      <part xsi:type="translatePart" />
+      <part xsi:type="cityDamagePart" />
+      <part xsi:type="autoRotatePart" />
+      <part xsi:type="waypointsPart" />
+      <part xsi:type="groundShooterPart" />
+      <part xsi:type="boundsRemovePart">
           <bounds>
               <bounds>BOTTOM</bounds>
           </bounds>
           <isPartial>false</isPartial>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="collisionTypePart">
+      <part xsi:type="collisionTypePart">
       	<collisionType>ENEMY</collisionType>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="curvedMovementPart">
+      <part xsi:type="curvedMovementPart">
       	<curveSize>10</curveSize>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="weaponPart">
+      <part xsi:type="weaponPart">
       	<entityType>pellet</entityType>
       	<maxSpawns>1</maxSpawns>
         <spawnTimer>
             <maxTime>10</maxTime>
         </spawnTimer>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="damageOnCollisionPart">
+      <part xsi:type="damageOnCollisionPart">
           <collisionTypes>
               <collisionTypes>PLAYER</collisionTypes>
           </collisionTypes>
           <damage>1</damage>
       </part>
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fragsPart" />
-      <part xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="spawnOnDeathPart">
+      <part xsi:type="fragsPart" />
+      <part xsi:type="spawnOnDeathPart">
       	<entityType>smallharmlessexplosion</entityType>
       </part>
    </parts>

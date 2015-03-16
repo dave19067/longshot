@@ -361,7 +361,7 @@ public final class LevelScreen implements Screen {
 			Entity spawn = entityLoader.create(entityTypeName);
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
 			Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
-					spawnTransform.getStartingSize());
+					spawnTransform.getSize());
 			spawnTransform.setPosition(position);
 			entityManager.add(spawn);
 		}
@@ -478,7 +478,7 @@ public final class LevelScreen implements Screen {
 		entities.add(ground);
 		Entity shooter = entityLoader.create("shooter");
 		TransformPart shooterTransformPart = shooter.get(TransformPart.class);
-		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterTransformPart.getStartingSize().x);
+		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterTransformPart.getSize().x);
 		Vector2 shooterPosition = new Vector2(shooterX, 0);
 		shooterTransformPart.setPosition(shooterPosition);
 		entities.add(shooter);

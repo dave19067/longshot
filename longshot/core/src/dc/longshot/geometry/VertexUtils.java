@@ -1,6 +1,7 @@
 package dc.longshot.geometry;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class VertexUtils {
 	
@@ -55,6 +56,22 @@ public class VertexUtils {
 			maxY = Math.max(maxY, vertices[i * 2 + 1]);
 		}
 		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+	}
+	
+	public static float[] sizedVertices(final float[] vertices, final Vector2 size) {
+		Vector2 verticesSize = VertexUtils.bounds(vertices).getSize(new Vector2());
+		float scaleX = size.x / verticesSize.x;
+		float scaleY = size.y / verticesSize.y;
+		float[] sizedVertices = new float[vertices.length];
+		for (int i = 0; i < vertices.length; i++) {
+			if (i % 2 == 0) {
+				sizedVertices[i] = vertices[i] * scaleX;
+			}
+			else {
+				sizedVertices[i] = vertices[i] * scaleY;
+			}
+		}
+		return sizedVertices;
 	}
 
 }

@@ -27,24 +27,8 @@ public final class ConvexHullCache {
 			VertexUtils.flipY(convexHull);
 			convexHulls.put(regionName, convexHull);
 		}
-		float[] vertices = sizedVertices(convexHulls.get(regionName), size);
+		float[] vertices = VertexUtils.sizedVertices(convexHulls.get(regionName), size);
 		return new Polygon(vertices);
-	}
-	
-	private float[] sizedVertices(final float[] vertices, final Vector2 size) {
-		Vector2 verticesSize = VertexUtils.bounds(vertices).getSize(new Vector2());
-		float scaleX = size.x / verticesSize.x;
-		float scaleY = size.y / verticesSize.y;
-		float[] sizedVertices = new float[vertices.length];
-		for (int i = 0; i < vertices.length; i++) {
-			if (i % 2 == 0) {
-				sizedVertices[i] = vertices[i] * scaleX;
-			}
-			else {
-				sizedVertices[i] = vertices[i] * scaleY;
-			}
-		}
-		return sizedVertices;
 	}
 
 }

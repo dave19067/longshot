@@ -49,7 +49,7 @@ public final class ShooterInputSystem extends EntitySystem {
 		TransformPart cannonTransform = cannon.get(TransformPart.class);
 		Vector2 size = cannonTransform.getSize();
 		Vector2 spawnPosition = PolygonUtils.toGlobal(size.x, size.y / 2, cannonTransform.getPolygon());
-		return PolygonUtils.relativeCenter(spawnPosition, spawn.get(TransformPart.class).getStartingSize());
+		return PolygonUtils.relativeCenter(spawnPosition, spawn.get(TransformPart.class).getSize());
 	}
 
 }

@@ -119,7 +119,7 @@ public final class LevelController {
 	private void placeAbove(final Entity entity) {
 		Rectangle boundsBox = level.getBoundsBox();
 		TransformPart transform = entity.get(TransformPart.class);
-		Vector2 size = transform.getStartingSize();
+		Vector2 size = transform.getSize();
 		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.y);
 		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(boundsBox));
 		transform.setPosition(spawnPosition);
@@ -128,7 +128,7 @@ public final class LevelController {
 	private void setupBouncer(final Entity entity) {
 		Rectangle boundsBox = level.getBoundsBox();
 		TransformPart transform = entity.get(TransformPart.class);
-		Vector2 size = transform.getStartingSize();
+		Vector2 size = transform.getSize();
 		float spawnX;
 		float minVelocityX = 4;
 		float maxVelocityX = 16;
@@ -150,7 +150,7 @@ public final class LevelController {
 
 	private void placeInSpace(final Entity entity) {
 		Rectangle boundsBox = level.getBoundsBox();
-		Vector2 size = entity.get(TransformPart.class).getStartingSize();
+		Vector2 size = entity.get(TransformPart.class).getSize();
 		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.x);
 		float boundsHeightRatio = 2 / 3f;
 		float spawnY = MathUtils.random(boundsBox.y + boundsBox.height * boundsHeightRatio, 

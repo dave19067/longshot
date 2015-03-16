@@ -41,8 +41,7 @@ public final class LevelUtils {
 		Entity spawn = entityLoader.create(weaponPart.getEntityType());
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		TransformPart transform = entity.get(TransformPart.class);
-		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), 
-				spawnTransform.getStartingSize()));
+		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), spawnTransform.getSize()));
 		weaponPart.addSpawn(spawn);
 		return spawn;
 	}
@@ -51,7 +50,7 @@ public final class LevelUtils {
 		TransformPart transformPart = entity.get(TransformPart.class);
 		
 		// Get the destination, which is a random point on the ground
-		float destX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - transformPart.getStartingSize().x);
+		float destX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - transformPart.getSize().x);
 		Vector2 destPosition = new Vector2(destX, 0);
 		
 		// Find the direction to get from the entity spawn position to the destination

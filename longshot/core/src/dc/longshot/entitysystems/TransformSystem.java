@@ -24,9 +24,9 @@ public final class TransformSystem extends EntitySystem {
 			DrawablePart drawablePart = entity.get(DrawablePart.class);
 			// TODO: NULL CHECK BAD!
 			if (drawablePart.getTextureName() != null) {
-				Polygon polygon = convexHullCache.create(drawablePart.getTextureName(), transformPart.getStartingSize());
+				Polygon polygon = convexHullCache.create(drawablePart.getTextureName(), transformPart.getSize());
 				transformPart.setVertices(polygon.getVertices());
-				Vector2 startingOrigin = transformPart.getStartingOrigin();
+				Vector2 startingOrigin = transformPart.getOrigin();
 				if (startingOrigin != null) {
 					transformPart.setOrigin(startingOrigin);
 				}
