@@ -2,6 +2,7 @@
 <entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
       <part xsi:type="transformPart">
+        <regionName>objects/green</regionName>
       	<size>
       	    <x>0.3</x>
       	    <y>0.1</y>

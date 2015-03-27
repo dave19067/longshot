@@ -10,7 +10,6 @@ import dc.longshot.epf.Entity;
 @XmlRootElement
 public final class FollowerPart {
 
-	// TODO: separate this
 	@XmlElementWrapper
 	private List<String> followerTypeNames;
 	private List<Entity> followers;

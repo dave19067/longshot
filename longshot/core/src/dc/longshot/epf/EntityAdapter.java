@@ -10,9 +10,11 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 public final class EntityAdapter extends XmlAdapter<EntityAdapted, Entity> {
 	
 	private final EntityCache entityCache;
+	private final Converter[] converters;
 	
-	public EntityAdapter(final EntityCache entityCache) {
+	public EntityAdapter(final EntityCache entityCache, final Converter[] converters) {
 		this.entityCache = entityCache;
+		this.converters = converters;
 	}
 
 	@Override
@@ -32,6 +34,11 @@ public final class EntityAdapter extends XmlAdapter<EntityAdapted, Entity> {
 			entity = new Entity();
 		}
 		for (Object part : entityAdapted.getParts()) {
+			for (Converter converter : converters) {
+				if (converter.canConvert(part)) {
+					part = converter.convert(part);
+				}
+			}
 			if (entity.has(part.getClass())) {
 				entity.detach(part.getClass());
 			}

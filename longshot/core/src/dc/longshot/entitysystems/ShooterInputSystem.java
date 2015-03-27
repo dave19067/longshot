@@ -18,11 +18,11 @@ import dc.longshot.parts.WeaponPart;
 
 public final class ShooterInputSystem extends EntitySystem {
 
-	private final EntityCache entityLoader;
+	private final EntityCache entityCache;
 	private final EntityManager entityManager;
 	
-	public ShooterInputSystem(final EntityCache entityLoader, final EntityManager entityManager) {
-		this.entityLoader = entityLoader;
+	public ShooterInputSystem(final EntityCache entityCache, final EntityManager entityManager) {
+		this.entityCache = entityCache;
 		this.entityManager = entityManager;
 	}
 
@@ -32,7 +32,7 @@ public final class ShooterInputSystem extends EntitySystem {
 			if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
 				WeaponPart weaponPart = entity.get(WeaponPart.class);
 				if (weaponPart.canSpawn()) {
-					Entity bullet =  LevelUtils.createWeaponSpawn(entity, entityLoader);
+					Entity bullet =  LevelUtils.createWeaponSpawn(entity, entityCache);
 					Entity cannon = entity.get(AttachmentPart.class).getAttachedEntity();
 					Vector2 spawnPosition = getMiddleOfCannonMouth(cannon, bullet);
 					bullet.get(TransformPart.class).setPosition(spawnPosition);

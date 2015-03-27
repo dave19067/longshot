@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 public final class RectangleAdapter extends XmlAdapter<RectangleAdapter.RectangleAdapted, Rectangle> {
 
 	@Override
-	public final RectangleAdapter.RectangleAdapted marshal(final Rectangle rectangle) throws Exception {
+	public final RectangleAdapter.RectangleAdapted marshal(final Rectangle rectangle) {
 		RectangleAdapted rectangleAdapted = new RectangleAdapted();
 		rectangleAdapted.x = rectangle.x;
 		rectangleAdapted.y = rectangle.y;
@@ -18,7 +18,7 @@ public final class RectangleAdapter extends XmlAdapter<RectangleAdapter.Rectangl
 	}
 
 	@Override
-	public final Rectangle unmarshal(final RectangleAdapted rectangleAdapted) throws Exception {
+	public final Rectangle unmarshal(final RectangleAdapted rectangleAdapted) {
 		return new Rectangle(rectangleAdapted.x, rectangleAdapted.y, rectangleAdapted.width, rectangleAdapted.height);
 	}
 

@@ -12,7 +12,7 @@ import com.rits.cloning.IFastCloner;
 public final class PointLightCloner implements IFastCloner {
 
 	@Override
-	public Object clone(Object object, Cloner cloner, Map<Object, Object> map) throws IllegalAccessException {
+	public Object clone(final Object object, final Cloner cloner, final Map<Object, Object> map) throws IllegalAccessException {
 		PointLight pointLight = (PointLight)object;
 		try {
 			// HACK: Getting hidden fields using reflection
@@ -29,14 +29,14 @@ public final class PointLightCloner implements IFastCloner {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T> T getFieldValue(Object object, String fieldName) throws NoSuchFieldException, SecurityException, 
+	private <T> T getFieldValue(final Object object, final String fieldName) throws NoSuchFieldException, SecurityException, 
 		IllegalArgumentException, IllegalAccessException {
 		Field field = getField(object.getClass(), fieldName);
 		field.setAccessible(true);
 		return (T)field.get(object);
 	}
 	
-	private Field getField(Class<?> c, String fieldName) throws NoSuchFieldException {
+	private Field getField(final Class<?> c, final String fieldName) throws NoSuchFieldException {
 		try {
 			return c.getDeclaredField(fieldName);
 		}

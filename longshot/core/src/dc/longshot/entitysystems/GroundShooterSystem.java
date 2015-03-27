@@ -12,13 +12,13 @@ import dc.longshot.parts.WeaponPart;
 
 public final class GroundShooterSystem extends EntitySystem {
 	
-	private final EntityCache entityLoader;
+	private final EntityCache entityCache;
 	private final EntityManager entityManager;
 	private final Rectangle boundsBox;
 	
-	public GroundShooterSystem(final EntityCache entityLoader, final EntityManager entityManager, 
+	public GroundShooterSystem(final EntityCache entityCache, final EntityManager entityManager, 
 			final Rectangle boundsBox) {
-		this.entityLoader = entityLoader;
+		this.entityCache = entityCache;
 		this.entityManager = entityManager;
 		this.boundsBox = boundsBox;
 	}
@@ -28,7 +28,7 @@ public final class GroundShooterSystem extends EntitySystem {
 		if (entity.hasActive(GroundShooterPart.class)) {
 			WeaponPart weaponPart = entity.get(WeaponPart.class);
 			if (weaponPart.canSpawn()) {
-				Entity spawn = LevelUtils.createWeaponSpawn(entity, entityLoader);
+				Entity spawn = LevelUtils.createWeaponSpawn(entity, entityCache);
 				LevelUtils.setupBottomDestination(spawn, boundsBox);
 				entityManager.add(spawn);
 			}

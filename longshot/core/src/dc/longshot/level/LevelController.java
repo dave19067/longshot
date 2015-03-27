@@ -26,14 +26,14 @@ import dc.longshot.parts.TranslatePart;
 
 public final class LevelController {
 
-	private final EntityCache entityLoader;
+	private final EntityCache entityCache;
 	private final EntityManager entityManager;
 	private final Level level;
 	private final List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
 	private float time = 0;
 
-	public LevelController(final EntityCache entityLoader, final EntityManager entityManager, final Level level) {
-		this.entityLoader = entityLoader;
+	public LevelController(final EntityCache entityCache, final EntityManager entityManager, final Level level) {
+		this.entityCache = entityCache;
 		this.entityManager = entityManager;
 		this.level = level;
 		generateSpawnInfos();
@@ -86,7 +86,7 @@ public final class LevelController {
 	}
 	
 	private void spawn(final SpawnInfo spawnInfo) {
-		Entity spawn = entityLoader.create(spawnInfo.entityType);
+		Entity spawn = entityCache.create(spawnInfo.entityType);
 		if (spawn.has(SpawningPart.class)) {
 			SpawningType spawningType = spawn.get(SpawningPart.class).getSpawningType();
 			switch (spawningType) {
@@ -102,7 +102,7 @@ public final class LevelController {
 				LevelUtils.setupBottomDestination(spawn, boundsBox);
 				moveToOutOfBounds(spawn, boundsBox);
 				break;
-			case SIDE_BOUNCE:
+			case SIDE_IN:
 				setupBouncer(spawn);
 				break;
 			default:
@@ -163,7 +163,7 @@ public final class LevelController {
 	private void moveToOutOfBounds(final Entity entity, final Rectangle boundsBox) {
 		// If the spawn is partially in bounds, move to just out of bounds using the negative velocity
 		TransformPart transformPart = entity.get(TransformPart.class);
-		float unboundedOverlapY = PolygonUtils.top(boundsBox) - transformPart.getPosition().y/* TODO: transformPart.getBoundingBox().y*/;
+		float unboundedOverlapY = PolygonUtils.top(boundsBox) - transformPart.getBoundingBox().y;
 		TranslatePart translate = entity.get(TranslatePart.class);
 		Vector2 velocity = translate.getVelocity();
 		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);

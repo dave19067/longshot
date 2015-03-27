@@ -13,15 +13,12 @@ import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.CurvedMovementPart;
 import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DamageOnSpawnPart;
-import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.EmitPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
-import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.GravityPart;
 import dc.longshot.parts.GroundShooterPart;
 import dc.longshot.parts.HealthPart;
-import dc.longshot.parts.LightPart;
 import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.RotateToCursorPart;
@@ -32,11 +29,14 @@ import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.SpinPart;
 import dc.longshot.parts.TargetShooterPart;
 import dc.longshot.parts.TimedDeathPart;
-import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WanderMovementPart;
 import dc.longshot.parts.WaypointsPart;
 import dc.longshot.parts.WeaponPart;
+import dc.longshot.parts.converters.DrawablePartConverter.DrawablePart;
+import dc.longshot.parts.converters.GhostPartConverter.GhostPart;
+import dc.longshot.parts.converters.LightPartConverter.LightPart;
+import dc.longshot.parts.converters.TransformPartConverter.TransformPart;
 
 public final class XmlBindings {
 	

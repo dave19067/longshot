@@ -7,14 +7,14 @@ import dc.longshot.util.Timer;
 public final class TimerAdapter extends XmlAdapter<TimerAdapter.TimerAdapted, Timer> {
 
 	@Override
-	public TimerAdapted marshal(final Timer timer) throws Exception {
+	public TimerAdapted marshal(final Timer timer) {
 		TimerAdapted timerAdapted = new TimerAdapted();
 		timerAdapted.maxTime = timer.getMaxTime();
 		return timerAdapted;
 	}
 
 	@Override
-	public Timer unmarshal(final TimerAdapted timerAdapted) throws Exception {
+	public Timer unmarshal(final TimerAdapted timerAdapted) {
 		return new Timer(timerAdapted.maxTime);
 	}
 

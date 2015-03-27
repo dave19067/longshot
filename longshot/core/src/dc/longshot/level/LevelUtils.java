@@ -35,10 +35,10 @@ public final class LevelUtils {
 		return distance;
 	}
 	
-	public static final Entity createWeaponSpawn(final Entity entity, final EntityCache entityLoader) {
+	public static final Entity createWeaponSpawn(final Entity entity, final EntityCache entityCache) {
 		WeaponPart weaponPart = entity.get(WeaponPart.class);
 		weaponPart.reset();
-		Entity spawn = entityLoader.create(weaponPart.getEntityType());
+		Entity spawn = entityCache.create(weaponPart.getEntityType());
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		TransformPart transform = entity.get(TransformPart.class);
 		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), spawnTransform.getSize()));

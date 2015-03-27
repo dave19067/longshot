@@ -8,7 +8,6 @@ import dc.longshot.epf.Entity;
 @XmlRootElement
 public final class AttachmentPart {
 
-	// TODO: separate this
 	@XmlElement
 	private String attachedEntityType;
 	private Entity attachedEntity;

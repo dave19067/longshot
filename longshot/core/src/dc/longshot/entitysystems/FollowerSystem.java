@@ -40,8 +40,7 @@ public final class FollowerSystem extends EntitySystem {
 				Vector2 followerPosition = PolygonUtils.relativeCenter(entityCenter, followerSize);
 				followerPosition.add(0, offsetY);
 				followerTransformPart.setPosition(followerPosition);
-				float endBuffer = VectorUtils.offset(entityCenter, followerPosition /* TODO: followerTransformPart.getCenter()*/)
-						.dst(new Vector2());
+				float endBuffer = VectorUtils.offset(entityCenter, followerTransformPart.getCenter()).dst(new Vector2());
 				follower.get(WaypointsPart.class).setEndBuffer(endBuffer);
 				offsetY += followerSize.y;
 			}

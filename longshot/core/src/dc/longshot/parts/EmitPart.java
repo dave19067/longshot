@@ -13,7 +13,6 @@ import dc.longshot.xmladapters.Vector2Adapter;
 @XmlRootElement
 public final class EmitPart {
 
-	// TODO: separate this
 	@XmlElement
 	private String entityType;
 	@XmlJavaTypeAdapter(Vector2Adapter.class)

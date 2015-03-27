@@ -41,8 +41,7 @@ public final class EmitSystem extends EntitySystem {
 		spawnTransform.setRotation(transformPart.getRotation());
 		Vector2 localSpawnPosition = emitPart.getLocalSpawnPosition();
 		Vector2 spawnPosition = PolygonUtils.toGlobal(localSpawnPosition, transformPart.getPolygon());
-		spawnTransform.setPosition(spawnPosition);
-		//TODO: spawnTransform.setCenter(spawnPosition);
+		spawnTransform.setCenter(spawnPosition);
 		return spawn;
 	}
 

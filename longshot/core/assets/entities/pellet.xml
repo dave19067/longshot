@@ -2,6 +2,7 @@
 <entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
       <part xsi:type="transformPart">
+        <regionName>objects/pellet</regionName>
       	<size>
       	    <x>0.2</x>
       	    <y>0.2</y>

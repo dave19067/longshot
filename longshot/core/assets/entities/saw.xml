@@ -2,6 +2,7 @@
 <entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
       <part xsi:type="transformPart">
+        <regionName>objects/sawblades</regionName>
       	<size>
       	    <x>2</x>
       	    <y>2</y>
@@ -51,7 +52,7 @@
       	<entityType>smallexplosion</entityType>
       </part>
       <part xsi:type="spawningPart">
-          <spawningType>SIDE_BOUNCE</spawningType>
+          <spawningType>SIDE_IN</spawningType>
       </part>
    </parts>
 </entity>

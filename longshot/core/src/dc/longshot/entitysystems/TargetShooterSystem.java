@@ -17,11 +17,11 @@ import dc.longshot.parts.WeaponPart;
 
 public final class TargetShooterSystem extends EntitySystem {
 	
-	private final EntityCache entityLoader;
+	private final EntityCache entityCache;
 	private final EntityManager entityManager;
 	
-	public TargetShooterSystem(final EntityCache entityLoader, final EntityManager entityManager) {
-		this.entityLoader = entityLoader;
+	public TargetShooterSystem(final EntityCache entityCache, final EntityManager entityManager) {
+		this.entityCache = entityCache;
 		this.entityManager = entityManager;
 	}
 
@@ -45,7 +45,7 @@ public final class TargetShooterSystem extends EntitySystem {
 	}
 	
 	private void spawn(final Entity entity, final Entity target) {
-		Entity spawn = LevelUtils.createWeaponSpawn(entity, entityLoader);
+		Entity spawn = LevelUtils.createWeaponSpawn(entity, entityCache);
 		TransformPart entityTransform = entity.get(TransformPart.class);
 		TransformPart otherTransform = target.get(TransformPart.class);
 		Vector2 direction = VectorUtils.offset(entityTransform.getCenter(), otherTransform.getCenter());

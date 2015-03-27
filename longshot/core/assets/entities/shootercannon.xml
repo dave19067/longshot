@@ -2,14 +2,15 @@
 <entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <parts>
       <part xsi:type="transformPart">
+        <regionName>objects/cannon</regionName>
       	<size>
       	    <x>1.5</x>
       	    <y>0.3</y>
       	</size>
-      	<startingOrigin>
+      	<origin>
       	    <x>0</x>
       	    <y>0.15</y>
-      	</startingOrigin>
+      	</origin>
       </part>
       <part xsi:type="drawablePart">
       	<textureName>objects/cannon</textureName>

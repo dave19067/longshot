@@ -1,10 +1,5 @@
 package dc.longshot.parts;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -14,15 +9,9 @@ import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.geometry.VertexUtils;
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.NONE)
 public final class TransformPart {
 
 	private Polygon polygon = new Polygon();
-	
-	public TransformPart() {
-		this(new Polygon(new float[] { 0, 0, 1, 0, 1, 1 }));
-	}
 	
 	public TransformPart(final Polygon polygon) {
 		this(polygon, new Vector2());
@@ -46,7 +35,6 @@ public final class TransformPart {
 		polygon.setVertices(vertices);
 	}
 
-	@XmlElement
 	public final Vector2 getSize() {
 		return PolygonUtils.size(polygon);
 	}
@@ -77,7 +65,6 @@ public final class TransformPart {
 		setPosition(getPosition().add(offset));
 	}
 
-	@XmlElement
 	public final Vector2 getOrigin() {
 		return new Vector2(polygon.getOriginX(), polygon.getOriginY());
 	}

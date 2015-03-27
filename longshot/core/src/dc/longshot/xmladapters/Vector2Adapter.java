@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 public final class Vector2Adapter extends XmlAdapter<Vector2Adapter.Vector2Adapted, Vector2> {
 
 	@Override
-	public final Vector2Adapter.Vector2Adapted marshal(final Vector2 vector) throws Exception {
+	public final Vector2Adapter.Vector2Adapted marshal(final Vector2 vector) {
 		Vector2Adapted vectorAdapted = new Vector2Adapted();
 		vectorAdapted.x = vector.x;
 		vectorAdapted.y = vector.y;
@@ -16,7 +16,7 @@ public final class Vector2Adapter extends XmlAdapter<Vector2Adapter.Vector2Adapt
 	}
 
 	@Override
-	public final Vector2 unmarshal(final Vector2Adapter.Vector2Adapted vectorAdapted) throws Exception {
+	public final Vector2 unmarshal(final Vector2Adapter.Vector2Adapted vectorAdapted) {
 		return new Vector2(vectorAdapted.x, vectorAdapted.y);
 	}
 

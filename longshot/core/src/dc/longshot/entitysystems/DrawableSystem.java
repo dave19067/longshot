@@ -1,35 +1,15 @@
 package dc.longshot.entitysystems;
 
-import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.UnitConvert;
-import dc.longshot.graphics.TextureCache;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.TransformPart;
 
 public final class DrawableSystem extends EntitySystem {
-	
-	private final TextureCache textureCache;
-	
-	public DrawableSystem(final TextureCache textureCache) {
-		this.textureCache = textureCache;
-	}
-	
-	@Override
-	public final void initialize(final Entity entity) {
-		if (entity.hasActive(DrawablePart.class)) {
-			DrawablePart drawablePart = entity.get(DrawablePart.class);
-			// TODO: NULL CHECK BAD!
-			if (drawablePart.getTextureName() != null) {
-				PolygonRegion region = textureCache.getPolygonRegion(drawablePart.getTextureName());
-				drawablePart.setSprite(new PolygonSprite(region));
-			}
-		}
-	}
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
