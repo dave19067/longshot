@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.badlogic.gdx.math.Rectangle;
 
-import dc.longshot.game.DecorationProfile;
+import dc.longshot.level.DecorationProfile;
 import dc.longshot.xmladapters.RectangleAdapter;
 
 @XmlRootElement

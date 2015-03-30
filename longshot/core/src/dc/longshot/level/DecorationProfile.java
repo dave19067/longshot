@@ -1,4 +1,4 @@
-package dc.longshot.game;
+package dc.longshot.level;
 
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -14,6 +14,7 @@ public final class DecorationProfile {
 	public float maxXYRatio;
 	public float minZ;
 	public float maxZ;
+	public float minZScale;
 	public float minSpeed;
 	public float maxSpeed;
 	public PolygonRegion region;
@@ -31,9 +32,9 @@ public final class DecorationProfile {
 	 * @param textureRegion texture region of decoration
 	 */
 	public DecorationProfile(final Rectangle area, final boolean rotate, final float spawnRate, 
-			final float minSize, final float maxSize, final float minZ, final float maxZ, 
+			final float minSize, final float maxSize, final float minZ, final float maxZ, final float minZScale, 
 			final float minSpeed, final float maxSpeed, final PolygonRegion region) {
-		this(area, rotate, spawnRate, minSize, maxSize, 1, 1, minZ, maxZ, minSpeed, maxSpeed, region);
+		this(area, rotate, spawnRate, minSize, maxSize, 1, 1, minZ, maxZ, minZScale, minSpeed, maxSpeed, region);
 	}
 	
 	/**
@@ -50,8 +51,8 @@ public final class DecorationProfile {
 	 */
 	public DecorationProfile(final Rectangle area, final boolean rotate, final float spawnRate, 
 			final float minSize, final float maxSize, final float minXYRatio, 
-			final float maxXYRatio, final float minZ, final float maxZ, final float minSpeed, final float maxSpeed, 
-			final PolygonRegion region) {
+			final float maxXYRatio, final float minZ, final float maxZ, final float minZScale, 
+			final float minSpeed, final float maxSpeed, final PolygonRegion region) {
 		this.area = area;
 		this.spawnRate = spawnRate;
 		this.minSize = minSize;
@@ -60,6 +61,7 @@ public final class DecorationProfile {
 		this.maxXYRatio = maxXYRatio;
 		this.minZ = minZ;
 		this.maxZ = maxZ;
+		this.minZScale = minZScale;
 		this.minSpeed = minSpeed;
 		this.maxSpeed = maxSpeed;
 		this.region = region;

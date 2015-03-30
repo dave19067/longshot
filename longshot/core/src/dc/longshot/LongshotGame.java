@@ -16,11 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 import dc.longshot.eventmanagement.NoArgsListener;
-import dc.longshot.game.DecorationProfile;
 import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.SkinPack;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.TextureCache;
+import dc.longshot.level.DecorationProfile;
 import dc.longshot.models.DebugSettings;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.GameSettings;
@@ -287,13 +287,13 @@ public final class LongshotGame extends Game {
 			Rectangle cloudBoundsBox = new Rectangle(boundsBox);
 			PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
 			DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, 3, 6, 1f, 2, 
-					-200, -100, 0.75f, 1.25f, cloudRegion);
+					-200, -100, 0.5f, 0.75f, 1.25f, cloudRegion);
 			decorationProfiles.add(cloudProfile);
 		}
 		if (nightRatio > 0.5f) {
 			PolygonRegion starRegion = textureCache.getPolygonRegion("objects/star");
 			DecorationProfile starProfile = new DecorationProfile(boundsBox, true, 1, 0.02f, 0.1f, -1000, -500, 
-					0.3f, 0.7f, starRegion);
+					0.5f, 0.3f, 0.7f, starRegion);
 			decorationProfiles.add(starProfile);
 		}
 		return decorationProfiles;

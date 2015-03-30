@@ -6,7 +6,7 @@
         <width>40</width>
         <height>30</height>
     </boundsBox>
-    <spawnDuration>10</spawnDuration>
+    <spawnDuration>1000</spawnDuration>
     <spawns>
         <entry>
             <key>missile</key>

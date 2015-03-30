@@ -25,6 +25,8 @@ import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
 public final class LevelController {
+	
+	private static final float INITIAL_SPAWN_DELAY = 3;
 
 	private final EntityCache entityCache;
 	private final EntityManager entityManager;
@@ -40,20 +42,12 @@ public final class LevelController {
 	}
 	
 	public final boolean isComplete() {
-		boolean enemiesExist = false;
-		for (Entity entity : entityManager.getAll()) {
-			if (entity.hasActive(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
-				enemiesExist = true;
-				break;
-			}
-		}
-		return !enemiesExist && spawnInfos.isEmpty();
+		return !doEnemiesExist() && spawnInfos.isEmpty();
 	}
 	
 	public final void update(final float delta) {
 		time += delta;
 		Iterator<SpawnInfo> it = spawnInfos.iterator();
-		
 		while (it.hasNext()) {
 			SpawnInfo spawnInfo = it.next();
 			if (spawnInfo.time <= time) {
@@ -64,6 +58,20 @@ public final class LevelController {
 				break;
 			}
 		}
+		if (!doEnemiesExist() && !spawnInfos.isEmpty() && time >= INITIAL_SPAWN_DELAY) {
+			int spawnInfoIndex = MathUtils.random(0, spawnInfos.size() - 1);
+			SpawnInfo spawnInfo = spawnInfos.remove(spawnInfoIndex);
+			spawn(spawnInfo);
+		}
+	}
+	
+	private boolean doEnemiesExist() {
+		for (Entity entity : entityManager.getAll()) {
+			if (entity.hasActive(AlliancePart.class) && entity.get(AlliancePart.class).getAlliance() == Alliance.ENEMY) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void generateSpawnInfos() {
@@ -72,11 +80,10 @@ public final class LevelController {
 			for (int i = 0; i < entry.getValue(); i++) {
 				SpawnInfo spawnInfo = new SpawnInfo();
 				spawnInfo.entityType = entry.getKey();
-				spawnInfo.time = MathUtils.random(0, level.getSpawnDuration());
+				spawnInfo.time = MathUtils.random(INITIAL_SPAWN_DELAY, INITIAL_SPAWN_DELAY + level.getSpawnDuration());
 				spawnInfos.add(spawnInfo);
 			}
 		}
-		
 		Collections.sort(spawnInfos, new Comparator<SpawnInfo>() {
 			@Override
 			public int compare(final SpawnInfo spawnInfo1, final SpawnInfo spawnInfo2) {

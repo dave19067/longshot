@@ -1,4 +1,4 @@
-package dc.longshot.game;
+package dc.longshot.level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,8 @@ public final class BackdropManager {
 	
 	private Entity createDecoration(final DecorationProfile decorationProfile) {
 		Entity entity = new Entity();
-		Vector2 size = calculateSize(decorationProfile);
+		float z = MathUtils.random(decorationProfile.minZ, decorationProfile.maxZ);
+		Vector2 size = calculateSize(decorationProfile, z);
 		Polygon polygon = PolygonFactory.createRectangle(size);
 		TransformPart transformPart = new TransformPart(polygon);
 		if (decorationProfile.rotate) {
@@ -68,7 +69,6 @@ public final class BackdropManager {
 		}
 		entity.attach(transformPart);
 		PolygonSprite sprite = new PolygonSprite(decorationProfile.region);
-		float z = MathUtils.random(decorationProfile.minZ, decorationProfile.maxZ);
 		entity.attach(new DrawablePart(sprite, z));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		if (startBound == Bound.LEFT) {
@@ -90,9 +90,11 @@ public final class BackdropManager {
 		return entity;
 	}
 	
-	private Vector2 calculateSize(final DecorationProfile decorationProfile) {
+	private Vector2 calculateSize(final DecorationProfile decorationProfile, final float z) {
 		Vector2 size;
-		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize);
+		float zPercent = (z - decorationProfile.minZ) / (decorationProfile.maxZ - decorationProfile.minZ); 
+		float lengthPercent = decorationProfile.minZScale + (1 - decorationProfile.minZScale) * zPercent;
+		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize) * lengthPercent;
 		float xyRatio = MathUtils.random(decorationProfile.minXYRatio, decorationProfile.maxXYRatio);
 		if (xyRatio > 1) {
 			float ratioedLength = length / xyRatio;
