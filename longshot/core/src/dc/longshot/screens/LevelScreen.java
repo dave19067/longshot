@@ -73,7 +73,6 @@ import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.Fragmenter;
 import dc.longshot.game.SkinPack;
-import dc.longshot.game.XmlBindings;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.ConvexHullCache;
 import dc.longshot.geometry.PolygonUtils;
@@ -118,6 +117,7 @@ import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
 import dc.longshot.util.PathUtils;
+import dc.longshot.util.XmlContext;
 
 public final class LevelScreen implements Screen {
 
@@ -168,7 +168,7 @@ public final class LevelScreen implements Screen {
 
 	private final TextureRegion cursorRegion;
 	
-	public LevelScreen(final SkinPack skinPack, final TextureCache textureCache, 
+	public LevelScreen(final SkinPack skinPack, final XmlContext xmlContext, final TextureCache textureCache, 
 			final SoundCache<SoundKey> soundCache, final Map<InputAction, Integer> inputActions, 
 			final DebugSettings debugSettings, final PlaySession playSession, final Level level) {
 		this.textureCache = textureCache;
@@ -184,7 +184,7 @@ public final class LevelScreen implements Screen {
 		rayHandler = new RayHandler(world);
 		rayHandler.setShadows(false);
 		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
-		entityCache = new EntityCache(entitiesPath, XmlBindings.BOUND_CLASSES, 
+		entityCache = new EntityCache(xmlContext, entitiesPath, 
 				new Converter[] { 
 					new DrawablePartConverter(textureCache), 
 					new GhostPartConverter(textureCache), 

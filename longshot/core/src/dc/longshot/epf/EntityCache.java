@@ -7,19 +7,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dc.longshot.util.Cloning;
-import dc.longshot.util.XmlUtils;
+import dc.longshot.util.XmlContext;
 
 public final class EntityCache {
 
 	private static final String ENTITY_EXTENSION = ".xml";
+	private final XmlContext xmlContext;
 	private final EntityAdapter entityAdapter;
 	private final String root;
-	private final Class<?>[] boundClasses;
 	private final Map<String, Entity> cache = new HashMap<String, Entity>();
 	
-	public EntityCache(final String root, final Class<?>[] boundClasses, final Converter[] converters) {
+	public EntityCache(final XmlContext xmlContext, final String root, final Converter[] converters) {
+		this.xmlContext = xmlContext;
 		this.root = root;
-		this.boundClasses = boundClasses;
 		entityAdapter = new EntityAdapter(this, converters);
 	}
 	
@@ -33,7 +33,7 @@ public final class EntityCache {
 				throw new RuntimeException(e);
 			}
 			try {
-				Entity entity = XmlUtils.unmarshal(inputStream, entityAdapter, boundClasses);
+				Entity entity = xmlContext.unmarshal(inputStream, entityAdapter);
 				cache.put(entityType,  entity);
 			}
 			catch (Exception e) {

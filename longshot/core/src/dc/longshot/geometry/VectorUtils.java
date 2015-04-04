@@ -34,7 +34,12 @@ public final class VectorUtils {
 	}
 	
 	public static final Vector2 fromAngle(final float degrees) {
-		return new Vector2(MathUtils.cosDeg(degrees), MathUtils.sinDeg(degrees));
+		return fromAngle(degrees, 1);
+	}
+	
+	public static final Vector2 fromAngle(final float degrees, final float length) {
+		Vector2 vector = new Vector2(length, 0);
+		return vector.rotate(degrees);
 	}
 	
 	public static final float relativeMiddle(final float pivotMiddle, final float objectLength) {

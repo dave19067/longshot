@@ -25,9 +25,9 @@ import dc.longshot.ui.UIUtils;
 
 public final class MainMenuScreen implements Screen {
 
-	private final EventDelegate<NoArgsListener> newGameRequestedDelegate = new EventDelegate<NoArgsListener>();
-	private final EventDelegate<NoArgsListener> optionsRequestedDelegate = new EventDelegate<NoArgsListener>();
-	private final EventDelegate<NoArgsListener> highScoresRequestedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> newGameClickedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> optionsClickedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> highScoresClickedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final Skin skin;
 	private final BitmapFont font;
@@ -41,16 +41,16 @@ public final class MainMenuScreen implements Screen {
 		this.logoRegion = logoRegion;
 	}
 	
-	public final void addNewGameRequestedListener(final NoArgsListener listener) {
-		newGameRequestedDelegate.listen(listener);
+	public final void addNewGameClickedListener(final NoArgsListener listener) {
+		newGameClickedDelegate.listen(listener);
 	}
 	
-	public final void addOptionsRequestedListener(final NoArgsListener listener) {
-		optionsRequestedDelegate.listen(listener);
+	public final void addOptionsClickedListener(final NoArgsListener listener) {
+		optionsClickedDelegate.listen(listener);
 	}
 	
-	public final void addHighScoresRequestedListener(final NoArgsListener listener) {
-		highScoresRequestedDelegate.listen(listener);
+	public final void addHighScoresClickedListener(final NoArgsListener listener) {
+		highScoresClickedDelegate.listen(listener);
 	}
 
 	@Override
@@ -91,11 +91,11 @@ public final class MainMenuScreen implements Screen {
 		stage.dispose();
 	}
 	
-	private ClickListener requestButtonClicked(final EventDelegate<NoArgsListener> requestedDelegate) {
+	private ClickListener buttonClicked(final EventDelegate<NoArgsListener> clickedDelegate) {
 		return new ClickListener() {
 			@Override
 			public final void clicked(final InputEvent event, final float x, final float y) {
-				requestedDelegate.notify(new NoArgsEvent());
+				clickedDelegate.notify(new NoArgsEvent());
 			}
 		};
 	}
@@ -121,12 +121,12 @@ public final class MainMenuScreen implements Screen {
 		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
 		mainTable.add(new Image(logoRegion)).row();
-		Button newGameButton = UIFactory.button(skin, font, "New Game", requestButtonClicked(newGameRequestedDelegate));
+		Button newGameButton = UIFactory.button(skin, font, "New Game", buttonClicked(newGameClickedDelegate));
 		mainTable.add(newGameButton).row();
-		Button optionsButton = UIFactory.button(skin, font, "Options", requestButtonClicked(optionsRequestedDelegate));
+		Button optionsButton = UIFactory.button(skin, font, "Options", buttonClicked(optionsClickedDelegate));
 		mainTable.add(optionsButton).row();
 		Button highScoresButton = UIFactory.button(skin, font, "High Scores", 
-				requestButtonClicked(highScoresRequestedDelegate));
+				buttonClicked(highScoresClickedDelegate));
 		mainTable.add(highScoresButton).row();
 		Button quitButton = UIFactory.button(skin, font, "Quit", quitButtonClicked());
 		mainTable.add(quitButton).row();

@@ -1,6 +1,10 @@
 package dc.longshot.game;
 
 import dc.longshot.epf.EntityAdapted;
+import dc.longshot.models.DebugSettings;
+import dc.longshot.models.GameSession;
+import dc.longshot.models.GameSettings;
+import dc.longshot.models.Level;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.AutoRotatePart;
@@ -53,15 +57,19 @@ public final class XmlBindings {
 		CurvedMovementPart.class,
 		DamageOnCollisionPart.class, 
 		DamageOnSpawnPart.class, 
+		DebugSettings.class, 
 		DrawablePart.class, 
 		EmitPart.class, 
 		EntityAdapted.class,
 		FollowerPart.class, 
 		FragsPart.class, 
+		GameSession.class, 
+		GameSettings.class, 
 		GhostPart.class, 
 		GravityPart.class, 
 		GroundShooterPart.class, 
 		HealthPart.class, 
+		Level.class, 
 		LightPart.class, 
 		PlaySoundOnSpawnPart.class, 
 		PointsPart.class, 

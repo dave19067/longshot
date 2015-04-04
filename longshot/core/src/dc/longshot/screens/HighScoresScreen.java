@@ -26,7 +26,7 @@ public class HighScoresScreen implements Screen {
 	
 	private static final int SCORE_SPACE_LEFT = 100;
 	
-	private final EventDelegate<NoArgsListener> nextScreenRequestedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final GameSession gameSession;
 	private final Skin skin;
@@ -43,8 +43,8 @@ public class HighScoresScreen implements Screen {
 		smallFont = skinPack.getSmallFont();
 	}
 	
-	public final void addNextScreenRequestedListener(final NoArgsListener listener) {
-		nextScreenRequestedDelegate.listen(listener);
+	public final void addClosedListener(final NoArgsListener listener) {
+		closedDelegate.listen(listener);
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public class HighScoresScreen implements Screen {
 
 		@Override
 		public final boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
-			nextScreenRequestedDelegate.notify(new NoArgsEvent());
+			closedDelegate.notify(new NoArgsEvent());
 			return true;
 		}
 

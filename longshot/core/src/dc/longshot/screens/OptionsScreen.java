@@ -37,15 +37,16 @@ import dc.longshot.models.Paths;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
-import dc.longshot.util.XmlUtils;
+import dc.longshot.util.XmlContext;
 
 public final class OptionsScreen implements Screen {
 
 	private static final Color KEY_ENTRY_COLOR = Color.YELLOW;
 	private static final DisplayModeComparator DISPLAY_MODE_COMPARATOR = new DisplayModeComparator();
 	
-	private final EventDelegate<NoArgsListener> backRequestedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
 	
+	private final XmlContext xmlContext;
 	private final GameSettings gameSettings;
 	private OptionsScreenState state = OptionsScreenState.NORMAL;
 	private InputAction currentInputAction;
@@ -58,14 +59,15 @@ public final class OptionsScreen implements Screen {
 	private final Map<InputAction, Label> inputActionLabels = new HashMap<InputAction, Label>();
 	private final InputProcessor optionsInputProcessor = new OptionsInputProcessor();
 	
-	public OptionsScreen(final SkinPack skinPack, final GameSettings gameSettings) {
+	public OptionsScreen(final XmlContext xmlContext, final SkinPack skinPack, final GameSettings gameSettings) {
+		this.xmlContext = xmlContext;
+		this.gameSettings = gameSettings;
 		skin = skinPack.getSkin();
 		font = skinPack.getDefaultFont();
-		this.gameSettings = gameSettings;
 	}
 	
-	public final void addBackRequestedListener(final NoArgsListener listener) {
-		backRequestedDelegate.listen(listener);
+	public final void addClosedListener(final NoArgsListener listener) {
+		closedDelegate.listen(listener);
 	}
 	
 	@Override
@@ -120,8 +122,7 @@ public final class OptionsScreen implements Screen {
 					gameSettings.set(entry.getKey(), keycode);
 				}
 				GameSettingsApplier.apply(gameSettings);
-				XmlUtils.marshal(gameSettings, Gdx.files.local(Paths.GAME_SETTINGS_PATH), 
-						new Class[] { GameSettings.class });
+				xmlContext.marshal(gameSettings, Gdx.files.local(Paths.GAME_SETTINGS_PATH));
 			}
 		};
 	}
@@ -130,7 +131,7 @@ public final class OptionsScreen implements Screen {
 		return new ClickListener() {
 			@Override
 			public final void clicked(final InputEvent event, final float x, final float y) {
-				backRequestedDelegate.notify(new NoArgsEvent());
+				closedDelegate.notify(new NoArgsEvent());
 			}
 		};
 	}

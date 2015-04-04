@@ -19,7 +19,7 @@ import dc.longshot.ui.UIFactory;
 
 public final class LevelPreviewScreen implements Screen {
 
-	private final EventDelegate<NoArgsListener> nextScreenRequestedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final String levelName;
 	private final float duration;
@@ -34,8 +34,8 @@ public final class LevelPreviewScreen implements Screen {
 		font = skinPack.getDefaultFont();
 	}
 	
-	public final void addNextScreenRequestedListener(final NoArgsListener listener) {
-		nextScreenRequestedDelegate.listen(listener);
+	public final void addClosedListener(final NoArgsListener listener) {
+		closedDelegate.listen(listener);
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public final class LevelPreviewScreen implements Screen {
 			Actions.run(new Runnable() {
 			@Override
 			public void run() {
-				nextScreenRequestedDelegate.notify(new NoArgsEvent());
+				closedDelegate.notify(new NoArgsEvent());
 			}
 		})));
 		return stage;

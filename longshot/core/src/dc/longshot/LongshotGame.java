@@ -18,6 +18,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.SkinPack;
+import dc.longshot.game.XmlBindings;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.DecorationProfile;
@@ -41,7 +42,7 @@ import dc.longshot.ui.controls.ScoreEntryDialog;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.InputUtils;
 import dc.longshot.util.PathUtils;
-import dc.longshot.util.XmlUtils;
+import dc.longshot.util.XmlContext;
 
 public final class LongshotGame extends Game {
 	
@@ -59,6 +60,7 @@ public final class LongshotGame extends Game {
 	private static final String SOUNDS_PATH = "sounds/";
 	
 	private final ScreenManager screenManager = new ScreenManager();
+	private final XmlContext xmlContext = new XmlContext(XmlBindings.BOUND_CLASSES);
 	private SkinPack skinPack;
 	private TextureCache textureCache;
 	private SoundCache<SoundKey> soundCache;
@@ -72,12 +74,10 @@ public final class LongshotGame extends Game {
 		skinPack = createSkinPack();
 		textureCache = createTextureCache();
 		soundCache = createSoundCache();
-		gameSettings = XmlUtils.unmarshal(Gdx.files.local(Paths.GAME_SETTINGS_PATH), 
-				new Class[] { GameSettings.class });
+		gameSettings = xmlContext.unmarshal(Gdx.files.local(Paths.GAME_SETTINGS_PATH));
 		GameSettingsApplier.apply(gameSettings);
-		debugSettings = XmlUtils.unmarshal(Gdx.files.local(Paths.DEBUG_SETTINGS_PATH), 
-				new Class[] { DebugSettings.class });
-		gameSession = XmlUtils.unmarshal(Gdx.files.local(Paths.GAME_SESSION_PATH), new Class[] { GameSession.class });
+		debugSettings = xmlContext.unmarshal(Gdx.files.local(Paths.DEBUG_SETTINGS_PATH));
+		gameSession = xmlContext.unmarshal(Gdx.files.local(Paths.GAME_SESSION_PATH));
 		MainMenuScreen mainMenuScreen = createMainMenuScreen();
 		screenManager.add(mainMenuScreen);
 	}
@@ -141,7 +141,7 @@ public final class LongshotGame extends Game {
 	
 	private MainMenuScreen createMainMenuScreen() {
 		final MainMenuScreen mainMenuScreen = new MainMenuScreen(skinPack, textureCache.getTextureRegion("ui/logo"));
-		mainMenuScreen.addNewGameRequestedListener(new NoArgsListener() {
+		mainMenuScreen.addNewGameClickedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				// TODO: Ensure the playsession gets reset if the user uses other means to start a New Game other than from the main menu
@@ -151,14 +151,14 @@ public final class LongshotGame extends Game {
 				screenManager.swap(mainMenuScreen, levelPreviewScreen);
 			}
 		});
-		mainMenuScreen.addOptionsRequestedListener(new NoArgsListener() {
+		mainMenuScreen.addOptionsClickedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				OptionsScreen optionsScreen = createOptionsScreen();
 				screenManager.swap(mainMenuScreen, optionsScreen);
 			}
 		});
-		mainMenuScreen.addHighScoresRequestedListener(new NoArgsListener() {
+		mainMenuScreen.addHighScoresClickedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				HighScoresScreen highScoresScreen = createHighScoresScreen();
@@ -171,7 +171,7 @@ public final class LongshotGame extends Game {
 	private LevelPreviewScreen createLevelPreviewScreen(final Level level) {
 		String levelName = "Wave " + (playSession.getLevelNum());
 		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(skinPack, levelName, 1);
-		levelPreviewScreen.addNextScreenRequestedListener(new NoArgsListener() {
+		levelPreviewScreen.addClosedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				LevelScreen levelScreen = createLevelScreen(level);
@@ -182,9 +182,9 @@ public final class LongshotGame extends Game {
 	}
 	
 	private OptionsScreen createOptionsScreen() {
-		final OptionsScreen optionsScreen = new OptionsScreen(skinPack, gameSettings);
+		final OptionsScreen optionsScreen = new OptionsScreen(xmlContext, skinPack, gameSettings);
 		final Screen previousScreen = screenManager.getCurrentScreen();
-		optionsScreen.addBackRequestedListener(new NoArgsListener() {
+		optionsScreen.addClosedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				screenManager.swap(optionsScreen, previousScreen);
@@ -195,7 +195,7 @@ public final class LongshotGame extends Game {
 	
 	private HighScoresScreen createHighScoresScreen() {
 		final HighScoresScreen highScoresScreen = new HighScoresScreen(skinPack, gameSession);
-		highScoresScreen.addNextScreenRequestedListener(new NoArgsListener() {
+		highScoresScreen.addClosedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				MainMenuScreen mainMenuScreen = createMainMenuScreen();
@@ -206,7 +206,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(skinPack, textureCache, soundCache, 
+		final LevelScreen levelScreen = new LevelScreen(skinPack, xmlContext, textureCache, soundCache, 
 				gameSettings.getInputActions(), debugSettings, playSession, level);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
@@ -251,8 +251,8 @@ public final class LongshotGame extends Game {
 		final HighScoresScreen highScoresScreen = createHighScoresScreen();
 		int score = playSession.getScore();
 		if (gameSession.canAddHighScore(score)) {
-			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(skinPack, levelScreen.getStage(), gameSession, 
-					score);
+			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(xmlContext, skinPack, levelScreen.getStage(), 
+					gameSession, score);
 			scoreEntryDialog.addOkButtonClickListener(new ClickListener() {
 				@Override
 				public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
@@ -272,7 +272,7 @@ public final class LongshotGame extends Game {
 		float nightRatio = (float)playSession.getLevelNum() / (playSession.getLevelCount() - 1);
 		Color lerpedDuskColor = DUSK_COLOR.cpy().lerp(NIGHT_COLOR, nightRatio);
 		String levelName = playSession.advanceLevel();
-		Level level = XmlUtils.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName), new Class[] { Level.class });
+		Level level = xmlContext.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName));
 		RectangleGradient rectangleGradient = new RectangleGradient(NIGHT_COLOR, NIGHT_COLOR, lerpedDuskColor, 
 				lerpedDuskColor);
 		level.setSkyGradient(rectangleGradient);

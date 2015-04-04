@@ -16,12 +16,13 @@ import dc.longshot.models.GameSession;
 import dc.longshot.models.Paths;
 import dc.longshot.models.ScoreEntry;
 import dc.longshot.ui.UIFactory;
-import dc.longshot.util.XmlUtils;
+import dc.longshot.util.XmlContext;
 
 public final class ScoreEntryDialog {
 
 	private static final int MAX_NAME_LENGTH = 10;
 	
+	private final XmlContext xmlContext;
 	private final Skin skin;
 	private final BitmapFont font;
 	private final Stage stage;
@@ -31,13 +32,14 @@ public final class ScoreEntryDialog {
 	private TextField nameTextField;
 	private Button okButton;
 
-	public ScoreEntryDialog(final SkinPack skinPack, final Stage stage, final GameSession gameSession, 
-			final int score) {
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
+	public ScoreEntryDialog(final XmlContext xmlContext, final SkinPack skinPack, final Stage stage, 
+			final GameSession gameSession, final int score) {
+		this.xmlContext = xmlContext;
 		this.stage = stage;
 		this.gameSession = gameSession;
 		this.score = score;
+		skin = skinPack.getSkin();
+		font = skinPack.getDefaultFont();
 		dialog = createDialog();
 	}
 	
@@ -91,7 +93,7 @@ public final class ScoreEntryDialog {
 	private void saveHighScore() {
 		ScoreEntry scoreEntry = new ScoreEntry(nameTextField.getText(), score);
 		gameSession.addHighScore(scoreEntry);
-		XmlUtils.marshal(gameSession, Gdx.files.local(Paths.GAME_SESSION_PATH), new Class[] { GameSession.class });
+		xmlContext.marshal(gameSession, Gdx.files.local(Paths.GAME_SESSION_PATH));
 	}
 	
 }
