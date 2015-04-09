@@ -19,9 +19,6 @@
       	<maxHealth>1</maxHealth>
       	<health>1</health>
       </part>
-      <part xsi:type="pointsPart">
-      	<points>100</points>
-      </part>
       <part xsi:type="alliancePart">
       	<alliance>ENEMY</alliance>
       </part>

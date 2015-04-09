@@ -14,9 +14,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "entity")
 public class EntityAdapted {
-	
-	@XmlElement
-	private String parentEntityType;
 
 	@XmlElementWrapper
 	@XmlElement(name = "part")
@@ -27,10 +24,6 @@ public class EntityAdapted {
 	
 	public EntityAdapted(final List<Object> parts) {
 		this.parts = parts;
-	}
-	
-	public String getParentEntityType() {
-		return parentEntityType;
 	}
 
 	public List<Object> getParts() {

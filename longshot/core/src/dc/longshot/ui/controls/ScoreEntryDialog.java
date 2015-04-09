@@ -75,7 +75,8 @@ public final class ScoreEntryDialog {
 		nameEntryTable.add(UIFactory.label(skin, font, "Enter your name"));
 		nameTextField = UIFactory.textField(skin, font);
 		nameTextField.setMaxLength(MAX_NAME_LENGTH);
-		nameEntryTable.add(nameTextField);
+		float nameTextFieldWidth = MAX_NAME_LENGTH * (font.getSpaceWidth() + 1);
+		nameEntryTable.add(nameTextField).width(nameTextFieldWidth);
 		return nameEntryTable;
 	}
 	

@@ -20,7 +20,7 @@
       	<health>1</health>
       </part>
       <part xsi:type="pointsPart">
-      	<points>100</points>
+      	<points>400</points>
       </part>
       <part xsi:type="alliancePart">
       	<alliance>ENEMY</alliance>

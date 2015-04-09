@@ -21,12 +21,14 @@ import dc.longshot.models.Level;
 import dc.longshot.models.SpawningType;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.SpawningPart;
+import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 
 public final class LevelController {
 	
 	private static final float INITIAL_SPAWN_DELAY = 3;
+	private static final float MIN_RANDOM_SPEED_PERCENT = 0.3f;
 
 	private final EntityCache entityCache;
 	private final EntityManager entityManager;
@@ -104,13 +106,10 @@ public final class LevelController {
 				placeInSpace(spawn);
 				break;
 			case DOWNWARD:
-				placeAbove(spawn);
-				Rectangle boundsBox = level.getBoundsBox();
-				LevelUtils.setupBottomDestination(spawn, boundsBox);
-				moveToOutOfBounds(spawn, boundsBox);
+				setupDownward(spawn);
 				break;
 			case SIDE_IN:
-				setupBouncer(spawn);
+				setupSideIn(spawn);
 				break;
 			default:
 				throw new UnsupportedOperationException("Spawning type " + spawningType + " not supported");
@@ -131,8 +130,21 @@ public final class LevelController {
 		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(boundsBox));
 		transform.setPosition(spawnPosition);
 	}
+	
+	private void setupDownward(final Entity entity) {
+		if (entity.has(SpeedPart.class)) {
+			SpeedPart speedPart = entity.get(SpeedPart.class);
+			float speed = speedPart.getSpeed();
+			float newSpeed = MathUtils.random(speed * MIN_RANDOM_SPEED_PERCENT, speed);
+			speedPart.setSpeed(newSpeed);
+		}
+		placeAbove(entity);
+		Rectangle boundsBox = level.getBoundsBox();
+		LevelUtils.setupBottomDestination(entity, boundsBox);
+		moveToOutOfBounds(entity, boundsBox);
+	}
 
-	private void setupBouncer(final Entity entity) {
+	private void setupSideIn(final Entity entity) {
 		Rectangle boundsBox = level.getBoundsBox();
 		TransformPart transform = entity.get(TransformPart.class);
 		Vector2 size = transform.getSize();

@@ -335,7 +335,10 @@ public final class LevelScreen implements Screen {
 				for (EntitySystem entitySystem : entitySystems) {
 					entitySystem.cleanup(entity);
 				}
-				spawnOnDeath(entity);
+				boolean boundsRemoved = entity.has(BoundsRemovePart.class) && Bound.isOutOfBounds(
+						entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
+						entity.get(BoundsRemovePart.class).getBounds());
+				spawnOnDeath(entity, boundsRemoved);
 				if (entity.hasActive(FragsPart.class)) {
 					DrawablePart drawablePart = entity.get(DrawablePart.class);
 					Polygon polygon = entity.get(TransformPart.class).getPolygon();
@@ -345,9 +348,7 @@ public final class LevelScreen implements Screen {
 				}
 				if (entity.hasActive(PointsPart.class)) {
 					// TODO: This check isn't accurate
-					if (!entity.has(BoundsRemovePart.class) || !Bound.isOutOfBounds(
-							entity.get(TransformPart.class).getBoundingBox(), level.getBoundsBox(), 
-							entity.get(BoundsRemovePart.class).getBounds())) {
+					if (!boundsRemoved) {
 						playSession.addToScore(entity.get(PointsPart.class).getPoints());
 					}
 				}
@@ -364,10 +365,13 @@ public final class LevelScreen implements Screen {
 		};
 	}
 	
-	private void spawnOnDeath(final Entity entity) {
+	private void spawnOnDeath(final Entity entity, final boolean boundsRemoved) {
 		if (entity.hasActive(SpawnOnDeathPart.class)) {
 			String entityTypeName = entity.get(SpawnOnDeathPart.class).getEntityType();
 			Entity spawn = entityCache.create(entityTypeName);
+			if (boundsRemoved && spawn.has(DamageOnSpawnPart.class)) {
+				spawn.setActive(DamageOnSpawnPart.class, false);
+			}
 			TransformPart spawnTransform = spawn.get(TransformPart.class);
 			Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
 					spawnTransform.getSize());

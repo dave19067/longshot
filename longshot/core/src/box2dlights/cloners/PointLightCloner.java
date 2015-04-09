@@ -15,7 +15,7 @@ public final class PointLightCloner implements IFastCloner {
 	public Object clone(final Object object, final Cloner cloner, final Map<Object, Object> map) throws IllegalAccessException {
 		PointLight pointLight = (PointLight)object;
 		try {
-			// HACK: Getting hidden fields using reflection
+			// HACK: Getting private fields using reflection
 			RayHandler rayHandler = getFieldValue(pointLight, "rayHandler");
 			int rays = getFieldValue(pointLight, "rayNum");
 			PointLight clone = new PointLight(rayHandler, rays, pointLight.getColor(), pointLight.getDistance(), 

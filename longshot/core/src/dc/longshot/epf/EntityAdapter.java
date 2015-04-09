@@ -25,22 +25,12 @@ public final class EntityAdapter extends XmlAdapter<EntityAdapted, Entity> {
 
 	@Override
 	public final Entity unmarshal(final EntityAdapted entityAdapted) {
-		Entity entity;
-		String parentEntityType = entityAdapted.getParentEntityType();
-		if (parentEntityType != null) {
-			entity = entityCache.create(parentEntityType);
-		}
-		else {
-			entity = new Entity();
-		}
+		Entity entity = new Entity();
 		for (Object part : entityAdapted.getParts()) {
 			for (Converter converter : converters) {
 				if (converter.canConvert(part)) {
 					part = converter.convert(part);
 				}
-			}
-			if (entity.has(part.getClass())) {
-				entity.detach(part.getClass());
 			}
 			entity.attach(part);
 		}
