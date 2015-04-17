@@ -9,11 +9,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public final class EntityAdapter extends XmlAdapter<EntityAdapted, Entity> {
 	
-	private final EntityCache entityCache;
 	private final Converter[] converters;
 	
-	public EntityAdapter(final EntityCache entityCache, final Converter[] converters) {
-		this.entityCache = entityCache;
+	public EntityAdapter(final Converter[] converters) {
 		this.converters = converters;
 	}
 

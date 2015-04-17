@@ -20,7 +20,7 @@ public final class EntityCache {
 	public EntityCache(final XmlContext xmlContext, final String root, final Converter[] converters) {
 		this.xmlContext = xmlContext;
 		this.root = root;
-		entityAdapter = new EntityAdapter(this, converters);
+		entityAdapter = new EntityAdapter(converters);
 	}
 	
 	public final Entity create(final String entityType) {

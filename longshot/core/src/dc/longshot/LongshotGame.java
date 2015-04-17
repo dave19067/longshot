@@ -9,6 +9,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -22,6 +23,7 @@ import dc.longshot.game.XmlBindings;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.DecorationProfile;
+import dc.longshot.level.LevelController;
 import dc.longshot.models.DebugSettings;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.GameSettings;
@@ -62,6 +64,7 @@ public final class LongshotGame extends Game {
 	private final ScreenManager screenManager = new ScreenManager();
 	private final XmlContext xmlContext = new XmlContext(XmlBindings.BOUND_CLASSES);
 	private SkinPack skinPack;
+	private PolygonSpriteBatch spriteBatch;
 	private TextureCache textureCache;
 	private SoundCache<SoundKey> soundCache;
 	private GameSettings gameSettings;
@@ -72,6 +75,7 @@ public final class LongshotGame extends Game {
 	@Override
 	public final void create() {
 		skinPack = createSkinPack();
+		spriteBatch = new PolygonSpriteBatch();
 		textureCache = createTextureCache();
 		soundCache = createSoundCache();
 		gameSettings = xmlContext.unmarshal(Gdx.files.local(Paths.GAME_SETTINGS_PATH));
@@ -206,13 +210,14 @@ public final class LongshotGame extends Game {
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
-		final LevelScreen levelScreen = new LevelScreen(skinPack, xmlContext, textureCache, soundCache, 
-				gameSettings.getInputActions(), debugSettings, playSession, level);
+		final LevelController levelController = new LevelController(xmlContext, spriteBatch, textureCache, soundCache, level, 
+				playSession, gameSettings.getInputActions(), debugSettings);
+		final LevelScreen levelScreen = new LevelScreen(skinPack, textureCache, playSession, levelController);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				final MainMenuScreen mainMenuScreen = createMainMenuScreen();
-				PauseMenu pauseMenu = new PauseMenu(skinPack, levelScreen.getStage(), levelScreen.getLevelSession());
+				PauseMenu pauseMenu = new PauseMenu(skinPack, levelScreen.getStage(), levelController.getLevelSession());
 				pauseMenu.addMainMenuButtonClickListener(new ClickListener() {
 					@Override
 					public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
@@ -224,21 +229,20 @@ public final class LongshotGame extends Game {
 				pauseMenu.showDialog();
 			}
 		});
-		final LevelScreen currentLevelScreen = levelScreen;
-		levelScreen.addCompleteListener(new NoArgsListener() {
+		levelController.addCompleteListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				if (playSession.hasNextLevel()) {
 					Level level = loadNextLevel();
 					LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);
-					screenManager.swap(currentLevelScreen, levelPreviewScreen);
+					screenManager.swap(levelScreen, levelPreviewScreen);
 				}
 				else {
 					endGame(levelScreen);
 				}
 			}
 		});
-		levelScreen.addGameOverListener(new NoArgsListener() {
+		levelController.addGameOverListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				endGame(levelScreen);
@@ -269,14 +273,22 @@ public final class LongshotGame extends Game {
 	}
 	
 	private Level loadNextLevel() {
-		float nightRatio = (float)playSession.getLevelNum() / (playSession.getLevelCount() - 1);
+		float nightRatio;
+		if (playSession.getLevelNum() == playSession.getLevelCount() - 1) {
+			// avoids divide by 0 bugs
+			nightRatio = 1;
+		}
+		else {
+			nightRatio = (float)playSession.getLevelNum() / (playSession.getLevelCount() - 1);
+		}
 		Color lerpedDuskColor = DUSK_COLOR.cpy().lerp(NIGHT_COLOR, nightRatio);
 		String levelName = playSession.advanceLevel();
 		Level level = xmlContext.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName));
 		RectangleGradient rectangleGradient = new RectangleGradient(NIGHT_COLOR, NIGHT_COLOR, lerpedDuskColor, 
 				lerpedDuskColor);
 		level.setSkyGradient(rectangleGradient);
-		level.setDecorationProfiles(createDecorationProfiles(level.getBoundsBox(), nightRatio));
+		List<DecorationProfile> decorationProfiles = createDecorationProfiles(level.getBoundsBox(), nightRatio);
+		level.setDecorationProfiles(decorationProfiles);
 		return level;
 	}
 	
