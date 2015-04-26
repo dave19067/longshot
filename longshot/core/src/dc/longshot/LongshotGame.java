@@ -148,7 +148,6 @@ public final class LongshotGame extends Game {
 		mainMenuScreen.addNewGameClickedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
-				// TODO: Ensure the playsession gets reset if the user uses other means to start a New Game other than from the main menu
 				playSession = new PlaySession(gameSession.getLevelNames());
 				Level level = loadNextLevel();
 				LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);

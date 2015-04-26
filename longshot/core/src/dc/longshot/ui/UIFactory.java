@@ -41,9 +41,8 @@ public final class UIFactory {
 		return button;
 	}
 	
-	public static final CheckBox checkBox(final Skin skin, final BitmapFont font, final boolean isChecked) {
-		CheckBox checkBox = new CheckBox("Windowed", skin);
-		checkBox.getStyle().font = font;
+	public static final CheckBox checkBox(final Skin skin, final boolean isChecked) {
+		CheckBox checkBox = new CheckBox("", skin);
 		checkBox.setStyle(checkBox.getStyle());
 		checkBox.setChecked(isChecked);
 		return checkBox;

@@ -41,6 +41,7 @@ import dc.longshot.util.XmlContext;
 
 public final class OptionsScreen implements Screen {
 
+	private static final int DEFAULT_SPACE_LEFT = 20;
 	private static final Color KEY_ENTRY_COLOR = Color.YELLOW;
 	private static final DisplayModeComparator DISPLAY_MODE_COMPARATOR = new DisplayModeComparator();
 	
@@ -52,6 +53,7 @@ public final class OptionsScreen implements Screen {
 	private InputAction currentInputAction;
 	private final Skin skin;
 	private final BitmapFont font;
+	private final BitmapFont smallFont;
 	private Stage stage;
 	private Color normalColor;
 	private SelectBox<DisplayModeItem> displayModeSelectBox;
@@ -64,6 +66,7 @@ public final class OptionsScreen implements Screen {
 		this.gameSettings = gameSettings;
 		skin = skinPack.getSkin();
 		font = skinPack.getDefaultFont();
+		smallFont = skinPack.getSmallFont();
 	}
 	
 	public final void addClosedListener(final NoArgsListener listener) {
@@ -155,31 +158,40 @@ public final class OptionsScreen implements Screen {
 	private Table createOptionsTable() {
 		Table optionsTable = new Table(skin);
 		optionsTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
-		optionsTable.add(UIFactory.label(skin, font, "Resolution"));
-		displayModeSelectBox = new SelectBox<DisplayModeItem>(skin);
+		optionsTable.add(UIFactory.label(skin, font, "Display")).right().row();
+		optionsTable.add(UIFactory.label(skin, smallFont, "Resolution")).right();
+		displayModeSelectBox = createDisplayModeSelectBox();
+		optionsTable.add(displayModeSelectBox).width(150).spaceLeft(DEFAULT_SPACE_LEFT).left().row();
+		optionsTable.add(UIFactory.label(skin, smallFont, "Windowed")).right();
+		windowedCheckBox = UIFactory.checkBox(skin, !gameSettings.isFullScreen());
+		optionsTable.add(windowedCheckBox).spaceLeft(DEFAULT_SPACE_LEFT).left().row();
+		optionsTable.add(UIFactory.label(skin, font, "Controls")).right().row();
+		for (Map.Entry<InputAction, Integer> entry : gameSettings.getInputActions().entrySet()) {
+			InputAction inputAction = entry.getKey();
+			Table actionTable = new Table(skin);
+			actionTable.add(UIFactory.label(skin, smallFont, inputAction.toString())).left();
+			Label keyLabel = UIFactory.label(skin, smallFont, Keys.toString(entry.getValue()));
+			actionTable.add(createSetButton(inputAction, keyLabel)).spaceLeft(DEFAULT_SPACE_LEFT);
+			optionsTable.add(actionTable).right();
+			optionsTable.add(keyLabel).width(175).spaceLeft(DEFAULT_SPACE_LEFT).left().row();
+			inputActionLabels.put(inputAction, keyLabel);
+		}
+		return optionsTable;
+	}
+	
+	private SelectBox<DisplayModeItem> createDisplayModeSelectBox() {
+		SelectBox<DisplayModeItem> displayModeSelectBox = new SelectBox<DisplayModeItem>(skin);
 		displayModeSelectBox.setItems(getDisplayModeItems());
 		for (DisplayModeItem item : displayModeSelectBox.getItems()) {
 			if (item.equals(gameSettings.getWidth(), gameSettings.getHeight())) {
 				displayModeSelectBox.setSelected(item);
 			}
 		}
-		optionsTable.add(displayModeSelectBox).row();
-		windowedCheckBox = UIFactory.checkBox(skin, font, !gameSettings.isFullScreen());
-		optionsTable.add(windowedCheckBox).left().row();
-		optionsTable.add(UIFactory.label(skin, font, "Controls")).row();
-		for (Map.Entry<InputAction, Integer> entry : gameSettings.getInputActions().entrySet()) {
-			InputAction inputAction = entry.getKey();
-			optionsTable.add(UIFactory.label(skin, font, inputAction.toString()));
-			Label keyLabel = UIFactory.label(skin, font, Keys.toString(entry.getValue())); 
-			optionsTable.add(keyLabel);
-			inputActionLabels.put(inputAction, keyLabel);
-			optionsTable.add(createChangeButton(inputAction, keyLabel)).row();
-		}
-		return optionsTable;
+		return displayModeSelectBox;
 	}
 	
-	private Button createChangeButton(final InputAction inputAction, final Label keyLabel) {
-		return UIFactory.button(skin, font, "Change", new ClickListener() {
+	private Button createSetButton(final InputAction inputAction, final Label keyLabel) {
+		return UIFactory.button(skin, smallFont, "Set", new ClickListener() {
 			@Override
 			public final void clicked(final InputEvent event, final float x, final float y) {
 				state = OptionsScreenState.KEY_ENTRY;
@@ -194,7 +206,7 @@ public final class OptionsScreen implements Screen {
 	private Table createButtonTable() {
 		Table buttonTable = new Table(skin);
 		buttonTable.add(UIFactory.button(skin, font, "Apply", applyButtonClicked()));
-		buttonTable.add(UIFactory.button(skin, font, "Back", backButtonClicked()));
+		buttonTable.add(UIFactory.button(skin, font, "Back", backButtonClicked())).spaceLeft(DEFAULT_SPACE_LEFT);
 		return buttonTable;
 	}
 	

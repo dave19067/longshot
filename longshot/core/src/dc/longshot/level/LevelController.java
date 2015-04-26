@@ -164,7 +164,6 @@ public final class LevelController {
 		rayHandler.setShadows(false);
 		rayHandler.diffuseBlendFunc.set(GL20.GL_SRC_COLOR, GL20.GL_DST_COLOR);
 		String entitiesPath = PathUtils.internalToAbsolutePath("entities") + "/";
-		// TODO: create this externally
 		entityCache = new EntityCache(xmlContext, entitiesPath, 
 				new Converter[] { 
 					new DrawablePartConverter(textureCache), 

@@ -120,7 +120,7 @@ public final class MainMenuScreen implements Screen {
 		Table mainTable = new Table(skin);
 		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
-		mainTable.add(new Image(logoRegion)).row();
+		mainTable.add(new Image(logoRegion)).spaceBottom(UIConstants.MENU_SPACE_BOTTOM * 2).row();
 		Button newGameButton = UIFactory.button(skin, font, "New Game", buttonClicked(newGameClickedDelegate));
 		mainTable.add(newGameButton).row();
 		Button optionsButton = UIFactory.button(skin, font, "Options", buttonClicked(optionsClickedDelegate));

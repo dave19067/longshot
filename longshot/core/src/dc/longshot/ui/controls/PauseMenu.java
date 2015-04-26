@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import dc.longshot.game.SkinPack;
 import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
-import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 
@@ -54,7 +53,7 @@ public final class PauseMenu {
 	
 	private Table createTable(final Dialog dialog) {
 		Table table = new Table(skin);
-		table.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
+		table.defaults().pad(15);
 		Button resumeButton = UIFactory.button(skin, font, "Resume", resumeButtonClicked(dialog));
 		table.add(resumeButton).row();
 		mainMenuButton = UIFactory.button(skin, font, "Main Menu");
