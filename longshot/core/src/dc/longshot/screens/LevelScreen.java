@@ -30,6 +30,7 @@ import dc.longshot.system.Input;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
+import dc.longshot.util.InputUtils;
 
 public final class LevelScreen implements Screen {
 
@@ -97,7 +98,7 @@ public final class LevelScreen implements Screen {
 	@Override
 	public final void show() {
 		stage = createStage();
-		Gdx.input.setCursorCatched(true);
+		InputUtils.setCursorVisible(false);
 		addInputProcessors();
 	}
 

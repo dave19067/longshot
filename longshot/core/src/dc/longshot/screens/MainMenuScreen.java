@@ -22,6 +22,7 @@ import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
+import dc.longshot.util.InputUtils;
 
 public final class MainMenuScreen implements Screen {
 
@@ -69,7 +70,7 @@ public final class MainMenuScreen implements Screen {
 	@Override
 	public final void show() {
 		stage = createStage();
-		Gdx.input.setCursorCatched(false);
+		InputUtils.setCursorVisible(true);
 		Input.addProcessor(stage);
 	}
 

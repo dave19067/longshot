@@ -42,7 +42,6 @@ import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.ui.controls.ScoreEntryDialog;
 import dc.longshot.util.ColorUtils;
-import dc.longshot.util.InputUtils;
 import dc.longshot.util.PathUtils;
 import dc.longshot.util.XmlContext;
 
@@ -88,7 +87,6 @@ public final class LongshotGame extends Game {
 
 	@Override
 	public final void render() {
-		InputUtils.boundCursor();
 		screenManager.render();
 		screenManager.update();
 	}

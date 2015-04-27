@@ -16,6 +16,7 @@ import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.SkinPack;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIFactory;
+import dc.longshot.util.InputUtils;
 
 public final class LevelPreviewScreen implements Screen {
 
@@ -55,7 +56,7 @@ public final class LevelPreviewScreen implements Screen {
 	public final void show() {
 		stage = createStage();
 		Input.addProcessor(stage);
-		Gdx.input.setCursorCatched(false);
+		InputUtils.setCursorVisible(true);
 	}
 
 	@Override

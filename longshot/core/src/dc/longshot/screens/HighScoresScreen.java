@@ -21,6 +21,7 @@ import dc.longshot.models.GameSession;
 import dc.longshot.models.ScoreEntry;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIFactory;
+import dc.longshot.util.InputUtils;
 
 public class HighScoresScreen implements Screen {
 	
@@ -66,7 +67,7 @@ public class HighScoresScreen implements Screen {
 		Input.addProcessor(stage);
 		highScoresInputProcessor = new HighScoresInputProcessor();
 		Input.addProcessor(highScoresInputProcessor);
-		Gdx.input.setCursorCatched(false);
+		InputUtils.setCursorVisible(true);
 	}
 
 	@Override

@@ -37,6 +37,7 @@ import dc.longshot.models.Paths;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
+import dc.longshot.util.InputUtils;
 import dc.longshot.util.XmlContext;
 
 public final class OptionsScreen implements Screen {
@@ -91,7 +92,7 @@ public final class OptionsScreen implements Screen {
 		stage = createStage();
 		Input.addProcessor(optionsInputProcessor);
 		Input.addProcessor(stage);
-		Gdx.input.setCursorCatched(false);
+		InputUtils.setCursorVisible(true);
 	}
 
 	@Override
