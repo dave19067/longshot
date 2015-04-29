@@ -3,13 +3,13 @@ package dc.longshot.game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-public final class SkinPack {
+public final class UIPack {
 
 	private final Skin skin;
 	private final BitmapFont defaultFont;
 	private final BitmapFont smallFont;
 	
-	public SkinPack(final Skin skin, final BitmapFont defaultFont, final BitmapFont smallFont) {
+	public UIPack(final Skin skin, final BitmapFont defaultFont, final BitmapFont smallFont) {
 		this.skin = skin;
 		this.defaultFont = defaultFont;
 		this.smallFont = smallFont;

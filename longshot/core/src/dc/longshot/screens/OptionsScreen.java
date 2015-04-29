@@ -30,7 +30,7 @@ import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.GameSettingsApplier;
-import dc.longshot.game.SkinPack;
+import dc.longshot.game.UIPack;
 import dc.longshot.models.GameSettings;
 import dc.longshot.models.InputAction;
 import dc.longshot.models.Paths;
@@ -62,12 +62,12 @@ public final class OptionsScreen implements Screen {
 	private final Map<InputAction, Label> inputActionLabels = new HashMap<InputAction, Label>();
 	private final InputProcessor optionsInputProcessor = new OptionsInputProcessor();
 	
-	public OptionsScreen(final XmlContext xmlContext, final SkinPack skinPack, final GameSettings gameSettings) {
+	public OptionsScreen(final XmlContext xmlContext, final UIPack uiPack, final GameSettings gameSettings) {
 		this.xmlContext = xmlContext;
 		this.gameSettings = gameSettings;
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
-		smallFont = skinPack.getSmallFont();
+		skin = uiPack.getSkin();
+		font = uiPack.getDefaultFont();
+		smallFont = uiPack.getSmallFont();
 	}
 	
 	public final void addClosedListener(final NoArgsListener listener) {

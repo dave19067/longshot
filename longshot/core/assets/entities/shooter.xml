@@ -57,6 +57,9 @@
           <ghostRegionName>objects/tank_outline</ghostRegionName>
           <deactivateSound>POWER_UP</deactivateSound>
       </part>
+      <part xsi:type="spawnOnDeathPart">
+      	<entityType>largeexplosion</entityType>
+      </part>
       <part xsi:type="soundOnDeathPart">
           <soundKey>POWER_DOWN</soundKey>
       </part>

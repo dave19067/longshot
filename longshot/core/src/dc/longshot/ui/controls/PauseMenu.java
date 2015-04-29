@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import dc.longshot.game.SkinPack;
+import dc.longshot.game.UIPack;
 import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.ui.UIFactory;
@@ -27,9 +27,9 @@ public final class PauseMenu {
 	private final Dialog dialog;
 	private Button mainMenuButton;
 
-	public PauseMenu(final SkinPack skinPack, final Stage stage, final LevelSession levelSession) {
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
+	public PauseMenu(final UIPack uiPack, final Stage stage, final LevelSession levelSession) {
+		skin = uiPack.getSkin();
+		font = uiPack.getDefaultFont();
 		this.stage = stage;
 		this.levelSession = levelSession;
 		dialog = createDialog();

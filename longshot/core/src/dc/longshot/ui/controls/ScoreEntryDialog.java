@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import dc.longshot.game.SkinPack;
+import dc.longshot.game.UIPack;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.Paths;
 import dc.longshot.models.ScoreEntry;
@@ -32,14 +32,14 @@ public final class ScoreEntryDialog {
 	private TextField nameTextField;
 	private Button okButton;
 
-	public ScoreEntryDialog(final XmlContext xmlContext, final SkinPack skinPack, final Stage stage, 
+	public ScoreEntryDialog(final XmlContext xmlContext, final UIPack uiPack, final Stage stage, 
 			final GameSession gameSession, final int score) {
 		this.xmlContext = xmlContext;
 		this.stage = stage;
 		this.gameSession = gameSession;
 		this.score = score;
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
+		skin = uiPack.getSkin();
+		font = uiPack.getDefaultFont();
 		dialog = createDialog();
 	}
 	

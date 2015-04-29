@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
-import dc.longshot.game.SkinPack;
+import dc.longshot.game.UIPack;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
 import dc.longshot.ui.UIFactory;
@@ -36,9 +36,9 @@ public final class MainMenuScreen implements Screen {
 	
 	private Stage stage;
 	
-	public MainMenuScreen(final SkinPack skinPack, final TextureRegion logoRegion) {
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
+	public MainMenuScreen(final UIPack uiPack, final TextureRegion logoRegion) {
+		skin = uiPack.getSkin();
+		font = uiPack.getDefaultFont();
 		this.logoRegion = logoRegion;
 	}
 	

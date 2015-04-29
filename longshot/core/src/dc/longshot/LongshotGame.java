@@ -18,7 +18,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.GameSettingsApplier;
-import dc.longshot.game.SkinPack;
+import dc.longshot.game.UIPack;
 import dc.longshot.game.XmlBindings;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.TextureCache;
@@ -62,7 +62,7 @@ public final class LongshotGame extends Game {
 	
 	private final ScreenManager screenManager = new ScreenManager();
 	private final XmlContext xmlContext = new XmlContext(XmlBindings.BOUND_CLASSES);
-	private SkinPack skinPack;
+	private UIPack uiPack;
 	private PolygonSpriteBatch spriteBatch;
 	private TextureCache textureCache;
 	private SoundCache<SoundKey> soundCache;
@@ -73,7 +73,7 @@ public final class LongshotGame extends Game {
 	
 	@Override
 	public final void create() {
-		skinPack = createSkinPack();
+		uiPack = createUIPack();
 		spriteBatch = new PolygonSpriteBatch();
 		textureCache = createTextureCache();
 		soundCache = createSoundCache();
@@ -100,7 +100,7 @@ public final class LongshotGame extends Game {
 	public final void dispose() {
 		textureCache.dispose();
 		screenManager.dispose();
-		skinPack.dispose();
+		uiPack.dispose();
 	}
 	
 	private TextureCache createTextureCache() {
@@ -125,11 +125,11 @@ public final class LongshotGame extends Game {
 		return path.replaceFirst(TEXTURES_PATH, "");
 	}
 	
-	private SkinPack createSkinPack() {
+	private UIPack createUIPack() {
 		Skin skin = new Skin(Gdx.files.internal(SKIN_PATH));
 		BitmapFont defaultFont = new BitmapFont(Gdx.files.internal(DEFAULT_FONT_PATH));
 		BitmapFont smallFont = new BitmapFont(Gdx.files.internal(SMALL_FONT_PATH));
-		return new SkinPack(skin, defaultFont, smallFont);
+		return new UIPack(skin, defaultFont, smallFont);
 	}
 	
 	private SoundCache<SoundKey> createSoundCache() {
@@ -142,7 +142,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private MainMenuScreen createMainMenuScreen() {
-		final MainMenuScreen mainMenuScreen = new MainMenuScreen(skinPack, textureCache.getTextureRegion("ui/logo"));
+		final MainMenuScreen mainMenuScreen = new MainMenuScreen(uiPack, textureCache.getTextureRegion("ui/logo"));
 		mainMenuScreen.addNewGameClickedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -171,7 +171,7 @@ public final class LongshotGame extends Game {
 	
 	private LevelPreviewScreen createLevelPreviewScreen(final Level level) {
 		String levelName = "Wave " + (playSession.getLevelNum());
-		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(skinPack, levelName, 1);
+		final LevelPreviewScreen levelPreviewScreen = new LevelPreviewScreen(uiPack, levelName, 1);
 		levelPreviewScreen.addClosedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -183,7 +183,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private OptionsScreen createOptionsScreen() {
-		final OptionsScreen optionsScreen = new OptionsScreen(xmlContext, skinPack, gameSettings);
+		final OptionsScreen optionsScreen = new OptionsScreen(xmlContext, uiPack, gameSettings);
 		final Screen previousScreen = screenManager.getCurrentScreen();
 		optionsScreen.addClosedListener(new NoArgsListener() {
 			@Override
@@ -195,7 +195,7 @@ public final class LongshotGame extends Game {
 	}
 	
 	private HighScoresScreen createHighScoresScreen() {
-		final HighScoresScreen highScoresScreen = new HighScoresScreen(skinPack, gameSession);
+		final HighScoresScreen highScoresScreen = new HighScoresScreen(uiPack, gameSession);
 		highScoresScreen.addClosedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -209,12 +209,12 @@ public final class LongshotGame extends Game {
 	private LevelScreen createLevelScreen(final Level level) {
 		final LevelController levelController = new LevelController(xmlContext, spriteBatch, textureCache, soundCache, level, 
 				playSession, gameSettings.getInputActions(), debugSettings);
-		final LevelScreen levelScreen = new LevelScreen(skinPack, textureCache, playSession, levelController);
+		final LevelScreen levelScreen = new LevelScreen(uiPack, textureCache, playSession, levelController);
 		levelScreen.addPausedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
 				final MainMenuScreen mainMenuScreen = createMainMenuScreen();
-				PauseMenu pauseMenu = new PauseMenu(skinPack, levelScreen.getStage(), levelController.getLevelSession());
+				PauseMenu pauseMenu = new PauseMenu(uiPack, levelScreen.getStage(), levelController.getLevelSession());
 				pauseMenu.addMainMenuButtonClickListener(new ClickListener() {
 					@Override
 					public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
@@ -252,7 +252,7 @@ public final class LongshotGame extends Game {
 		final HighScoresScreen highScoresScreen = createHighScoresScreen();
 		int score = playSession.getScore();
 		if (gameSession.canAddHighScore(score)) {
-			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(xmlContext, skinPack, levelScreen.getStage(), 
+			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(xmlContext, uiPack, levelScreen.getStage(), 
 					gameSession, score);
 			scoreEntryDialog.addOkButtonClickListener(new ClickListener() {
 				@Override

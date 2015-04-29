@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
-import dc.longshot.game.SkinPack;
+import dc.longshot.game.UIPack;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.LevelController;
 import dc.longshot.models.LevelSession;
@@ -55,7 +55,7 @@ public final class LevelScreen implements Screen {
 
 	private final TextureRegion cursorRegion;
 	
-	public LevelScreen(final SkinPack skinPack, final TextureCache textureCache, final PlaySession playSession, 
+	public LevelScreen(final UIPack uiPack, final TextureCache textureCache, final PlaySession playSession, 
 			final LevelController levelController) {
 		this.textureCache = textureCache;
 		this.playSession = playSession;
@@ -68,8 +68,8 @@ public final class LevelScreen implements Screen {
 				hideStatusUI();
 			}
 		});
-		skin = skinPack.getSkin();
-		font = skinPack.getDefaultFont();
+		skin = uiPack.getSkin();
+		font = uiPack.getDefaultFont();
 		spriteBatch = new PolygonSpriteBatch();
 		cursorRegion = textureCache.getTextureRegion("objects/crosshairs");
 	}

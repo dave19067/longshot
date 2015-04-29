@@ -222,6 +222,12 @@ public final class LevelController {
 			}
 			if (!gameOver) {
 				if (levelSession.getHealth() <= 0) {
+					for (Entity entity : entityManager.getAll()) {
+						if (entity.hasActive(AlliancePart.class)
+								&& entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
+							entityManager.remove(entity);
+						}
+					}
 					gameOver = true;
 					gameOverDelegate.notify(new NoArgsEvent());
 				}
