@@ -51,7 +51,7 @@ public final class LongshotGame extends Game {
 	private static final Color NIGHT_COLOR = ColorUtils.toGdxColor(15, 16, 26);
 	private static final String TEMPORARY_PATH = "temp/";
 	private static final String SKIN_PATH = "ui/test/uiskin.json";
-	private static final String DEFAULT_FONT_PATH = "ui/ocr/ocr_32.fnt";
+	private static final String MEDIUM_FONT_PATH = "ui/ocr/ocr_32.fnt";
 	private static final String SMALL_FONT_PATH = "ui/ocr/ocr_24.fnt";
 	private static final String LEVELS_PATH = "levels/";
 	private static final String ATLAS_EXTENSION = ".atlas";
@@ -127,9 +127,9 @@ public final class LongshotGame extends Game {
 	
 	private UIPack createUIPack() {
 		Skin skin = new Skin(Gdx.files.internal(SKIN_PATH));
-		BitmapFont defaultFont = new BitmapFont(Gdx.files.internal(DEFAULT_FONT_PATH));
+		BitmapFont mediumFont = new BitmapFont(Gdx.files.internal(MEDIUM_FONT_PATH));
 		BitmapFont smallFont = new BitmapFont(Gdx.files.internal(SMALL_FONT_PATH));
-		return new UIPack(skin, defaultFont, smallFont);
+		return new UIPack(skin, mediumFont, smallFont);
 	}
 	
 	private SoundCache<SoundKey> createSoundCache() {

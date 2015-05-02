@@ -7,20 +7,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.game.FontSize;
 import dc.longshot.game.UIPack;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.ScoreEntry;
 import dc.longshot.system.Input;
-import dc.longshot.ui.UIFactory;
 import dc.longshot.util.InputUtils;
 
 public class HighScoresScreen implements Screen {
@@ -30,18 +28,13 @@ public class HighScoresScreen implements Screen {
 	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final GameSession gameSession;
-	private final Skin skin;
-	private final BitmapFont font;
-	private final BitmapFont smallFont;
-	
+	private final UIPack uiPack;
 	private Stage stage;
 	private InputProcessor highScoresInputProcessor;
 
 	public HighScoresScreen(final UIPack uiPack, final GameSession gameSession) {
 		this.gameSession = gameSession;
-		skin = uiPack.getSkin();
-		font = uiPack.getDefaultFont();
-		smallFont = uiPack.getSmallFont();
+		this.uiPack = uiPack;
 	}
 	
 	public final void addClosedListener(final NoArgsListener listener) {
@@ -97,24 +90,24 @@ public class HighScoresScreen implements Screen {
 	}
 	
 	private Table createMainTable() {
-		Table mainTable = new Table(skin);
+		Table mainTable = uiPack.table();
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.label(skin, font, "High Scores")).row();
-		mainTable.add(UIFactory.lineBreak(skin, font)).row();
+		mainTable.add(uiPack.label("High Scores")).row();
+		mainTable.add(uiPack.lineBreak()).row();
 		mainTable.add(createScoresTable()).row();
-		mainTable.add(UIFactory.lineBreak(skin, font)).row();
-		mainTable.add(UIFactory.label(skin, font, "Click or touch to continue...")).row();
+		mainTable.add(uiPack.lineBreak()).row();
+		mainTable.add(uiPack.label("Click or touch to continue...")).row();
 		return mainTable;
 	}
 	
 	private Table createScoresTable() {
-		Table scoresTable = new Table(skin);
+		Table scoresTable = uiPack.table();
 		List<ScoreEntry> descendingHighScores = gameSession.getSortedHighScores();
 		Collections.reverse(descendingHighScores);
 		for (ScoreEntry highScore : descendingHighScores) {
-			scoresTable.add(UIFactory.label(skin, smallFont, highScore.getName())).left();
-			scoresTable.add(UIFactory.label(skin, smallFont, Integer.toString(highScore.getScore())))
-				.spaceLeft(SCORE_SPACE_LEFT).right().row();
+			scoresTable.add(uiPack.label(highScore.getName(), FontSize.SMALL)).left();
+			String scoreString = Integer.toString(highScore.getScore());
+			scoresTable.add(uiPack.label(scoreString, FontSize.SMALL)).spaceLeft(SCORE_SPACE_LEFT).right().row();
 		}
 		return scoresTable;
 	}

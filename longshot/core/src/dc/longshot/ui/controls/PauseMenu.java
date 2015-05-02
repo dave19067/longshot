@@ -2,34 +2,29 @@ package dc.longshot.ui.controls;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import dc.longshot.game.UIPack;
 import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
-import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 
 public final class PauseMenu {
-	
-	private final Skin skin;
-	private final BitmapFont font;
+
+	private final UIPack uiPack;
 	private final Stage stage;
 	private final LevelSession levelSession;
 	private final Dialog dialog;
 	private Button mainMenuButton;
 
 	public PauseMenu(final UIPack uiPack, final Stage stage, final LevelSession levelSession) {
-		skin = uiPack.getSkin();
-		font = uiPack.getDefaultFont();
+		this.uiPack = uiPack;
 		this.stage = stage;
 		this.levelSession = levelSession;
 		dialog = createDialog();
@@ -45,22 +40,20 @@ public final class PauseMenu {
 	}
 	
 	private Dialog createDialog() {
-		Dialog dialog = new Dialog("Menu", skin);
+		Dialog dialog = uiPack.dialog("Menu");
 		dialog.add(createTable(dialog));
 		dialog.addListener(dialogInput(dialog));
 		return dialog;
 	}
 	
 	private Table createTable(final Dialog dialog) {
-		Table table = new Table(skin);
+		Table table = uiPack.table();
 		table.defaults().pad(15);
-		Button resumeButton = UIFactory.button(skin, font, "Resume", resumeButtonClicked(dialog));
-		table.add(resumeButton).row();
-		mainMenuButton = UIFactory.button(skin, font, "Main Menu");
+		table.add(uiPack.button("Resume", resumeButtonClicked(dialog))).row();
+		mainMenuButton = uiPack.button("Main Menu"); 
 		table.add(mainMenuButton).row();
-		Button quitButton = UIFactory.button(skin, font, "Quit", quitButtonClicked());
-		table.add(quitButton);
-		UIUtils.setSameWidth(table, resumeButton, mainMenuButton, quitButton);
+		table.add(uiPack.button("Quit", quitButtonClicked()));
+		UIUtils.setSameWidth(table, Button.class);
 		return table;
 	}
 	

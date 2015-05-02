@@ -14,14 +14,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -29,6 +27,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventmanagement.EventDelegate;
 import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.game.FontSize;
 import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.UIPack;
 import dc.longshot.models.GameSettings;
@@ -36,7 +35,6 @@ import dc.longshot.models.InputAction;
 import dc.longshot.models.Paths;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
-import dc.longshot.ui.UIFactory;
 import dc.longshot.util.InputUtils;
 import dc.longshot.util.XmlContext;
 
@@ -49,12 +47,10 @@ public final class OptionsScreen implements Screen {
 	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
 	
 	private final XmlContext xmlContext;
+	private final UIPack uiPack;
 	private final GameSettings gameSettings;
 	private OptionsScreenState state = OptionsScreenState.NORMAL;
 	private InputAction currentInputAction;
-	private final Skin skin;
-	private final BitmapFont font;
-	private final BitmapFont smallFont;
 	private Stage stage;
 	private Color normalColor;
 	private SelectBox<DisplayModeItem> displayModeSelectBox;
@@ -64,10 +60,8 @@ public final class OptionsScreen implements Screen {
 	
 	public OptionsScreen(final XmlContext xmlContext, final UIPack uiPack, final GameSettings gameSettings) {
 		this.xmlContext = xmlContext;
+		this.uiPack = uiPack;
 		this.gameSettings = gameSettings;
-		skin = uiPack.getSkin();
-		font = uiPack.getDefaultFont();
-		smallFont = uiPack.getSmallFont();
 	}
 	
 	public final void addClosedListener(final NoArgsListener listener) {
@@ -148,7 +142,7 @@ public final class OptionsScreen implements Screen {
 	}
 	
 	private Table createMainTable() {
-		Table mainTable = new Table(skin);
+		Table mainTable = uiPack.table();
 		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
 		mainTable.add(createOptionsTable()).row();
@@ -157,21 +151,21 @@ public final class OptionsScreen implements Screen {
 	}
 	
 	private Table createOptionsTable() {
-		Table optionsTable = new Table(skin);
+		Table optionsTable = uiPack.table();
 		optionsTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
-		optionsTable.add(UIFactory.label(skin, font, "Display")).right().row();
-		optionsTable.add(UIFactory.label(skin, smallFont, "Resolution")).right();
+		optionsTable.add(uiPack.label("Display")).right().row();
+		optionsTable.add(uiPack.label("Resolution", FontSize.SMALL)).right();
 		displayModeSelectBox = createDisplayModeSelectBox();
 		optionsTable.add(displayModeSelectBox).width(150).spaceLeft(DEFAULT_SPACE_LEFT).left().row();
-		optionsTable.add(UIFactory.label(skin, smallFont, "Windowed")).right();
-		windowedCheckBox = UIFactory.checkBox(skin, !gameSettings.isFullScreen());
+		optionsTable.add(uiPack.label("Windowed", FontSize.SMALL)).right();
+		windowedCheckBox = uiPack.checkBox(!gameSettings.isFullScreen());
 		optionsTable.add(windowedCheckBox).spaceLeft(DEFAULT_SPACE_LEFT).left().row();
-		optionsTable.add(UIFactory.label(skin, font, "Controls")).right().row();
+		optionsTable.add(uiPack.label("Controls")).right().row();
 		for (Map.Entry<InputAction, Integer> entry : gameSettings.getInputActions().entrySet()) {
 			InputAction inputAction = entry.getKey();
-			Table actionTable = new Table(skin);
-			actionTable.add(UIFactory.label(skin, smallFont, inputAction.toString())).left();
-			Label keyLabel = UIFactory.label(skin, smallFont, Keys.toString(entry.getValue()));
+			Table actionTable = uiPack.table();
+			actionTable.add(uiPack.label(inputAction.toString(), FontSize.SMALL)).left();
+			Label keyLabel = uiPack.label(Keys.toString(entry.getValue()), FontSize.SMALL);
 			actionTable.add(createSetButton(inputAction, keyLabel)).spaceLeft(DEFAULT_SPACE_LEFT);
 			optionsTable.add(actionTable).right();
 			optionsTable.add(keyLabel).width(175).spaceLeft(DEFAULT_SPACE_LEFT).left().row();
@@ -181,7 +175,7 @@ public final class OptionsScreen implements Screen {
 	}
 	
 	private SelectBox<DisplayModeItem> createDisplayModeSelectBox() {
-		SelectBox<DisplayModeItem> displayModeSelectBox = new SelectBox<DisplayModeItem>(skin);
+		SelectBox<DisplayModeItem> displayModeSelectBox = uiPack.selectBox();
 		displayModeSelectBox.setItems(getDisplayModeItems());
 		for (DisplayModeItem item : displayModeSelectBox.getItems()) {
 			if (item.equals(gameSettings.getWidth(), gameSettings.getHeight())) {
@@ -192,7 +186,7 @@ public final class OptionsScreen implements Screen {
 	}
 	
 	private Button createSetButton(final InputAction inputAction, final Label keyLabel) {
-		return UIFactory.button(skin, smallFont, "Set", new ClickListener() {
+		return uiPack.button("Set", FontSize.SMALL, new ClickListener() {
 			@Override
 			public final void clicked(final InputEvent event, final float x, final float y) {
 				state = OptionsScreenState.KEY_ENTRY;
@@ -205,9 +199,9 @@ public final class OptionsScreen implements Screen {
 	}
 	
 	private Table createButtonTable() {
-		Table buttonTable = new Table(skin);
-		buttonTable.add(UIFactory.button(skin, font, "Apply", applyButtonClicked()));
-		buttonTable.add(UIFactory.button(skin, font, "Back", backButtonClicked())).spaceLeft(DEFAULT_SPACE_LEFT);
+		Table buttonTable = uiPack.table();
+		buttonTable.add(uiPack.button("Apply", applyButtonClicked()));
+		buttonTable.add(uiPack.button("Back", backButtonClicked())).spaceLeft(DEFAULT_SPACE_LEFT);
 		return buttonTable;
 	}
 	

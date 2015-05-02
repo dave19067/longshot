@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -27,7 +25,6 @@ import dc.longshot.models.LevelSession;
 import dc.longshot.models.PlaySession;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.system.Input;
-import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
 import dc.longshot.util.InputUtils;
@@ -36,19 +33,15 @@ public final class LevelScreen implements Screen {
 
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
 
-	private final Skin skin;
-	private final BitmapFont font;
+	private final UIPack uiPack;
 	private final TextureCache textureCache;
 	private final PlaySession playSession;
-	
 	private final PolygonSpriteBatch spriteBatch;
-
 	private Stage stage;
 	private Table worldTable;
 	private Table statusTable;
 	private HealthDisplay healthDisplay;
 	private Label scoreValueLabel;
-	
 	private final LevelController levelController;
 	private final LevelSession levelSession;
 	private InputProcessor levelInputProcessor;
@@ -57,6 +50,7 @@ public final class LevelScreen implements Screen {
 	
 	public LevelScreen(final UIPack uiPack, final TextureCache textureCache, final PlaySession playSession, 
 			final LevelController levelController) {
+		this.uiPack = uiPack;
 		this.textureCache = textureCache;
 		this.playSession = playSession;
 		this.levelController = levelController;
@@ -68,8 +62,6 @@ public final class LevelScreen implements Screen {
 				hideStatusUI();
 			}
 		});
-		skin = uiPack.getSkin();
-		font = uiPack.getDefaultFont();
 		spriteBatch = new PolygonSpriteBatch();
 		cursorRegion = textureCache.getTextureRegion("objects/crosshairs");
 	}
@@ -133,7 +125,7 @@ public final class LevelScreen implements Screen {
 	
 	private Stage createStage() {
 		Stage stage = new Stage(new ScreenViewport());
-		worldTable = new Table(skin);
+		worldTable = uiPack.table();
 		Table statusTable = createStatusTable();
 		Table mainTable = createMainTable(worldTable, statusTable);
 		stage.addActor(mainTable);
@@ -141,19 +133,19 @@ public final class LevelScreen implements Screen {
 	}
 	
 	private Table createStatusTable() {
-		statusTable = new Table(skin);
-		statusTable.add(UIFactory.label(skin, font, "HEALTH: ")).right();
+		statusTable = uiPack.table();
+		statusTable.add(uiPack.label("HEALTH: ")).right();
 		TextureRegion healthBarRegion = textureCache.getTextureRegion("objects/health_bar");
 		healthDisplay = new HealthDisplay(healthBarRegion);
 		statusTable.add(healthDisplay.getTable()).left().row();
-		statusTable.add(UIFactory.label(skin, font, "SCORE: ")).right();
-		scoreValueLabel = UIFactory.label(skin, font, "");
+		statusTable.add(uiPack.label("SCORE: ")).right();
+		scoreValueLabel = uiPack.label("");
 		statusTable.add(scoreValueLabel).left();
 		return statusTable;
 	}
 	
 	private Table createMainTable(final Table worldTable, final Table statusTable) {
-		Table mainTable = new Table(skin).top().left();
+		Table mainTable = uiPack.table().top().left();
 		mainTable.setFillParent(true);
 		mainTable.add(worldTable).expand().fill().row();
 		mainTable.add(statusTable).left().row();

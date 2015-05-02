@@ -3,10 +3,8 @@ package dc.longshot.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -15,7 +13,6 @@ import dc.longshot.eventmanagement.NoArgsEvent;
 import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.UIPack;
 import dc.longshot.system.Input;
-import dc.longshot.ui.UIFactory;
 import dc.longshot.util.InputUtils;
 
 public final class LevelPreviewScreen implements Screen {
@@ -24,15 +21,13 @@ public final class LevelPreviewScreen implements Screen {
 	
 	private final String levelName;
 	private final float duration;
-	private final Skin skin;
-	private final BitmapFont font;
+	private final UIPack uiPack;
 	private Stage stage;
 	
 	public LevelPreviewScreen(final UIPack uiPack, final String levelName, final float duration) {
+		this.uiPack = uiPack;
 		this.levelName = levelName;
 		this.duration = duration;
-		skin = uiPack.getSkin();
-		font = uiPack.getDefaultFont();
 	}
 	
 	public final void addClosedListener(final NoArgsListener listener) {
@@ -92,9 +87,9 @@ public final class LevelPreviewScreen implements Screen {
 	}
 
 	private Table createMainTable() {
-		Table mainTable = new Table(skin);
+		Table mainTable = uiPack.table();
 		mainTable.setFillParent(true);
-		mainTable.add(UIFactory.label(skin, font, levelName)).row();
+		mainTable.add(uiPack.label(levelName)).row();
 		return mainTable;
 	}
 

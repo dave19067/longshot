@@ -3,13 +3,11 @@ package dc.longshot.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -20,7 +18,6 @@ import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.UIPack;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
-import dc.longshot.ui.UIFactory;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.util.InputUtils;
 
@@ -29,16 +26,13 @@ public final class MainMenuScreen implements Screen {
 	private final EventDelegate<NoArgsListener> newGameClickedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> optionsClickedDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> highScoresClickedDelegate = new EventDelegate<NoArgsListener>();
-	
-	private final Skin skin;
-	private final BitmapFont font;
+
+	private final UIPack uiPack;
 	private final TextureRegion logoRegion;
-	
 	private Stage stage;
 	
 	public MainMenuScreen(final UIPack uiPack, final TextureRegion logoRegion) {
-		skin = uiPack.getSkin();
-		font = uiPack.getDefaultFont();
+		this.uiPack = uiPack;
 		this.logoRegion = logoRegion;
 	}
 	
@@ -118,20 +112,15 @@ public final class MainMenuScreen implements Screen {
 	}
 	
 	private Table createMainTable() {
-		Table mainTable = new Table(skin);
+		Table mainTable = uiPack.table();
 		mainTable.defaults().spaceBottom(UIConstants.MENU_SPACE_BOTTOM);
 		mainTable.setFillParent(true);
 		mainTable.add(new Image(logoRegion)).spaceBottom(UIConstants.MENU_SPACE_BOTTOM * 2).row();
-		Button newGameButton = UIFactory.button(skin, font, "New Game", buttonClicked(newGameClickedDelegate));
-		mainTable.add(newGameButton).row();
-		Button optionsButton = UIFactory.button(skin, font, "Options", buttonClicked(optionsClickedDelegate));
-		mainTable.add(optionsButton).row();
-		Button highScoresButton = UIFactory.button(skin, font, "High Scores", 
-				buttonClicked(highScoresClickedDelegate));
-		mainTable.add(highScoresButton).row();
-		Button quitButton = UIFactory.button(skin, font, "Quit", quitButtonClicked());
-		mainTable.add(quitButton).row();
-		UIUtils.setSameWidth(mainTable, newGameButton, optionsButton, highScoresButton, quitButton);
+		mainTable.add(uiPack.button("New Game", buttonClicked(newGameClickedDelegate))).row();
+		mainTable.add(uiPack.button("Options", buttonClicked(optionsClickedDelegate))).row();
+		mainTable.add(uiPack.button("High Scores", buttonClicked(highScoresClickedDelegate))).row();
+		mainTable.add(uiPack.button("Quit", quitButtonClicked())).row();
+		UIUtils.setSameWidth(mainTable, Button.class);
 		return mainTable;
 	}
 	

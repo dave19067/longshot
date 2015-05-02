@@ -1,7 +1,6 @@
 package dc.longshot.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
@@ -23,12 +22,11 @@ public final class UIUtils {
 	/**
 	 * Sets the width of a table's child actors to have the same width of the longest child actor.
 	 */
-	public static final void setSameWidth(final Table table, final Actor... children) {
+	public static final void setSameWidth(final Table table, final Class<?> actorClass) {
 		table.validate();
-		List<Actor> childrenList = Arrays.asList(children);
 		List<Cell<?>> childCells = new ArrayList<Cell<?>>();
 		for (Cell<?> cell : table.getCells()) {
-			if (childrenList.contains(cell.getActor())) {
+			if (actorClass.isAssignableFrom(cell.getActor().getClass())) {
 				childCells.add(cell);
 			}
 		}
