@@ -4,25 +4,5 @@
         <levelNames>level1.xml</levelNames>
     </levelNames>
     <highScores>
-        <highScores>
-            <name>ffffffffff</name>
-            <score>300</score>
-        </highScores>
-        <highScores>
-            <name>afffffffww</name>
-            <score>300</score>
-        </highScores>
-        <highScores>
-            <name>asdfghijkl</name>
-            <score>300</score>
-        </highScores>
-        <highScores>
-            <name>aaaaddddad</name>
-            <score>300</score>
-        </highScores>
-        <highScores>
-            <name>dav</name>
-            <score>2000</score>
-        </highScores>
     </highScores>
 </gameSession>

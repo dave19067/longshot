@@ -4,8 +4,8 @@
       <part xsi:type="transformPart">
         <regionName>objects/ufo</regionName>
       	<size>
-      	    <x>1</x>
-      	    <y>0.5</y>
+      	    <x>1.5</x>
+      	    <y>0.75</y>
       	</size>
       </part>
       <part xsi:type="drawablePart">

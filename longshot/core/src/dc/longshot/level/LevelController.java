@@ -40,6 +40,7 @@ import dc.longshot.entitysystems.EmitSystem;
 import dc.longshot.entitysystems.FollowerSystem;
 import dc.longshot.entitysystems.GhostSystem;
 import dc.longshot.entitysystems.GravitySystem;
+import dc.longshot.entitysystems.GroundExploderSystem;
 import dc.longshot.entitysystems.GroundShooterSystem;
 import dc.longshot.entitysystems.InputMovementSystem;
 import dc.longshot.entitysystems.LightSystem;
@@ -88,6 +89,7 @@ import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.GhostPart;
+import dc.longshot.parts.GroundExploderPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
@@ -117,6 +119,7 @@ public final class LevelController {
 	private static final int FRAG_HEIGHT = 8;
 	private static final float FRAG_SPEED_MULTIPLIER = 50;
 	private static final int FRAG_FADE_TIME = 2;
+	private static EntityZComparator ENTITY_Z_COMPARATOR = new EntityZComparator();
 	
 	private final EventDelegate<NoArgsListener> completeDelegate = new EventDelegate<NoArgsListener>();
 	private final EventDelegate<NoArgsListener> gameOverDelegate = new EventDelegate<NoArgsListener>();
@@ -143,7 +146,7 @@ public final class LevelController {
 	private List<EntitySystem> entitySystems;
 	private RotateToCursorSystem rotateToCursorSystem;
 	private final List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
-	private boolean gameOver = false;
+	private boolean finished = false;
 	private double accumulatedDelta = 0;
 	private float time = 0;
 
@@ -220,22 +223,7 @@ public final class LevelController {
 				rayHandler.update();
 				accumulatedDelta -= MAX_UPDATE_DELTA;
 			}
-			if (!gameOver) {
-				if (levelSession.getHealth() <= 0) {
-					for (Entity entity : entityManager.getAll()) {
-						if (entity.hasActive(AlliancePart.class)
-								&& entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
-							entityManager.remove(entity);
-						}
-					}
-					gameOver = true;
-					gameOverDelegate.notify(new NoArgsEvent());
-				}
-				else if (isComplete()) {
-					gameOver = true;
-					completeDelegate.notify(new NoArgsEvent());
-				}
-			}
+			checkFinished();
 		}
 	}
 	
@@ -407,6 +395,7 @@ public final class LevelController {
 		entitySystems.add(new ColorChangeSystem());
 		entitySystems.add(new LightSystem());
 		entitySystems.add(new GhostSystem(soundCache));
+		entitySystems.add(new GroundExploderSystem(entityCache, entityManager, level.getBoundsBox()));
 	}
 	
 	private List<Entity> createInitialEntities() {
@@ -610,6 +599,33 @@ public final class LevelController {
 		transformPart.setPosition(transformPart.getPosition().add(outOfBoundsOffset));
 	}
 	
+	private void checkFinished() {
+		if (!finished) {
+			if (levelSession.getHealth() <= 0) {
+				updateToGameOver();
+			}
+			else if (isComplete()) {
+				finished = true;
+				completeDelegate.notify(new NoArgsEvent());
+			}
+		}
+	}
+	
+	private void updateToGameOver() {
+		for (Entity entity : entityManager.getAll()) {
+			if (entity.hasActive(AlliancePart.class)
+					&& entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
+				entityManager.remove(entity);
+			}
+		}
+		Entity groundExploder = new Entity();
+		GroundExploderPart groundExploderPart = new GroundExploderPart("smallharmlessexplosion", 0.05f, 0.5f, 5);
+		groundExploder.attach(groundExploderPart);
+		entityManager.add(groundExploder);
+		finished = true;
+		gameOverDelegate.notify(new NoArgsEvent());
+	}
+	
 	private boolean isComplete() {
 		return !doEnemiesExist() && spawnInfos.isEmpty();
 	}
@@ -632,7 +648,7 @@ public final class LevelController {
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
 		List<Entity> entities = entityManager.getManaged();
-		Collections.sort(entities, new ZComparator());
+		Collections.sort(entities, ENTITY_Z_COMPARATOR);
 		for (Entity entity : entities) {
 			if (entity.hasActive(DrawablePart.class)) {
 				DrawablePart drawablePart = entity.get(DrawablePart.class);
@@ -687,12 +703,16 @@ public final class LevelController {
 		
 	}
 	
-	private class ZComparator implements Comparator<Entity> {
+	private static class EntityZComparator implements Comparator<Entity> {
 		
 	    @Override
 	    public final int compare(final Entity e1, final Entity e2) {
-	    	if (e1.hasActive(DrawablePart.class) && e2.hasActive(DrawablePart.class)) {
-	    		return Float.compare(e1.get(DrawablePart.class).getZ(), e2.get(DrawablePart.class).getZ());
+	    	return Float.compare(getValue(e1), getValue(e2));
+	    }
+	    
+	    private final float getValue(final Entity entity) {
+	    	if (entity.hasActive(DrawablePart.class)) {
+	    		return entity.get(DrawablePart.class).getZ();
 	    	}
 	    	else {
 	    		return 0;
