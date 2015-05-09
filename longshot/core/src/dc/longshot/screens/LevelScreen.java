@@ -21,6 +21,9 @@ import dc.longshot.eventmanagement.NoArgsListener;
 import dc.longshot.game.UIPack;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.LevelController;
+import dc.longshot.level.LevelFinishedEvent;
+import dc.longshot.level.LevelFinishedListener;
+import dc.longshot.level.LevelResult;
 import dc.longshot.models.LevelSession;
 import dc.longshot.models.PlaySession;
 import dc.longshot.system.ExecutionState;
@@ -28,10 +31,12 @@ import dc.longshot.system.Input;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.ui.controls.HealthDisplay;
 import dc.longshot.util.InputUtils;
+import dc.longshot.util.Timer;
 
 public final class LevelScreen implements Screen {
 
 	private final EventDelegate<NoArgsListener> pausedDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<LevelFinishedListener> finishedDelegate = new EventDelegate<LevelFinishedListener>();
 
 	private final UIPack uiPack;
 	private final TextureCache textureCache;
@@ -45,8 +50,9 @@ public final class LevelScreen implements Screen {
 	private final LevelController levelController;
 	private final LevelSession levelSession;
 	private InputProcessor levelInputProcessor;
-
 	private final TextureRegion cursorRegion;
+	private LevelResult result = null;
+	private final Timer finishedTransitionTimer = new Timer(1);
 	
 	public LevelScreen(final UIPack uiPack, final TextureCache textureCache, final PlaySession playSession, 
 			final LevelController levelController) {
@@ -55,11 +61,22 @@ public final class LevelScreen implements Screen {
 		this.playSession = playSession;
 		this.levelController = levelController;
 		this.levelSession = levelController.getLevelSession();
-		levelController.addGameOverListener(new NoArgsListener()
+		final LevelScreen thisLevelScreen = this;
+		levelController.addFinishedListener(new LevelFinishedListener()
 		{
 			@Override
-			public void executed() {
-				hideStatusUI();
+			public final void finished(final LevelResult result) {
+				thisLevelScreen.result = result;
+				switch (result) {
+				case COMPLETE:
+					worldTable.add(uiPack.label("LEVEL COMPLETE!")).row();
+					break;
+				case GAME_OVER:
+					worldTable.add(uiPack.label("GAME OVER!")).row();
+					break;
+				}
+				worldTable.add(uiPack.label("Click or touch to continue...")).row();
+				statusTable.setVisible(false);
 			}
 		});
 		spriteBatch = new PolygonSpriteBatch();
@@ -69,6 +86,10 @@ public final class LevelScreen implements Screen {
 	public final void addPausedListener(final NoArgsListener listener) {
 		pausedDelegate.listen(listener);
 	}
+
+	public final void addFinishedListener(final LevelFinishedListener listener) {
+		finishedDelegate.listen(listener);
+	}
 	
 	public final Stage getStage() {
 		return stage;
@@ -77,6 +98,9 @@ public final class LevelScreen implements Screen {
 	@Override
 	public final void render(final float delta) {
 		stage.act(delta);
+		if (result != null) {
+			finishedTransitionTimer.tick(delta);
+		}
 		updateUI();
 		levelController.update(delta);
 		draw();
@@ -156,10 +180,6 @@ public final class LevelScreen implements Screen {
 		healthDisplay.setHealth(MathUtils.ceil(levelSession.getHealth()));
 		scoreValueLabel.setText(Integer.toString(playSession.getScore()));
 	}
-
-	private void hideStatusUI() {
-		statusTable.setVisible(false);
-	}
 	
 	private void draw() {
 		clearScreen();
@@ -228,6 +248,9 @@ public final class LevelScreen implements Screen {
 
 		@Override
 		public final boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
+			if (finishedTransitionTimer.isElapsed()) {
+				finishedDelegate.notify(new LevelFinishedEvent(result));
+			}
 			return false;
 		}
 

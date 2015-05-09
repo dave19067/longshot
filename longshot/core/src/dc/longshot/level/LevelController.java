@@ -121,8 +121,7 @@ public final class LevelController {
 	private static final int FRAG_FADE_TIME = 2;
 	private static EntityZComparator ENTITY_Z_COMPARATOR = new EntityZComparator();
 	
-	private final EventDelegate<NoArgsListener> completeDelegate = new EventDelegate<NoArgsListener>();
-	private final EventDelegate<NoArgsListener> gameOverDelegate = new EventDelegate<NoArgsListener>();
+	private final EventDelegate<LevelFinishedListener> finishedDelegate = new EventDelegate<LevelFinishedListener>();
 
 	private final PolygonSpriteBatch spriteBatch;
 	private final TextureCache textureCache;
@@ -186,12 +185,8 @@ public final class LevelController {
 		entityManager.addAll(createInitialEntities());
 	}
 	
-	public final void addCompleteListener(final NoArgsListener listener) {
-		completeDelegate.listen(listener);
-	}
-
-	public final void addGameOverListener(final NoArgsListener listener) {
-		gameOverDelegate.listen(listener);
+	public final void addFinishedListener(final LevelFinishedListener listener) {
+		finishedDelegate.listen(listener);
 	}
 	
 	public final LevelSession getLevelSession() {
@@ -606,7 +601,7 @@ public final class LevelController {
 			}
 			else if (isComplete()) {
 				finished = true;
-				completeDelegate.notify(new NoArgsEvent());
+				finishedDelegate.notify(new LevelFinishedEvent(LevelResult.COMPLETE));
 			}
 		}
 	}
@@ -623,7 +618,7 @@ public final class LevelController {
 		groundExploder.attach(groundExploderPart);
 		entityManager.add(groundExploder);
 		finished = true;
-		gameOverDelegate.notify(new NoArgsEvent());
+		finishedDelegate.notify(new LevelFinishedEvent(LevelResult.GAME_OVER));
 	}
 	
 	private boolean isComplete() {

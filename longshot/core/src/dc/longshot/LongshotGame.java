@@ -24,6 +24,8 @@ import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.DecorationProfile;
 import dc.longshot.level.LevelController;
+import dc.longshot.level.LevelFinishedListener;
+import dc.longshot.level.LevelResult;
 import dc.longshot.models.DebugSettings;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.GameSettings;
@@ -226,23 +228,23 @@ public final class LongshotGame extends Game {
 				pauseMenu.showDialog();
 			}
 		});
-		levelController.addCompleteListener(new NoArgsListener() {
+		levelScreen.addFinishedListener(new LevelFinishedListener() {
 			@Override
-			public void executed() {
-				if (playSession.hasNextLevel()) {
-					Level level = loadNextLevel();
-					LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);
-					screenManager.swap(levelScreen, levelPreviewScreen);
-				}
-				else {
+			public final void finished(final LevelResult result) {
+				switch (result) {
+				case COMPLETE:
+					if (playSession.hasNextLevel()) {
+						Level level = loadNextLevel();
+						LevelPreviewScreen levelPreviewScreen = createLevelPreviewScreen(level);
+						screenManager.swap(levelScreen, levelPreviewScreen);
+					}
+					else {
+						endGame(levelScreen);
+					}
+				case GAME_OVER:
 					endGame(levelScreen);
+					break;
 				}
-			}
-		});
-		levelController.addGameOverListener(new NoArgsListener() {
-			@Override
-			public void executed() {
-				endGame(levelScreen);
 			}
 		});
 		return levelScreen;

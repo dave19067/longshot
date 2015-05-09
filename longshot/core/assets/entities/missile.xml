@@ -13,7 +13,7 @@
 		<z>0.5</z>
       </part>
       <part xsi:type="speedPart">
-      	<speed>2</speed>
+      	<speed>20</speed>
       </part>
       <part xsi:type="healthPart">
       	<maxHealth>1</maxHealth>
