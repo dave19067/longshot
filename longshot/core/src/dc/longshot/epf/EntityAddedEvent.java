@@ -1,6 +1,6 @@
 package dc.longshot.epf;
 
-import dc.longshot.eventmanagement.Event;
+import dc.longshot.eventing.Event;
 
 /**
  * Notify that an entity is ready to be created.

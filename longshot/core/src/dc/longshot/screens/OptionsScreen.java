@@ -24,9 +24,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import dc.longshot.eventmanagement.EventDelegate;
-import dc.longshot.eventmanagement.NoArgsEvent;
-import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.eventing.EventDelegate;
+import dc.longshot.eventing.NoArgsEvent;
+import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.FontSize;
 import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.UIPack;
@@ -41,7 +41,7 @@ import dc.longshot.util.XmlContext;
 public final class OptionsScreen implements Screen {
 
 	private static final int DEFAULT_SPACE_LEFT = 20;
-	private static final Color KEY_ENTRY_COLOR = Color.YELLOW;
+	private static final Color KEY_ENTRY_COLOR = Color.YELLOW.cpy();
 	private static final DisplayModeComparator DISPLAY_MODE_COMPARATOR = new DisplayModeComparator();
 	
 	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();

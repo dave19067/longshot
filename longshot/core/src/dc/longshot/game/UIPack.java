@@ -3,6 +3,7 @@ package dc.longshot.game;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -48,8 +49,16 @@ public final class UIPack {
 		return UIFactory.label(skin, fonts.get(fontSize), text);
 	}
 	
+	public final Label label(final String text, final FontSize fontSize, final Color color) {
+		return UIFactory.label(skin, fonts.get(fontSize), color, text);
+	}
+	
 	public final TextField textField() {
-		return UIFactory.textField(skin, fonts.get(FontSize.MEDIUM));
+		return textField(FontSize.MEDIUM);
+	}
+	
+	public final TextField textField(final FontSize fontSize) {
+		return UIFactory.textField(skin, fonts.get(fontSize));
 	}
 	
 	public final Button button(final String text) {

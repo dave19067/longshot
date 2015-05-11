@@ -1,6 +1,6 @@
 package dc.longshot.level;
 
-import dc.longshot.eventmanagement.Event;
+import dc.longshot.eventing.Event;
 
 public final class LevelFinishedEvent implements Event<LevelFinishedListener> {
 

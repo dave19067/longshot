@@ -1,4 +1,4 @@
-package dc.longshot.eventmanagement;
+package dc.longshot.eventing;
 
 public class NoArgsEvent implements Event<NoArgsListener> {
 

@@ -4,5 +4,21 @@
         <levelNames>level1.xml</levelNames>
     </levelNames>
     <highScores>
+        <highScores>
+            <name>d</name>
+            <score>0</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>das</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>das</name>
+            <score>100</score>
+        </highScores>
     </highScores>
 </gameSession>

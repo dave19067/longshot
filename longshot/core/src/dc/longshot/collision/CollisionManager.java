@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.eventmanagement.EventDelegate;
+import dc.longshot.eventing.EventDelegate;
 import dc.longshot.parts.CollisionTypePart;
 import dc.longshot.parts.TransformPart;
 

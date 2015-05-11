@@ -1,7 +1,7 @@
 package dc.longshot.collision;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.eventmanagement.Event;
+import dc.longshot.eventing.Event;
 
 public final class CollidedEvent implements Event<CollidedListener> {
 

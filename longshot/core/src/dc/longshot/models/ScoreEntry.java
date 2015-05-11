@@ -8,8 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class ScoreEntry {
 
-	private String name;
-	private int score;
+	public String name;
+	public int score;
 	
 	public ScoreEntry() {
 		// for serialization
@@ -18,14 +18,6 @@ public final class ScoreEntry {
 	public ScoreEntry(final String name, final int score) {
 		this.name = name;
 		this.score = score;
-	}
-	
-	public final String getName() {
-		return name;
-	}
-	
-	public final int getScore() {
-		return score;
 	}
 	
 }

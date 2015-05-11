@@ -1,4 +1,4 @@
-package dc.longshot.eventmanagement;
+package dc.longshot.eventing;
 
 import java.util.HashMap;
 import java.util.Map;

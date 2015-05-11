@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
-import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.GameSettingsApplier;
 import dc.longshot.game.UIPack;
 import dc.longshot.game.XmlBindings;
@@ -42,7 +42,6 @@ import dc.longshot.screens.OptionsScreen;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.controls.PauseMenu;
-import dc.longshot.ui.controls.ScoreEntryDialog;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.PathUtils;
 import dc.longshot.util.XmlContext;
@@ -197,7 +196,18 @@ public final class LongshotGame extends Game {
 	}
 	
 	private HighScoresScreen createHighScoresScreen() {
-		final HighScoresScreen highScoresScreen = new HighScoresScreen(uiPack, gameSession);
+		HighScoresScreen highScoresScreen = new HighScoresScreen(uiPack, gameSession);
+		setupHighScoresScreen(highScoresScreen);
+		return highScoresScreen;
+	}
+	
+	private HighScoresScreen createHighScoresScreen(final int score) {
+		HighScoresScreen highScoresScreen = new HighScoresScreen(uiPack, gameSession, xmlContext, score);
+		setupHighScoresScreen(highScoresScreen);
+		return highScoresScreen;
+	}
+	
+	private void setupHighScoresScreen(final HighScoresScreen highScoresScreen) {
 		highScoresScreen.addClosedListener(new NoArgsListener() {
 			@Override
 			public void executed() {
@@ -205,7 +215,6 @@ public final class LongshotGame extends Game {
 				screenManager.swap(highScoresScreen, mainMenuScreen);
 			}
 		});
-		return highScoresScreen;
 	}
 	
 	private LevelScreen createLevelScreen(final Level level) {
@@ -241,6 +250,7 @@ public final class LongshotGame extends Game {
 					else {
 						endGame(levelScreen);
 					}
+					break;
 				case GAME_OVER:
 					endGame(levelScreen);
 					break;
@@ -251,24 +261,15 @@ public final class LongshotGame extends Game {
 	}
 	
 	private void endGame(final LevelScreen levelScreen) {
-		final HighScoresScreen highScoresScreen = createHighScoresScreen();
 		int score = playSession.getScore();
+		HighScoresScreen highScoresScreen;
 		if (gameSession.canAddHighScore(score)) {
-			ScoreEntryDialog scoreEntryDialog = new ScoreEntryDialog(xmlContext, uiPack, levelScreen.getStage(), 
-					gameSession, score);
-			scoreEntryDialog.addOkButtonClickListener(new ClickListener() {
-				@Override
-				public boolean touchDown(final InputEvent event, final float x, final float y, final int pointer, 
-						final int button) {
-					screenManager.swap(levelScreen, highScoresScreen);
-					return true;
-				}
-			});
-			scoreEntryDialog.showDialog();
+			highScoresScreen = createHighScoresScreen(score);
 		}
 		else {
-			screenManager.swap(levelScreen, highScoresScreen);
+			highScoresScreen = createHighScoresScreen();
 		}
+		screenManager.swap(levelScreen, highScoresScreen);
 	}
 	
 	private Level loadNextLevel() {

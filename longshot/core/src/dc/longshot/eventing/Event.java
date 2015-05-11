@@ -1,4 +1,4 @@
-package dc.longshot.eventmanagement;
+package dc.longshot.eventing;
 
 /**
  * Notifies that an event occured.

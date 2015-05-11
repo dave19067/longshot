@@ -15,9 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import dc.longshot.eventmanagement.EventDelegate;
-import dc.longshot.eventmanagement.NoArgsEvent;
-import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.eventing.EventDelegate;
+import dc.longshot.eventing.NoArgsEvent;
+import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.UIPack;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.level.LevelController;
@@ -75,6 +75,7 @@ public final class LevelScreen implements Screen {
 					worldTable.add(uiPack.label("GAME OVER!")).row();
 					break;
 				}
+				worldTable.add(uiPack.lineBreak()).row();
 				worldTable.add(uiPack.label("Click or touch to continue...")).row();
 				statusTable.setVisible(false);
 			}

@@ -1,5 +1,6 @@
 package dc.longshot.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -21,9 +22,14 @@ public final class UIFactory {
 	}
 	
 	public static final Label label(final Skin skin, final BitmapFont font, final String text) {
+		return label(skin, font, font.getColor(), text);
+	}
+	
+	public static final Label label(final Skin skin, final BitmapFont font, final Color color, final String text) {
 		Label label = new Label(text, skin);
 		label.getStyle().font = font;
 		label.setStyle(label.getStyle());
+		label.setColor(color);
 		return label;
 	}
 	

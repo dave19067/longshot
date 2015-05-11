@@ -3,9 +3,9 @@ package dc.longshot.parts;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import dc.longshot.eventmanagement.EventDelegate;
-import dc.longshot.eventmanagement.NoArgsEvent;
-import dc.longshot.eventmanagement.NoArgsListener;
+import dc.longshot.eventing.EventDelegate;
+import dc.longshot.eventing.NoArgsEvent;
+import dc.longshot.eventing.NoArgsListener;
 
 @XmlRootElement
 public final class HealthPart {

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import dc.longshot.eventmanagement.EventDelegate;
+import dc.longshot.eventing.EventDelegate;
 
 /**
  * Manages a group of entities.  Provides accessing, removing, and adding entities.
