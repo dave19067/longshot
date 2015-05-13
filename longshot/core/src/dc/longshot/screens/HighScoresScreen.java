@@ -129,7 +129,6 @@ public class HighScoresScreen implements Screen {
 			Color fontColor;
 			if (newScoreEntry != null && highScore == newScoreEntry) {
 				fontColor = Color.YELLOW.cpy();
-				// TODO: BUG - this permanently changes the font color for the font
 				nameField = createNameField(fontColor);
 				scoresTable.add(nameField).left();
 				stage.setKeyboardFocus(nameField);

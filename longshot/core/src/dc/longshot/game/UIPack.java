@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import dc.longshot.ui.UIFactory;
 
 // TODO: Combine with UIFactory
+// TODO: Replace FontSize with "ocr_24", "ocr_32", etc?
 public final class UIPack {
 
 	private final Skin skin;
@@ -38,7 +39,7 @@ public final class UIPack {
 	}
 	
 	public final Label lineBreak() {
-		return UIFactory.lineBreak(skin, fonts.get(FontSize.MEDIUM));
+		return UIFactory.lineBreak(skin, getFont(FontSize.MEDIUM));
 	}
 	
 	public final Label label(final String text) {
@@ -46,11 +47,11 @@ public final class UIPack {
 	}
 	
 	public final Label label(final String text, final FontSize fontSize) {
-		return UIFactory.label(skin, fonts.get(fontSize), text);
+		return UIFactory.label(skin, getFont(fontSize), text);
 	}
 	
 	public final Label label(final String text, final FontSize fontSize, final Color color) {
-		return UIFactory.label(skin, fonts.get(fontSize), color, text);
+		return UIFactory.label(skin, getFont(fontSize, color), text);
 	}
 	
 	public final TextField textField() {
@@ -58,11 +59,11 @@ public final class UIPack {
 	}
 	
 	public final TextField textField(final FontSize fontSize) {
-		return UIFactory.textField(skin, fonts.get(fontSize));
+		return UIFactory.textField(skin, getFont(fontSize));
 	}
 	
 	public final Button button(final String text) {
-		return UIFactory.button(skin, fonts.get(FontSize.MEDIUM), text);
+		return UIFactory.button(skin, getFont(FontSize.MEDIUM), text);
 	}
 	
 	public final Button button(final String text, final EventListener listener) {
@@ -70,7 +71,7 @@ public final class UIPack {
 	}
 	
 	public final Button button(final String text, final FontSize fontSize, final EventListener listener) {
-		return UIFactory.button(skin, fonts.get(fontSize), text, listener);
+		return UIFactory.button(skin, getFont(fontSize), text, listener);
 	}
 	
 	public final CheckBox checkBox(final boolean isChecked) {
@@ -86,6 +87,16 @@ public final class UIPack {
 		for (BitmapFont font : fonts.values()) {
 			font.dispose();
 		}
+	}
+	
+	private BitmapFont getFont(final FontSize fontSize) {
+		return getFont(fontSize, Color.WHITE);
+	}
+	
+	private BitmapFont getFont(final FontSize fontSize, final Color color) {
+		BitmapFont font = fonts.get(fontSize);
+		font.setColor(color);
+		return font;
 	}
 
 }
