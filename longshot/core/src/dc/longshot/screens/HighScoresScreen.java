@@ -18,12 +18,12 @@ import dc.longshot.eventing.EventDelegate;
 import dc.longshot.eventing.NoArgsEvent;
 import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.FontSize;
-import dc.longshot.game.UIPack;
 import dc.longshot.models.GameSession;
 import dc.longshot.models.Paths;
 import dc.longshot.models.ScoreEntry;
 import dc.longshot.models.ScoreEntryComparator;
 import dc.longshot.system.Input;
+import dc.longshot.ui.UIPack;
 import dc.longshot.util.InputUtils;
 import dc.longshot.util.XmlContext;
 

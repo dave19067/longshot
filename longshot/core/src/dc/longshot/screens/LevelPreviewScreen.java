@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventing.EventDelegate;
 import dc.longshot.eventing.NoArgsEvent;
 import dc.longshot.eventing.NoArgsListener;
-import dc.longshot.game.UIPack;
 import dc.longshot.system.Input;
+import dc.longshot.ui.UIPack;
 import dc.longshot.util.InputUtils;
 
 public final class LevelPreviewScreen implements Screen {

@@ -6,11 +6,11 @@
         <width>40</width>
         <height>30</height>
     </boundsBox>
-    <spawnDuration>1</spawnDuration>
+    <spawnDuration>8</spawnDuration>
     <spawns>
         <entry>
-            <key>nuke</key>
-            <value>1</value>
+            <key>missile</key>
+            <value>8</value>
         </entry>
     </spawns>
 </level>

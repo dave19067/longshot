@@ -20,5 +20,21 @@
             <name>das</name>
             <score>100</score>
         </highScores>
+        <highScores>
+            <name>COOL</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>das</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>saasd</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>HELLO</name>
+            <score>400</score>
+        </highScores>
     </highScores>
 </gameSession>

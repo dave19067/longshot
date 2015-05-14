@@ -10,9 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import dc.longshot.game.UIPack;
 import dc.longshot.models.LevelSession;
 import dc.longshot.system.ExecutionState;
+import dc.longshot.ui.UIPack;
 import dc.longshot.ui.UIUtils;
 
 public final class PauseMenu {

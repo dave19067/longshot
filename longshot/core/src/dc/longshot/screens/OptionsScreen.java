@@ -29,12 +29,12 @@ import dc.longshot.eventing.NoArgsEvent;
 import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.FontSize;
 import dc.longshot.game.GameSettingsApplier;
-import dc.longshot.game.UIPack;
 import dc.longshot.models.GameSettings;
 import dc.longshot.models.InputAction;
 import dc.longshot.models.Paths;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
+import dc.longshot.ui.UIPack;
 import dc.longshot.util.InputUtils;
 import dc.longshot.util.XmlContext;
 

@@ -15,9 +15,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dc.longshot.eventing.EventDelegate;
 import dc.longshot.eventing.NoArgsEvent;
 import dc.longshot.eventing.NoArgsListener;
-import dc.longshot.game.UIPack;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIConstants;
+import dc.longshot.ui.UIPack;
 import dc.longshot.ui.UIUtils;
 import dc.longshot.util.InputUtils;
 

@@ -18,7 +18,6 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.GameSettingsApplier;
-import dc.longshot.game.UIPack;
 import dc.longshot.game.XmlBindings;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.graphics.TextureCache;
@@ -41,6 +40,7 @@ import dc.longshot.screens.MainMenuScreen;
 import dc.longshot.screens.OptionsScreen;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ScreenManager;
+import dc.longshot.ui.UIPack;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.PathUtils;
