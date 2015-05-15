@@ -24,7 +24,7 @@ public final class UIPack {
 	// Hack: Call to setStyle required to ensure that modified style from getStyle is updated
 	
 	private static final FontSize DEFAULT_SIZE = FontSize.MEDIUM;
-	private static final Color DEFAULT_COLOR = Color.WHITE;
+	private static final Color DEFAULT_COLOR = Color.WHITE.cpy();
 	
 	private final Skin skin;
 	private final Map<FontSize, BitmapFont> fonts = new HashMap<FontSize, BitmapFont>();
@@ -57,8 +57,9 @@ public final class UIPack {
 	
 	public final Label label(final String text, final FontSize size, final Color color) {
 		Label label = new Label(text, skin);
-		label.getStyle().font = getFont(size, color);
+		label.getStyle().font = getFont(size);
 		label.setStyle(label.getStyle());
+		label.setColor(color);
 		return label;
 	}
 	
@@ -113,13 +114,7 @@ public final class UIPack {
 	}
 	
 	private BitmapFont getFont(final FontSize size) {
-		return getFont(size, DEFAULT_COLOR);
-	}
-	
-	private BitmapFont getFont(final FontSize size, final Color color) {
-		BitmapFont font = fonts.get(size);
-		font.setColor(color);
-		return font;
+		return fonts.get(size);
 	}
 
 }

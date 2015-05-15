@@ -5,12 +5,16 @@
     </levelNames>
     <highScores>
         <highScores>
-            <name>David</name>
+            <name>Davd</name>
             <score>100</score>
         </highScores>
         <highScores>
-            <name>fda</name>
+            <name>David</name>
             <score>200</score>
+        </highScores>
+        <highScores>
+            <name>David</name>
+            <score>0</score>
         </highScores>
     </highScores>
 </gameSession>
