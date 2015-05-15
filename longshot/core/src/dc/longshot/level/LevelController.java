@@ -59,6 +59,7 @@ import dc.longshot.epf.EntityAddedListener;
 import dc.longshot.epf.EntityCache;
 import dc.longshot.epf.EntityManager;
 import dc.longshot.epf.EntityRemovedListener;
+import dc.longshot.epf.EntitySpawner;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.eventing.EventDelegate;
 import dc.longshot.eventing.NoArgsListener;
@@ -131,6 +132,7 @@ public final class LevelController {
 	private final SoundCache<SoundKey> soundCache;
 	private final EntityCache entityCache;
 	private final EntityManager entityManager;
+	private final EntitySpawner entitySpawner;
 	private final CollisionManager collisionManager;
 	private final BackdropManager backdropManager;
 	private final Fragmenter fragmenter = new Fragmenter(FRAG_WIDTH, FRAG_HEIGHT, FRAG_SPEED_MULTIPLIER);
@@ -176,12 +178,13 @@ public final class LevelController {
 		entityManager = new EntityManager();
 		entityManager.addEntityAddedListener(entityAdded());
 		entityManager.addEntityRemovedListener(entityRemoved());
+		entitySpawner = new EntitySpawner(entityCache, entityManager);
 		collisionManager = new CollisionManager();
 		backdropManager = new BackdropManager(entityManager, Bound.LEFT, level.getDecorationProfiles());
 		setupCamera();
 		setupSystems();
 		generateSpawnInfos();
-		entityManager.addAll(createInitialEntities());
+		spawnInitialEntities();
 	}
 	
 	public final void addFinishedListener(final LevelFinishedListener listener) {
@@ -252,9 +255,8 @@ public final class LevelController {
 				}
 				if (entity.hasActive(AttachmentPart.class)) {
 					AttachmentPart attachmentPart = entity.get(AttachmentPart.class);
-					Entity attachedEntity = entityCache.create(attachmentPart.getAttachedEntityType());
+					Entity attachedEntity = entitySpawner.spawn(attachmentPart.getAttachedEntityType());
 					attachmentPart.setAttachedEntity(attachedEntity);
-					entityManager.add(attachedEntity);
 				}
 				if (entity.hasActive(FollowerPart.class)) {
 					List<Entity> followers = entity.get(FollowerPart.class).getFollowers();
@@ -320,7 +322,7 @@ public final class LevelController {
 	private void spawnOnDeath(final Entity entity, final boolean boundsRemoved) {
 		if (entity.hasActive(SpawnOnDeathPart.class)) {
 			String entityTypeName = entity.get(SpawnOnDeathPart.class).getEntityType();
-			Entity spawn = entityCache.create(entityTypeName);
+			Entity spawn = entitySpawner.spawn(entityTypeName);
 			if (boundsRemoved && spawn.has(DamageOnSpawnPart.class)) {
 				spawn.setActive(DamageOnSpawnPart.class, false);
 			}
@@ -328,7 +330,6 @@ public final class LevelController {
 			Vector2 position = PolygonUtils.relativeCenter(entity.get(TransformPart.class).getCenter(), 
 					spawnTransform.getSize());
 			spawnTransform.setPosition(position);
-			entityManager.add(spawn);
 		}
 	}
 	
@@ -369,17 +370,17 @@ public final class LevelController {
 		entitySystems.add(new BoundPositionSystem(level.getBoundsBox()));
 		entitySystems.add(new CollisionDamageSystem(collisionManager));
 		entitySystems.add(new CityDamageSystem(level.getBoundsBox(), levelSession));
-		entitySystems.add(new EmitSystem(entityCache, entityManager));
+		entitySystems.add(new EmitSystem(entitySpawner));
 		entitySystems.add(new WanderMovementSystem());
 		entitySystems.add(new WeaponSystem());
-		entitySystems.add(new TargetShooterSystem(entityCache, entityManager));
-		entitySystems.add(new GroundShooterSystem(entityCache, entityManager, level.getBoundsBox()));
+		entitySystems.add(new TargetShooterSystem(entityManager, entitySpawner));
+		entitySystems.add(new GroundShooterSystem(entitySpawner, level.getBoundsBox()));
 		entitySystems.add(new InputMovementSystem(inputActions));
 		rotateToCursorSystem = new RotateToCursorSystem(camera);
 		entitySystems.add(rotateToCursorSystem);
 		entitySystems.add(new BoundsRemoveSystem(level.getBoundsBox(), entityManager));
 		entitySystems.add(new TimedDeathSystem(entityManager));
-		entitySystems.add(new ShooterInputSystem(entityCache, entityManager));
+		entitySystems.add(new ShooterInputSystem(entitySpawner));
 		entitySystems.add(new CurvedMovementSystem(level.getBoundsBox()));
 		entitySystems.add(new WaypointsSystem());
 		entitySystems.add(new AttachmentSystem());
@@ -389,27 +390,31 @@ public final class LevelController {
 		entitySystems.add(new ColorChangeSystem());
 		entitySystems.add(new LightSystem());
 		entitySystems.add(new GhostSystem(soundCache));
-		entitySystems.add(new GroundExploderSystem(entityCache, entityManager, level.getBoundsBox()));
+		entitySystems.add(new GroundExploderSystem(entitySpawner, level.getBoundsBox()));
 	}
 	
-	private List<Entity> createInitialEntities() {
-		List<Entity> entities = new ArrayList<Entity>();
+	private void spawnInitialEntities() {
+		spawnGround();
+		spawnShooter();
+		spawnBackgroundEntities();
+	}
+	
+	private void spawnGround() {
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
 				new Vector2(boundsBox.x, boundsBox.y), "objects/green");
-		entities.add(ground);
-		Entity shooter = entityCache.create("shooter");
+		entityManager.add(ground);
+	}
+	
+	private void spawnShooter() {
+		Entity shooter = entitySpawner.spawn("shooter");
 		TransformPart shooterTransformPart = shooter.get(TransformPart.class);
-		float shooterX = VectorUtils.relativeMiddle(boundsBox.width / 2, shooterTransformPart.getSize().x);
+		float shooterX = VectorUtils.relativeMiddle(level.getBoundsBox().width / 2, shooterTransformPart.getSize().x);
 		Vector2 shooterPosition = new Vector2(shooterX, 0);
 		shooterTransformPart.setPosition(shooterPosition);
-		entities.add(shooter);
-		entities.addAll(createBackgroundEntities());
-		return entities;
 	}
 
-	private List<Entity> createBackgroundEntities() {
-		List<Entity> entities = new ArrayList<Entity>();
+	private void spawnBackgroundEntities() {
 		int minWidth = (int)(5 * UnitConvert.PIXELS_PER_UNIT);
 		int maxWidth = (int)(20 * UnitConvert.PIXELS_PER_UNIT);
 		float minNum = 20;
@@ -428,9 +433,8 @@ public final class LevelController {
 			float y = 0;
 			float z = MathUtils.random(minZ, 0);
 			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, "backgrounds/rock02");
-			entities.add(entity);
+			entityManager.add(entity);
 		}
-		return entities;
 	}
 	
 	private void setupCamera() {
@@ -499,7 +503,7 @@ public final class LevelController {
 	}
 	
 	private void spawn(final SpawnInfo spawnInfo) {
-		Entity spawn = entityCache.create(spawnInfo.entityType);
+		Entity spawn = entitySpawner.spawn(spawnInfo.entityType);
 		if (spawn.has(SpawningPart.class)) {
 			SpawningType spawningType = spawn.get(SpawningPart.class).getSpawningType();
 			switch (spawningType) {
@@ -523,7 +527,6 @@ public final class LevelController {
 			throw new IllegalArgumentException("Could not spawn " + spawnInfo.entityType
 					+ ".  It does not have a spawning type");
 		}
-		entityManager.add(spawn);
 	}
 
 	private void placeAbove(final Entity entity) {

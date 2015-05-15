@@ -3,8 +3,7 @@ package dc.longshot.entitysystems;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.epf.EntityCache;
-import dc.longshot.epf.EntityManager;
+import dc.longshot.epf.EntitySpawner;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.parts.EmitPart;
@@ -12,12 +11,10 @@ import dc.longshot.parts.TransformPart;
 
 public final class EmitSystem extends EntitySystem {
 
-	private final EntityCache entityCache;
-	private final EntityManager entityManager;
+	private final EntitySpawner entitySpawner;
 	
-	public EmitSystem(final EntityCache entityCache, final EntityManager entityManager) {
-		this.entityCache = entityCache;
-		this.entityManager = entityManager;
+	public EmitSystem(final EntitySpawner entitySpawner) {
+		this.entitySpawner = entitySpawner;
 	}
 	
 	@Override
@@ -26,23 +23,21 @@ public final class EmitSystem extends EntitySystem {
 			EmitPart emitPart = entity.get(EmitPart.class);
 			emitPart.update(delta);
 			if (emitPart.canEmit()) {
-				Entity spawn = emit(entity);
-				entityManager.add(spawn);
+				emit(entity);
 			}
 		}
 	}
 	
-	private Entity emit(final Entity entity) {
+	private void emit(final Entity entity) {
 		EmitPart emitPart = entity.get(EmitPart.class);
 		emitPart.reset();
-		Entity spawn = entityCache.create(emitPart.getEntityType());
+		Entity spawn = entitySpawner.spawn(emitPart.getEntityType());
 		TransformPart transformPart = entity.get(TransformPart.class);
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		spawnTransform.setRotation(transformPart.getRotation());
 		Vector2 localSpawnPosition = emitPart.getLocalSpawnPosition();
 		Vector2 spawnPosition = PolygonUtils.toGlobal(localSpawnPosition, transformPart.getPolygon());
 		spawnTransform.setCenter(spawnPosition);
-		return spawn;
 	}
 
 }

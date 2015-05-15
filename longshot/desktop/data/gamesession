@@ -5,36 +5,12 @@
     </levelNames>
     <highScores>
         <highScores>
-            <name>d</name>
-            <score>0</score>
-        </highScores>
-        <highScores>
-            <name></name>
+            <name>David</name>
             <score>100</score>
         </highScores>
         <highScores>
-            <name>das</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
-            <name>das</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
-            <name>COOL</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
-            <name>das</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
-            <name>saasd</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
-            <name>HELLO</name>
-            <score>400</score>
+            <name>fda</name>
+            <score>200</score>
         </highScores>
     </highScores>
 </gameSession>

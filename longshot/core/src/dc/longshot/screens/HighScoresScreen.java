@@ -138,6 +138,7 @@ public class HighScoresScreen implements Screen {
 				scoresTable.add(uiPack.label(highScore.name, FontSize.SMALL)).left();
 			}
 			String scoreString = Integer.toString(highScore.score);
+			// BUG: the label doesn't turn yellow
 			Label scoreLabel = uiPack.label(scoreString, FontSize.SMALL, fontColor);
 			scoresTable.add(scoreLabel).spaceLeft(SCORE_SPACE_LEFT).right().row();
 		}

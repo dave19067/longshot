@@ -88,6 +88,9 @@ public final class EntityManager {
 		while (!entitiesToAdd.isEmpty()) {
 			Entity entityToAdd = entitiesToAdd.remove(0);
 			entityToAdd.setActive(true);
+			if (entities.contains(entityToAdd)) {
+				throw new IllegalStateException("Could not add entity " + entityToAdd + ".  It already exists");
+			}
 			entities.add(entityToAdd);
 			entityAddedDelegate.notify(new EntityAddedEvent(entityToAdd));
 		}

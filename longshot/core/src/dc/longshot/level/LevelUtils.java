@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
-import dc.longshot.epf.EntityCache;
+import dc.longshot.epf.EntitySpawner;
 import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.VectorUtils;
@@ -35,10 +35,10 @@ public final class LevelUtils {
 		return distance;
 	}
 	
-	public static final Entity createWeaponSpawn(final Entity entity, final EntityCache entityCache) {
+	public static final Entity createWeaponSpawn(final Entity entity, final EntitySpawner entitySpawner) {
 		WeaponPart weaponPart = entity.get(WeaponPart.class);
 		weaponPart.reset();
-		Entity spawn = entityCache.create(weaponPart.getEntityType());
+		Entity spawn = entitySpawner.spawn(weaponPart.getEntityType());
 		TransformPart spawnTransform = spawn.get(TransformPart.class);
 		TransformPart transform = entity.get(TransformPart.class);
 		spawnTransform.setPosition(PolygonUtils.relativeCenter(transform.getCenter(), spawnTransform.getSize()));
