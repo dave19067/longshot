@@ -7,10 +7,10 @@
       	    <x>0.5</x>
       	    <y>0.5</y>
       	</size>
+		<z>0.5</z>
       </part>
       <part xsi:type="drawablePart">
       	<textureName>objects/white</textureName>
-		<z>0.5</z>
       </part>
       <part xsi:type="colorChangePart">
       	<startColor>

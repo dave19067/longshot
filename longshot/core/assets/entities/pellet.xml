@@ -7,10 +7,10 @@
       	    <x>0.2</x>
       	    <y>0.2</y>
       	</size>
+		<z>0.2</z>
       </part>
       <part xsi:type="drawablePart">
       	<textureName>objects/pellet</textureName>
-		<z>0.2</z>
       </part>
       <part xsi:type="speedPart">
       	<speed>10</speed>

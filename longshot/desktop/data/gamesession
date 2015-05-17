@@ -16,5 +16,29 @@
             <name>David</name>
             <score>0</score>
         </highScores>
+        <highScores>
+            <name>DSav</name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>DA</name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>d</name>
+            <score>300</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>200</score>
+        </highScores>
+        <highScores>
+            <name>dddd</name>
+            <score>500</score>
+        </highScores>
     </highScores>
 </gameSession>

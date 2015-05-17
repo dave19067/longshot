@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
+import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.ConvexHullCache;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.graphics.RegionFactory;
@@ -27,11 +28,11 @@ public final class EntityFactory {
 	}
 	
 	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, final float minZ, 
-			final String regionName) {
+			final float maxZ, final String regionName) {
 		Entity entity = new Entity();
 		TextureRegion textureRegion = textureCache.getTextureRegion(regionName);
 		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion, vertices);
-		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region), position.z);
+		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region));
 		Color color = Color.WHITE.cpy().lerp(Color.DARK_GRAY, position.z / minZ);
 		drawablePart.getSprite().setColor(color);
 		entity.attach(drawablePart);
@@ -40,16 +41,20 @@ public final class EntityFactory {
 		for (int i = 0; i < shiftedVertices.length; i++) {
 			transformedVertices[i] = shiftedVertices[i] / UnitConvert.PIXELS_PER_UNIT;
 		}
-		entity.attach(new TransformPart(new Polygon(transformedVertices), new Vector2(position.x, position.y)));
+		TransformPart transformPart = new TransformPart(new Polygon(transformedVertices), position);
+		float minZScale = 0.5f;
+		Vector2 size = EntityUtils.calculateSize(transformPart.getSize(), position.z, minZScale, minZ, maxZ);
+		transformPart.setSize(size);
+		entity.attach(transformPart);
 		return entity;
 	}
 	
-	public final Entity createBaseEntity(final Vector3 size, final Vector2 position, final String regionName) {
+	public final Entity createBaseEntity(final Vector3 size, final Vector3 position, final String regionName) {
 		Entity entity = new Entity();
 		Polygon convexHull = convexHullCache.create(regionName, new Vector2(size.x, size.y));
 		entity.attach(new TransformPart(convexHull, position));
 		PolygonRegion region = textureCache.getPolygonRegion(regionName);
-		entity.attach(new DrawablePart(new PolygonSprite(region), size.z));
+		entity.attach(new DrawablePart(new PolygonSprite(region)));
 		return entity;
 	}
 	

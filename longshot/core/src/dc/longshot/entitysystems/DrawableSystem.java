@@ -10,7 +10,7 @@ import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.TransformPart;
 
 public final class DrawableSystem extends EntitySystem {
-
+	
 	@Override
 	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(DrawablePart.class) && entity.hasActive(TransformPart.class)) {

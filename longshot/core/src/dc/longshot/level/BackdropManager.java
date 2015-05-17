@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.epf.EntityManager;
+import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
@@ -63,13 +64,13 @@ public final class BackdropManager {
 		float z = MathUtils.random(decorationProfile.minZ, decorationProfile.maxZ);
 		Vector2 size = calculateSize(decorationProfile, z);
 		Polygon polygon = PolygonFactory.createRectangle(size);
-		TransformPart transformPart = new TransformPart(polygon);
+		TransformPart transformPart = new TransformPart(polygon, z);
 		if (decorationProfile.rotate) {
 			transformPart.setCenteredRotation(MathUtils.random(360));
 		}
 		entity.attach(transformPart);
 		PolygonSprite sprite = new PolygonSprite(decorationProfile.region);
-		entity.attach(new DrawablePart(sprite, z));
+		entity.attach(new DrawablePart(sprite));
 		List<Bound> deathBounds = new ArrayList<Bound>();
 		if (startBound == Bound.LEFT) {
 			deathBounds.add(Bound.RIGHT);
@@ -92,9 +93,7 @@ public final class BackdropManager {
 	
 	private Vector2 calculateSize(final DecorationProfile decorationProfile, final float z) {
 		Vector2 size;
-		float zPercent = (z - decorationProfile.minZ) / (decorationProfile.maxZ - decorationProfile.minZ); 
-		float lengthPercent = decorationProfile.minZScale + (1 - decorationProfile.minZScale) * zPercent;
-		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize) * lengthPercent;
+		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize);
 		float xyRatio = MathUtils.random(decorationProfile.minXYRatio, decorationProfile.maxXYRatio);
 		if (xyRatio > 1) {
 			float ratioedLength = length / xyRatio;
@@ -104,7 +103,8 @@ public final class BackdropManager {
 			float ratioedLength = length * xyRatio;
 			size = new Vector2(ratioedLength, length);
 		}
-		return size;
+		return EntityUtils.calculateSize(size, z, decorationProfile.minZScale, decorationProfile.minZ, 
+				decorationProfile.maxZ);
 	}
 	
 	private void trySpawn(final float delta, final DecorationProfile decorationProfile) {

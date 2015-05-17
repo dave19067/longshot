@@ -7,10 +7,10 @@
       	    <x>1.5</x>
       	    <y>1.5</y>
       	</size>
+		<z>1.5</z>
       </part>
       <part xsi:type="drawablePart">
       	<textureName>objects/circle</textureName>
-		<z>1.5</z>
       </part>
       <part xsi:type="damageOnSpawnPart">
       	<radius>0.75</radius>

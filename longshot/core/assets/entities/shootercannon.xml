@@ -11,10 +11,10 @@
       	    <x>0</x>
       	    <y>0.15</y>
       	</origin>
+		<z>0.3</z>
       </part>
       <part xsi:type="drawablePart">
       	<textureName>objects/cannon</textureName>
-		<z>0.3</z>
       </part>
       <part xsi:type="rotateToCursorPart" />
    </parts>

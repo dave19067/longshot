@@ -20,7 +20,6 @@ public final class DebugSettings {
 	private boolean drawWaypoints;
 	
 	public DebugSettings() {
-		// for serialization
 	}
 	
 	public float getSpeedMultiplier() {

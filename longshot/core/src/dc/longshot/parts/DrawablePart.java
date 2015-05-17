@@ -5,14 +5,12 @@ import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 public final class DrawablePart {
 
 	private PolygonSprite sprite;
-	private float z;
 	
 	public DrawablePart() {
 	}
 	
-	public DrawablePart(final PolygonSprite sprite, final float z) {
+	public DrawablePart(final PolygonSprite sprite) {
 		this.sprite = sprite;
-		this.z = z;
 	}
 	
 	public final PolygonSprite getSprite() {
@@ -21,10 +19,6 @@ public final class DrawablePart {
 	
 	public final void setSprite(final PolygonSprite sprite) {
 		this.sprite = sprite;
-	}
-	
-	public final float getZ() {
-		return z;
 	}
 	
 }

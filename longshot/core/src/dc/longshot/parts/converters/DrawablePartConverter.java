@@ -25,13 +25,12 @@ public final class DrawablePartConverter implements Converter {
 	public Object convert(final Object object) {
 		DrawablePart rawDrawablePart = (DrawablePart)object;
 		PolygonRegion region = textureCache.getPolygonRegion(rawDrawablePart.textureName);
-		return new dc.longshot.parts.DrawablePart(new PolygonSprite(region), rawDrawablePart.z);
+		return new dc.longshot.parts.DrawablePart(new PolygonSprite(region));
 	}
 
 	@XmlRootElement
 	public static final class DrawablePart {
 		public String textureName;
-		public float z;
 	}
 
 }

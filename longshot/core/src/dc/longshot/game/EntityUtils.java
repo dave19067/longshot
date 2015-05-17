@@ -24,4 +24,11 @@ public final class EntityUtils {
 		translatePart.setVelocity(velocity);
 	}
 	
+	public static final Vector2 calculateSize(final Vector2 originalSize, final float z, final float minZScale, 
+			final float minZ, final float maxZ) {
+		float zPercent = (z - minZ) / (maxZ - minZ); 
+		float zScalePercent = minZScale + (1 - minZScale) * zPercent;
+		return originalSize.scl(zScalePercent);
+	}
+	
 }

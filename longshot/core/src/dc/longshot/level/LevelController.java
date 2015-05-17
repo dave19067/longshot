@@ -66,6 +66,7 @@ import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.Fragmenter;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.ConvexHullCache;
+import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
@@ -295,9 +296,10 @@ public final class LevelController {
 				spawnOnDeath(entity, boundsRemoved);
 				if (entity.hasActive(FragsPart.class)) {
 					DrawablePart drawablePart = entity.get(DrawablePart.class);
-					Polygon polygon = entity.get(TransformPart.class).getPolygon();
+					TransformPart transformPart = entity.get(TransformPart.class);
+					Polygon polygon = transformPart.getPolygon();
 					List<Entity> frags = fragmenter.createFrags(drawablePart.getSprite().getRegion(), polygon, 
-							drawablePart.getZ(), FRAG_FADE_TIME);
+							transformPart.getZ(), FRAG_FADE_TIME);
 					entityManager.addAll(frags);
 				}
 				if (entity.hasActive(PointsPart.class)) {
@@ -402,7 +404,7 @@ public final class LevelController {
 	private void spawnGround() {
 		Rectangle boundsBox = level.getBoundsBox();
 		Entity ground = entityFactory.createBaseEntity(new Vector3(boundsBox.width, 0.1f, boundsBox.width), 
-				new Vector2(boundsBox.x, boundsBox.y), "objects/green");
+				new Vector3(boundsBox.x, boundsBox.y, 0), "objects/green");
 		entityManager.add(ground);
 	}
 	
@@ -415,24 +417,28 @@ public final class LevelController {
 	}
 
 	private void spawnBackgroundEntities() {
-		int minWidth = (int)(5 * UnitConvert.PIXELS_PER_UNIT);
-		int maxWidth = (int)(20 * UnitConvert.PIXELS_PER_UNIT);
-		float minNum = 20;
-		float maxNum = 40;
-		float minHeightRatio = 0.5f;
+		int minWidth = (int)(1 * UnitConvert.PIXELS_PER_UNIT);
+		int maxWidth = (int)(3 * UnitConvert.PIXELS_PER_UNIT);
+		float minNum = 100;
+		float maxNum = 200;
+		float minHeightRatio = 1.5f;
+		float maxHeightRatio = 4;
 		float minZ = -100;
+		float maxZ = 0;
 		for (int i = 0; i < MathUtils.random(minNum, maxNum); i++) {
-			TextureRegion region = textureCache.getTextureRegion("backgrounds/rock02");
+			// TODO: background should be scaled as well
+			TextureRegion region = textureCache.getTextureRegion("backgrounds/scraper");
 			int textureX = MathUtils.random(0, region.getRegionWidth() - 1);
 			int textureY = MathUtils.random(0, region.getRegionHeight() - 1);
 			int width = MathUtils.random(minWidth, maxWidth);
-			int height = (int)(width * minHeightRatio);
-			float[] vertices = new float[] { textureX, textureY, textureX + width, textureY, textureX + width / 2, 
-					textureY + height };
+			float heightRatio = MathUtils.random(minHeightRatio, maxHeightRatio);
+			int height = (int)(width * heightRatio);
+			float[] vertices = PolygonFactory.createRectangleVertices(textureX, textureY, width, height);
 			float x = MathUtils.random(-width / UnitConvert.PIXELS_PER_UNIT, PolygonUtils.right(level.getBoundsBox()));
 			float y = 0;
-			float z = MathUtils.random(minZ, 0);
-			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, "backgrounds/rock02");
+			float z = MathUtils.random(minZ, maxZ);
+			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, maxZ, 
+					"backgrounds/scraper");
 			entityManager.add(entity);
 		}
 	}
@@ -709,7 +715,7 @@ public final class LevelController {
 	    
 	    private final float getValue(final Entity entity) {
 	    	if (entity.hasActive(DrawablePart.class)) {
-	    		return entity.get(DrawablePart.class).getZ();
+	    		return entity.get(TransformPart.class).getZ();
 	    	}
 	    	else {
 	    		return 0;

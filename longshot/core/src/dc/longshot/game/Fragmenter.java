@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 import dc.longshot.epf.Entity;
 import dc.longshot.geometry.PolygonFactory;
@@ -72,9 +73,9 @@ public final class Fragmenter {
 		fragPolygon.setVertices(PolygonFactory.createRectangleVertices(fragSize.x, fragSize.y));
 		Vector2 worldPosition = UnitConvert.pixelToWorld(fragSprite.getX() * scale.x, fragSprite.getY() * scale.y);
 		Vector2 globalPosition = PolygonUtils.toGlobal(worldPosition.x, worldPosition.y, parentPolygon);
-		entity.attach(new TransformPart(fragPolygon, globalPosition));
+		entity.attach(new TransformPart(fragPolygon, new Vector3(globalPosition.x, globalPosition.y, z)));
 		PolygonSprite sprite = new PolygonSprite(fragSprite);
-		entity.attach(new DrawablePart(sprite, z));
+		entity.attach(new DrawablePart(sprite));
 		Vector2 velocity = calculateVelocity(parentPolygon, fragPolygon);
 		entity.attach(new SpeedPart(velocity.len()));
 		TranslatePart translatePart = new TranslatePart();

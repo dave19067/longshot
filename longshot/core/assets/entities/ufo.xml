@@ -7,10 +7,10 @@
       	    <x>1.5</x>
       	    <y>0.75</y>
       	</size>
+		<z>1</z>
       </part>
       <part xsi:type="drawablePart">
       	<textureName>objects/ufo</textureName>
-		<z>1</z>
       </part>
       <part xsi:type="speedPart">
       	<speed>3</speed>
