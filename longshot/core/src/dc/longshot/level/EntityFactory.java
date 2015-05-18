@@ -16,6 +16,7 @@ import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.TransformPart;
+import dc.longshot.util.FloatRange;
 
 public final class EntityFactory {
 	
@@ -27,13 +28,13 @@ public final class EntityFactory {
 		this.convexHullCache = convexHullCache;
 	}
 	
-	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, final float minZ, 
-			final float maxZ, final String regionName) {
+	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, 
+			final FloatRange zRange, final String regionName) {
 		Entity entity = new Entity();
 		TextureRegion textureRegion = textureCache.getTextureRegion(regionName);
 		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion, vertices);
 		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region));
-		Color color = Color.WHITE.cpy().lerp(Color.DARK_GRAY, position.z / minZ);
+		Color color = Color.WHITE.cpy().lerp(Color.BLACK, position.z / zRange.min());
 		drawablePart.getSprite().setColor(color);
 		entity.attach(drawablePart);
 		float[] shiftedVertices = region.getVertices();
@@ -43,7 +44,7 @@ public final class EntityFactory {
 		}
 		TransformPart transformPart = new TransformPart(new Polygon(transformedVertices), position);
 		float minZScale = 0.5f;
-		Vector2 size = EntityUtils.calculateSize(transformPart.getSize(), position.z, minZScale, minZ, maxZ);
+		Vector2 size = EntityUtils.calculateSize(transformPart.getSize(), position.z, minZScale, zRange);
 		transformPart.setSize(size);
 		entity.attach(transformPart);
 		return entity;

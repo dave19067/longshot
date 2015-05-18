@@ -43,6 +43,7 @@ import dc.longshot.system.ScreenManager;
 import dc.longshot.ui.UIPack;
 import dc.longshot.ui.controls.PauseMenu;
 import dc.longshot.util.ColorUtils;
+import dc.longshot.util.FloatRange;
 import dc.longshot.util.PathUtils;
 import dc.longshot.util.XmlContext;
 
@@ -298,14 +299,21 @@ public final class LongshotGame extends Game {
 			PolygonRegion cloudRegion = textureCache.getPolygonRegion("objects/cloud");
 			Rectangle cloudBoundsBox = new Rectangle(boundsBox);
 			PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
-			DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, 3, 6, 1f, 2, 
-					-200, -100, 0.5f, 0.75f, 1.25f, cloudRegion);
+			FloatRange sizeRange = new FloatRange(3, 6);
+			FloatRange xyRatioRange = new FloatRange(1, 2);
+			FloatRange zRange = new FloatRange(-200, -100);
+			FloatRange speedRange = new FloatRange(0.75f, 1.25f);
+			DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, sizeRange, xyRatioRange, 
+					zRange, 0.5f, speedRange, cloudRegion);
 			decorationProfiles.add(cloudProfile);
 		}
 		if (nightRatio > 0.5f) {
 			PolygonRegion starRegion = textureCache.getPolygonRegion("objects/star");
-			DecorationProfile starProfile = new DecorationProfile(boundsBox, true, 1, 0.02f, 0.1f, -1000, -500, 
-					0.5f, 0.3f, 0.7f, starRegion);
+			FloatRange sizeRange = new FloatRange(0.02f, 0.1f);
+			FloatRange zRange = new FloatRange(-1000, -500);
+			FloatRange speedRange = new FloatRange(0.3f, 0.7f);
+			DecorationProfile starProfile = new DecorationProfile(boundsBox, true, 1, sizeRange, zRange, 0.5f, 
+					speedRange, starRegion);
 			decorationProfiles.add(starProfile);
 		}
 		return decorationProfiles;

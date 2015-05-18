@@ -6,6 +6,7 @@ import dc.longshot.epf.Entity;
 import dc.longshot.geometry.VectorUtils;
 import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TranslatePart;
+import dc.longshot.util.FloatRange;
 
 public final class EntityUtils {
 
@@ -25,8 +26,8 @@ public final class EntityUtils {
 	}
 	
 	public static final Vector2 calculateSize(final Vector2 originalSize, final float z, final float minZScale, 
-			final float minZ, final float maxZ) {
-		float zPercent = (z - minZ) / (maxZ - minZ); 
+			final FloatRange zRange) {
+		float zPercent = (z - zRange.min()) / zRange.difference(); 
 		float zScalePercent = minZScale + (1 - minZScale) * zPercent;
 		return originalSize.scl(zScalePercent);
 	}

@@ -27,7 +27,7 @@ public final class GroundExploderSystem extends EntitySystem {
 			float explodeRate = groundExploderPart.getExplodeRate();
 			if (MathUtils.randomBoolean(delta / explodeRate)) {
 				Entity newEntity = entitySpawner.spawn(groundExploderPart.getEntityType());
-				float diameter = MathUtils.random(groundExploderPart.getMinSize(), groundExploderPart.getMaxSize());
+				float diameter = groundExploderPart.createRandomDiameter();
 				float positionX = MathUtils.random(boundsBox.x, boundsBox.x + boundsBox.width);
 				float positionY = MathUtils.random(boundsBox.y - diameter / 2, boundsBox.y + diameter);
 				Vector2 position = new Vector2(positionX, positionY);

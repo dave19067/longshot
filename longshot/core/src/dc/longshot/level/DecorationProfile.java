@@ -3,20 +3,18 @@ package dc.longshot.level;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.math.Rectangle;
 
+import dc.longshot.util.FloatRange;
+
 public final class DecorationProfile {
 
 	public Rectangle area;
 	public boolean rotate;
 	public float spawnRate; 
-	public float minSize;
-	public float maxSize;
-	public float minXYRatio;
-	public float maxXYRatio;
-	public float minZ;
-	public float maxZ;
+	public FloatRange sizeRange;
+	public FloatRange xyRatioRange;
+	public FloatRange zRange;
 	public float minZScale;
-	public float minSpeed;
-	public float maxSpeed;
+	public FloatRange speedRange;
 	public PolygonRegion region;
 	
 	/**
@@ -32,9 +30,9 @@ public final class DecorationProfile {
 	 * @param textureRegion texture region of decoration
 	 */
 	public DecorationProfile(final Rectangle area, final boolean rotate, final float spawnRate, 
-			final float minSize, final float maxSize, final float minZ, final float maxZ, final float minZScale, 
-			final float minSpeed, final float maxSpeed, final PolygonRegion region) {
-		this(area, rotate, spawnRate, minSize, maxSize, 1, 1, minZ, maxZ, minZScale, minSpeed, maxSpeed, region);
+			final FloatRange sizeRange, final FloatRange zRange, final float minZScale, 
+			final FloatRange speedRange, final PolygonRegion region) {
+		this(area, rotate, spawnRate, sizeRange, new FloatRange(1, 1), zRange, minZScale, speedRange, region);
 	}
 	
 	/**
@@ -50,20 +48,15 @@ public final class DecorationProfile {
 	 * @param textureRegion texture region of decoration
 	 */
 	public DecorationProfile(final Rectangle area, final boolean rotate, final float spawnRate, 
-			final float minSize, final float maxSize, final float minXYRatio, 
-			final float maxXYRatio, final float minZ, final float maxZ, final float minZScale, 
-			final float minSpeed, final float maxSpeed, final PolygonRegion region) {
+			final FloatRange sizeRange, final FloatRange xyRatioRange, final FloatRange zRange, 
+			final float minZScale, final FloatRange speedRange, final PolygonRegion region) {
 		this.area = area;
 		this.spawnRate = spawnRate;
-		this.minSize = minSize;
-		this.maxSize = maxSize;
-		this.minXYRatio = minXYRatio;
-		this.maxXYRatio = maxXYRatio;
-		this.minZ = minZ;
-		this.maxZ = maxZ;
+		this.sizeRange = sizeRange;
+		this.xyRatioRange = xyRatioRange;
+		this.zRange = zRange;
 		this.minZScale = minZScale;
-		this.minSpeed = minSpeed;
-		this.maxSpeed = maxSpeed;
+		this.speedRange = speedRange;
 		this.region = region;
 	}
 	

@@ -108,6 +108,8 @@ import dc.longshot.parts.converters.LightPartConverter;
 import dc.longshot.parts.converters.TransformPartConverter;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
+import dc.longshot.util.FloatRange;
+import dc.longshot.util.IntRange;
 import dc.longshot.util.PathUtils;
 import dc.longshot.util.XmlContext;
 
@@ -417,27 +419,22 @@ public final class LevelController {
 	}
 
 	private void spawnBackgroundEntities() {
-		int minWidth = (int)(1 * UnitConvert.PIXELS_PER_UNIT);
-		int maxWidth = (int)(3 * UnitConvert.PIXELS_PER_UNIT);
-		float minNum = 100;
-		float maxNum = 200;
-		float minHeightRatio = 1.5f;
-		float maxHeightRatio = 4;
-		float minZ = -100;
-		float maxZ = 0;
-		for (int i = 0; i < MathUtils.random(minNum, maxNum); i++) {
-			// TODO: background should be scaled as well
+		IntRange widthRange = new IntRange((int)(1 * UnitConvert.PIXELS_PER_UNIT), 
+				(int)(3 * UnitConvert.PIXELS_PER_UNIT));
+		FloatRange numRange = new FloatRange(100, 200);
+		FloatRange heightRatioRange = new FloatRange(1.5f, 4);
+		FloatRange zRange = new FloatRange(-100, 0);
+		for (int i = 0; i < numRange.random(); i++) {
 			TextureRegion region = textureCache.getTextureRegion("backgrounds/scraper");
 			int textureX = MathUtils.random(0, region.getRegionWidth() - 1);
 			int textureY = MathUtils.random(0, region.getRegionHeight() - 1);
-			int width = MathUtils.random(minWidth, maxWidth);
-			float heightRatio = MathUtils.random(minHeightRatio, maxHeightRatio);
-			int height = (int)(width * heightRatio);
+			int width = widthRange.random();
+			int height = (int)(width * heightRatioRange.random());
 			float[] vertices = PolygonFactory.createRectangleVertices(textureX, textureY, width, height);
 			float x = MathUtils.random(-width / UnitConvert.PIXELS_PER_UNIT, PolygonUtils.right(level.getBoundsBox()));
 			float y = 0;
-			float z = MathUtils.random(minZ, maxZ);
-			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), minZ, maxZ, 
+			float z = zRange.random();
+			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), zRange, 
 					"backgrounds/scraper");
 			entityManager.add(entity);
 		}
@@ -562,16 +559,15 @@ public final class LevelController {
 		TransformPart transform = entity.get(TransformPart.class);
 		Vector2 size = transform.getSize();
 		float spawnX;
-		float minVelocityX = 4;
-		float maxVelocityX = 16;
+		FloatRange velocityXRange = new FloatRange(4, 16);
 		float velocityX;
 		if (MathUtils.randomBoolean()) {
 			spawnX = boundsBox.x - size.x;
-			velocityX = MathUtils.random(minVelocityX, maxVelocityX);
+			velocityX = velocityXRange.random();
 		}
 		else {
 			spawnX = PolygonUtils.right(boundsBox);
-			velocityX = -MathUtils.random(minVelocityX, maxVelocityX);
+			velocityX = -velocityXRange.random();
 		}
 		entity.get(TranslatePart.class).setVelocity(new Vector2(velocityX, 0));
 		float boundsHeightRatio = 1 / 4f;
@@ -622,7 +618,8 @@ public final class LevelController {
 			}
 		}
 		Entity groundExploder = new Entity();
-		GroundExploderPart groundExploderPart = new GroundExploderPart("smallharmlessexplosion", 0.05f, 0.5f, 5);
+		FloatRange diameterRange = new FloatRange(0.5f, 5);
+		GroundExploderPart groundExploderPart = new GroundExploderPart("smallharmlessexplosion", 0.05f, diameterRange);
 		groundExploder.attach(groundExploderPart);
 		entityManager.add(groundExploder);
 		finished = true;

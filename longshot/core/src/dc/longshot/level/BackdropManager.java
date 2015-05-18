@@ -51,7 +51,7 @@ public final class BackdropManager {
 	}
 	
 	private void generateInitialDecorations(final DecorationProfile decorationProfile) {
-		float averageSpeed = (decorationProfile.maxSpeed - decorationProfile.minSpeed) / 2;
+		float averageSpeed = decorationProfile.speedRange.difference() / 2;
 		int decorationNum = (int)(decorationProfile.area.width / averageSpeed / decorationProfile.spawnRate);
 		for (int i = 0; i < decorationNum; i++) {
 			Entity decoration = createDecoration(decorationProfile);
@@ -61,7 +61,7 @@ public final class BackdropManager {
 	
 	private Entity createDecoration(final DecorationProfile decorationProfile) {
 		Entity entity = new Entity();
-		float z = MathUtils.random(decorationProfile.minZ, decorationProfile.maxZ);
+		float z = decorationProfile.zRange.random();
 		Vector2 size = calculateSize(decorationProfile, z);
 		Polygon polygon = PolygonFactory.createRectangle(size);
 		TransformPart transformPart = new TransformPart(polygon, z);
@@ -81,8 +81,9 @@ public final class BackdropManager {
 		entity.attach(new BoundsRemovePart(deathBounds, false));
 		TranslatePart translatePart = new TranslatePart();
 		Vector2 velocity = new Vector2(0, 0);
-		float zRatio = (z - decorationProfile.maxZ) / (decorationProfile.minZ - decorationProfile.maxZ);
-		velocity.x = MathUtils.random(decorationProfile.minSpeed, decorationProfile.maxSpeed) * zRatio;
+		float zRatio = (z - decorationProfile.zRange.max())
+				/ (decorationProfile.zRange.min() - decorationProfile.zRange.max());
+		velocity.x = decorationProfile.speedRange.random() * zRatio;
 		if (startBound == Bound.RIGHT) {
 			velocity.x *= -1;
 		}
@@ -93,8 +94,8 @@ public final class BackdropManager {
 	
 	private Vector2 calculateSize(final DecorationProfile decorationProfile, final float z) {
 		Vector2 size;
-		float length = MathUtils.random(decorationProfile.minSize, decorationProfile.maxSize);
-		float xyRatio = MathUtils.random(decorationProfile.minXYRatio, decorationProfile.maxXYRatio);
+		float length = decorationProfile.sizeRange.random();
+		float xyRatio = decorationProfile.xyRatioRange.random();
 		if (xyRatio > 1) {
 			float ratioedLength = length / xyRatio;
 			size = new Vector2(length, ratioedLength);
@@ -103,8 +104,7 @@ public final class BackdropManager {
 			float ratioedLength = length * xyRatio;
 			size = new Vector2(ratioedLength, length);
 		}
-		return EntityUtils.calculateSize(size, z, decorationProfile.minZScale, decorationProfile.minZ, 
-				decorationProfile.maxZ);
+		return EntityUtils.calculateSize(size, z, decorationProfile.minZScale, decorationProfile.zRange);
 	}
 	
 	private void trySpawn(final float delta, final DecorationProfile decorationProfile) {

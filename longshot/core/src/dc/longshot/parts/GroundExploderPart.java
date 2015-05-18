@@ -1,18 +1,17 @@
 package dc.longshot.parts;
 
+import dc.longshot.util.FloatRange;
+
 public final class GroundExploderPart {
 
 	private final String entityType;
 	private final float explodeRate;
-	private final float minSize;
-	private final float maxSize;
+	private final FloatRange diameterRange;
 	
-	public GroundExploderPart(final String entityType, final float explodeRate, final float minSize, 
-			final float maxSize) {
+	public GroundExploderPart(final String entityType, final float explodeRate, final FloatRange diameterRange) {
 		this.entityType = entityType;
 		this.explodeRate = explodeRate;
-		this.minSize = minSize;
-		this.maxSize = maxSize;
+		this.diameterRange = diameterRange;
 	}
 	
 	public final String getEntityType() {
@@ -23,12 +22,8 @@ public final class GroundExploderPart {
 		return explodeRate;
 	}
 	
-	public final float getMinSize() {
-		return minSize;
-	}
-	
-	public final float getMaxSize() {
-		return maxSize;
+	public final float createRandomDiameter() {
+		return diameterRange.random();
 	}
 
 }
