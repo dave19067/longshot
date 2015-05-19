@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
@@ -21,6 +19,7 @@ import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
+import dc.longshot.graphics.PolygonRegionKey;
 import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureUtils;
 import dc.longshot.parts.ColorChangePart;
@@ -122,48 +121,6 @@ public final class Fragmenter {
 			}
 		}
 		return false;
-	}
-	
-	private final class PolygonRegionKey {
-		
-		private final TextureRegion region;
-		
-		public PolygonRegionKey(final PolygonRegion region) {
-			this.region = region.getRegion();
-		}
-
-		@Override
-	    public final boolean equals(final Object obj) {
-			if (obj instanceof PolygonRegionKey) {
-				PolygonRegionKey other = ((PolygonRegionKey)obj);
-				return region.getTexture() == other.region.getTexture()
-					&& region.getRegionHeight() == other.region.getRegionHeight()
-					&& region.getRegionWidth() == other.region.getRegionWidth()
-					&& region.getRegionX() == other.region.getRegionX()
-					&& region.getRegionY() == other.region.getRegionY()
-					&& region.getU() == other.region.getU()
-					&& region.getU2() == other.region.getU2()
-					&& region.getV() == other.region.getV()
-					&& region.getV2() == other.region.getV2();
-			}
-			return false;
-		}
-
-		@Override
-		public final int hashCode() {
-			return new HashCodeBuilder()
-				.append(region.getTexture().getTextureObjectHandle())
-				.append(region.getRegionHeight())
-				.append(region.getRegionWidth())
-				.append(region.getRegionX())
-				.append(region.getRegionY())
-				.append(region.getU())
-				.append(region.getU2())
-				.append(region.getV())
-				.append(region.getV2())
-				.toHashCode();
-		}
-		
 	}
 	
 }

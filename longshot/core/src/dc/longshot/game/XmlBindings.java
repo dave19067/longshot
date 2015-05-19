@@ -20,6 +20,7 @@ import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.EmitPart;
 import dc.longshot.parts.FollowerPart;
 import dc.longshot.parts.FragsPart;
+import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.GravityPart;
 import dc.longshot.parts.GroundShooterPart;
 import dc.longshot.parts.HealthPart;
@@ -38,7 +39,6 @@ import dc.longshot.parts.WanderMovementPart;
 import dc.longshot.parts.WaypointsPart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.parts.converters.DrawablePartConverter.DrawablePart;
-import dc.longshot.parts.converters.GhostPartConverter.GhostPart;
 import dc.longshot.parts.converters.LightPartConverter.LightPart;
 import dc.longshot.parts.converters.TransformPartConverter.TransformPart;
 

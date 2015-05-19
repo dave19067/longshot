@@ -1,22 +1,30 @@
 package dc.longshot.parts;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 
 import dc.longshot.models.SoundKey;
 import dc.longshot.util.Timer;
+import dc.longshot.xmladapters.TimerAdapter;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public final class GhostPart {
 
 	private boolean ghostMode = false;
-	private final Timer ghostTimer;
+	@XmlJavaTypeAdapter(TimerAdapter.class)
+	private Timer ghostTimer;
 	private PolygonRegion normalRegion;
 	private PolygonRegion ghostRegion;
-	private final SoundKey deactivateSound;
+	@XmlElement
+	private SoundKey deactivateSound;
 	
-	public GhostPart(final Timer ghostTimer, final PolygonRegion ghostRegion, final SoundKey deactivateSound) {
-		this.ghostTimer = ghostTimer;
-		this.ghostRegion = ghostRegion;
-		this.deactivateSound = deactivateSound;
+	public GhostPart() {
 	}
 	
 	public final boolean ghostMode() {

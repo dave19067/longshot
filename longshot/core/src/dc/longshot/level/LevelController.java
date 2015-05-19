@@ -103,7 +103,6 @@ import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WaypointsPart;
 import dc.longshot.parts.WeaponPart;
 import dc.longshot.parts.converters.DrawablePartConverter;
-import dc.longshot.parts.converters.GhostPartConverter;
 import dc.longshot.parts.converters.LightPartConverter;
 import dc.longshot.parts.converters.TransformPartConverter;
 import dc.longshot.sound.SoundCache;
@@ -173,7 +172,6 @@ public final class LevelController {
 		entityCache = new EntityCache(xmlContext, entitiesPath, 
 				new Converter[] { 
 					new DrawablePartConverter(textureCache), 
-					new GhostPartConverter(textureCache), 
 					new LightPartConverter(rayHandler), 
 					new TransformPartConverter(convexHullCache)
 				});
@@ -242,6 +240,9 @@ public final class LevelController {
 	
 	public final void dispose() {
 		entityManager.cleanup();
+		for (EntitySystem entitySystem : entitySystems) {
+			entitySystem.dispose();
+		}
 		rayHandler.dispose();
 		world.dispose();
 	}

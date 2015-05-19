@@ -14,10 +14,6 @@
             <score>200</score>
         </highScores>
         <highScores>
-            <name>David</name>
-            <score>0</score>
-        </highScores>
-        <highScores>
             <name>DSav</name>
             <score>400</score>
         </highScores>
@@ -48,6 +44,10 @@
         <highScores>
             <name>da</name>
             <score>1100</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>100</score>
         </highScores>
     </highScores>
 </gameSession>

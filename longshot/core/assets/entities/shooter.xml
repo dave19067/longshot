@@ -54,7 +54,6 @@
           <ghostTimer>
               <maxTime>3</maxTime>
           </ghostTimer>
-          <ghostRegionName>objects/tank_outline</ghostRegionName>
           <deactivateSound>POWER_UP</deactivateSound>
       </part>
       <part xsi:type="fragsPart" />

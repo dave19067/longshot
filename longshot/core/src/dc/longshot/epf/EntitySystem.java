@@ -2,6 +2,9 @@ package dc.longshot.epf;
 
 public abstract class EntitySystem {
 
+	public void dispose() {
+	}
+	
 	public void initialize(final Entity entity) {
 	}
 	
