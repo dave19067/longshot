@@ -17,5 +17,12 @@
       	<textureName>objects/cannon</textureName>
       </part>
       <part xsi:type="rotateToCursorPart" />
+      <part xsi:type="ghostPart">
+          <ghostTimer>
+              <maxTime>3</maxTime>
+          </ghostTimer>
+          <classesToDeactivate/>
+      </part>
+      <part xsi:type="fragsPart" />
    </parts>
 </entity>

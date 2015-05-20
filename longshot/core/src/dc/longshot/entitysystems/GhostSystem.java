@@ -12,12 +12,9 @@ import dc.longshot.graphics.PolygonRegionKey;
 import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureFactory;
 import dc.longshot.models.SoundKey;
-import dc.longshot.parts.CollisionTypePart;
-import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.GhostPart;
 import dc.longshot.parts.HealthPart;
-import dc.longshot.parts.WeaponPart;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.util.Timer;
 
@@ -62,23 +59,28 @@ public final class GhostSystem extends EntitySystem {
 				Timer ghostTimer = ghostPart.getGhostTimer();
 				ghostTimer.tick(delta);
 				if (ghostTimer.isElapsed()) {
-					deactivateGhostMode(entity);
+					deghost(entity);
 				}
 			}
 		}
 	}
 	
-	private void deactivateGhostMode(final Entity entity) {
+	private void deghost(final Entity entity) {
 		GhostPart ghostPart = entity.get(GhostPart.class);
 		ghostPart.setGhostMode(false);
 		ghostPart.getGhostTimer().reset();
 		PolygonRegion normalRegion = ghostPart.getNormalRegion();
 		entity.get(DrawablePart.class).getSprite().setRegion(normalRegion);
-		entity.get(HealthPart.class).reset();
-		entity.setActive(CollisionTypePart.class, true);
-		entity.setActive(DamageOnCollisionPart.class, true);
-		entity.setActive(WeaponPart.class, true);
-		soundCache.play(ghostPart.getDeactivateSound());
+		for (Class<?> classToDeactivate : ghostPart.getClassesToDeactivate()) {
+			entity.setActive(classToDeactivate, true);
+		}
+		SoundKey deghostSound = ghostPart.getDeghostSound();
+		if (deghostSound != null) {
+			soundCache.play(deghostSound);
+		}
+		if (entity.hasActive(HealthPart.class)) {
+			entity.get(HealthPart.class).reset();
+		}
 	}
 
 }

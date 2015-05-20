@@ -1,8 +1,11 @@
 package dc.longshot.parts;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -10,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 
 import dc.longshot.models.SoundKey;
 import dc.longshot.util.Timer;
+import dc.longshot.xmladapters.ClassAdapter;
 import dc.longshot.xmladapters.TimerAdapter;
 
 @XmlRootElement
@@ -21,8 +25,11 @@ public final class GhostPart {
 	private Timer ghostTimer;
 	private PolygonRegion normalRegion;
 	private PolygonRegion ghostRegion;
-	@XmlElement
-	private SoundKey deactivateSound;
+	@XmlElement(nillable=true)
+	private SoundKey deghostSound;
+	@XmlElementWrapper
+	@XmlJavaTypeAdapter(ClassAdapter.class)
+	private List<Class<?>> classesToDeactivate;
 	
 	public GhostPart() {
 	}
@@ -55,8 +62,12 @@ public final class GhostPart {
 		this.ghostRegion = ghostRegion;
 	}
 	
-	public final SoundKey getDeactivateSound() {
-		return deactivateSound;
+	public final SoundKey getDeghostSound() {
+		return deghostSound;
+	}
+	
+	public final List<Class<?>> getClassesToDeactivate() {
+		return classesToDeactivate;
 	}
 
 }

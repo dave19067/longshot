@@ -27,10 +27,6 @@
         </highScores>
         <highScores>
             <name></name>
-            <score>100</score>
-        </highScores>
-        <highScores>
-            <name></name>
             <score>200</score>
         </highScores>
         <highScores>
@@ -46,8 +42,12 @@
             <score>1100</score>
         </highScores>
         <highScores>
-            <name></name>
-            <score>100</score>
+            <name>ad</name>
+            <score>300</score>
+        </highScores>
+        <highScores>
+            <name>da</name>
+            <score>300</score>
         </highScores>
     </highScores>
 </gameSession>

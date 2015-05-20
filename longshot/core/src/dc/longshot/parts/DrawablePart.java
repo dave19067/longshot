@@ -6,9 +6,6 @@ public final class DrawablePart {
 
 	private PolygonSprite sprite;
 	
-	public DrawablePart() {
-	}
-	
 	public DrawablePart(final PolygonSprite sprite) {
 		this.sprite = sprite;
 	}

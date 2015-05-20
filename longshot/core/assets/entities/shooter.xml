@@ -54,7 +54,12 @@
           <ghostTimer>
               <maxTime>3</maxTime>
           </ghostTimer>
-          <deactivateSound>POWER_UP</deactivateSound>
+          <deghostSound>POWER_UP</deghostSound>
+          <classesToDeactivate>
+              <classesToDeactivate>dc.longshot.parts.CollisionTypePart</classesToDeactivate>
+              <classesToDeactivate>dc.longshot.parts.DamageOnCollisionPart</classesToDeactivate>
+              <classesToDeactivate>dc.longshot.parts.WeaponPart</classesToDeactivate>
+          </classesToDeactivate>
       </part>
       <part xsi:type="fragsPart" />
       <part xsi:type="spawnOnDeathPart">

@@ -83,8 +83,6 @@ import dc.longshot.models.SpawningType;
 import dc.longshot.parts.AlliancePart;
 import dc.longshot.parts.AttachmentPart;
 import dc.longshot.parts.BoundsRemovePart;
-import dc.longshot.parts.CollisionTypePart;
-import dc.longshot.parts.DamageOnCollisionPart;
 import dc.longshot.parts.DamageOnSpawnPart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.FollowerPart;
@@ -101,7 +99,6 @@ import dc.longshot.parts.SpeedPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.parts.TranslatePart;
 import dc.longshot.parts.WaypointsPart;
-import dc.longshot.parts.WeaponPart;
 import dc.longshot.parts.converters.DrawablePartConverter;
 import dc.longshot.parts.converters.LightPartConverter;
 import dc.longshot.parts.converters.TransformPartConverter;
@@ -347,7 +344,7 @@ public final class LevelController {
 					soundCache.play(soundKey);
 				}
 				if (entity.hasActive(GhostPart.class)) {
-					activateGhostMode(entity);
+					ghost(entity);
 				}
 				else {
 					entityManager.remove(entity);
@@ -356,14 +353,20 @@ public final class LevelController {
 		};
 	}
 	
-	private void activateGhostMode(final Entity entity) {
+	private void ghost(final Entity entity) {
 		GhostPart ghostPart = entity.get(GhostPart.class);
 		ghostPart.setGhostMode(true);
 		PolygonRegion ghostRegion = ghostPart.getGhostRegion();
 		entity.get(DrawablePart.class).getSprite().setRegion(ghostRegion);
-		entity.setActive(CollisionTypePart.class, false);
-		entity.setActive(DamageOnCollisionPart.class, false);
-		entity.setActive(WeaponPart.class, false);
+		for (Class<?> classToDeactivate : ghostPart.getClassesToDeactivate()) {
+			entity.setActive(classToDeactivate, false);
+		}
+		if (entity.hasActive(AttachmentPart.class)) {
+			Entity attachedEntity = entity.get(AttachmentPart.class).getAttachedEntity();
+			if (attachedEntity.hasActive(GhostPart.class)) {
+				ghost(attachedEntity);
+			}
+		}
 	}
 	
 	private void setupSystems() {
