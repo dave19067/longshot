@@ -2,7 +2,7 @@ package dc.longshot.util;
 
 public final class Timer {
 
-	private float maxTime;
+	private float maxTime = 0;
 	private float time = 0;
 	
 	public Timer() {
@@ -14,6 +14,10 @@ public final class Timer {
 	
 	public final float getMaxTime() {
 		return maxTime;
+	}
+	
+	public final void setMaxTime(final float maxTime) {
+		this.maxTime = maxTime;
 	}
 	
 	public final boolean isElapsed() {

@@ -32,13 +32,13 @@ public final class GameSession {
 	}
 	
 	public final boolean canAddHighScore(final int score) {
-		return highScores.size() < MAX_HIGH_SCORES || score > getLowestHighScore().score;
+		return score > 0 && (highScores.size() < MAX_HIGH_SCORES || score > getLowestHighScore().score);
 	}
 	
 	public final void addHighScore(final ScoreEntry scoreEntry) {
 		if (!canAddHighScore(scoreEntry.score)) {
 			throw new IllegalArgumentException("Could not add score of " + scoreEntry.score
-					+ " because it is not a high score.");
+					+ " because it does not qualify as a high score");
 		}
 		if (highScores.size() > MAX_HIGH_SCORES) {
 			highScores.remove(getLowestHighScore());

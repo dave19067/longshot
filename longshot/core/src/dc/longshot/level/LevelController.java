@@ -92,6 +92,7 @@ import dc.longshot.parts.GroundExploderPart;
 import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
+import dc.longshot.parts.ShakeOnSpawnPart;
 import dc.longshot.parts.SoundOnDeathPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.SpawningPart;
@@ -102,6 +103,7 @@ import dc.longshot.parts.WaypointsPart;
 import dc.longshot.parts.converters.DrawablePartConverter;
 import dc.longshot.parts.converters.LightPartConverter;
 import dc.longshot.parts.converters.TransformPartConverter;
+import dc.longshot.screeneffects.Shake;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.util.FloatRange;
@@ -142,6 +144,7 @@ public final class LevelController {
 	private final PlaySession playSession;
 	private final DebugSettings debugSettings;
 	private Camera camera;
+	private final Shake shake;
 	private List<EntitySystem> entitySystems;
 	private RotateToCursorSystem rotateToCursorSystem;
 	private final List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
@@ -180,6 +183,7 @@ public final class LevelController {
 		collisionManager = new CollisionManager();
 		backdropManager = new BackdropManager(entityManager, Bound.LEFT, level.getDecorationProfiles());
 		setupCamera();
+		shake = new Shake(camera);
 		setupSystems();
 		generateSpawnInfos();
 		spawnInitialEntities();
@@ -215,6 +219,7 @@ public final class LevelController {
 				backdropManager.update(MAX_UPDATE_DELTA);
 				entityManager.update();
 				updateEntities(MAX_UPDATE_DELTA);
+				shake.update(MAX_UPDATE_DELTA);
 				rayHandler.update();
 				accumulatedDelta -= MAX_UPDATE_DELTA;
 			}
@@ -275,6 +280,10 @@ public final class LevelController {
 							}
 						}
 					}
+				}
+				if (entity.hasActive(ShakeOnSpawnPart.class)) {
+					ShakeOnSpawnPart shakeOnSpawnPart = entity.get(ShakeOnSpawnPart.class);
+					shake.execute(shakeOnSpawnPart.getMaxRadius(), shakeOnSpawnPart.getDuration());
 				}
 				if (entity.hasActive(PlaySoundOnSpawnPart.class)) {
 					soundCache.play(entity.get(PlaySoundOnSpawnPart.class).getSoundKey());

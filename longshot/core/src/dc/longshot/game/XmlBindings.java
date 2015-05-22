@@ -27,6 +27,7 @@ import dc.longshot.parts.HealthPart;
 import dc.longshot.parts.PlaySoundOnSpawnPart;
 import dc.longshot.parts.PointsPart;
 import dc.longshot.parts.RotateToCursorPart;
+import dc.longshot.parts.ShakeOnSpawnPart;
 import dc.longshot.parts.SoundOnDeathPart;
 import dc.longshot.parts.SpawnOnDeathPart;
 import dc.longshot.parts.SpawningPart;
@@ -74,6 +75,7 @@ public final class XmlBindings {
 		PlaySoundOnSpawnPart.class, 
 		PointsPart.class, 
 		RotateToCursorPart.class, 
+		ShakeOnSpawnPart.class, 
 		SoundOnDeathPart.class, 
 		SpawnOnDeathPart.class, 
 		SpawningPart.class, 

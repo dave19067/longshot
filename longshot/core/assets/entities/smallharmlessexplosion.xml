@@ -12,6 +12,10 @@
       <part xsi:type="drawablePart">
       	<textureName>objects/circle</textureName>
       </part>
+      <part xsi:type="shakeOnSpawnPart">
+          <maxRadius>0.2</maxRadius>
+          <duration>0.25</duration>
+      </part>
       <part xsi:type="colorChangePart">
       	<startColor>
       	    <r>1</r>

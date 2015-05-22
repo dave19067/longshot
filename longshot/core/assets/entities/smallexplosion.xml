@@ -16,6 +16,10 @@
       	<radius>0.75</radius>
 		<damage>1</damage>
       </part>
+      <part xsi:type="shakeOnSpawnPart">
+          <maxRadius>0.2</maxRadius>
+          <duration>0.25</duration>
+      </part>
       <part xsi:type="colorChangePart">
       	<startColor>
       	    <r>1</r>
