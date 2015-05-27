@@ -1,6 +1,5 @@
 package dc.longshot.parts.converters;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -42,7 +41,6 @@ public final class LightPartConverter implements Converter {
 	public static final class LightPart {
 		@XmlJavaTypeAdapter(ColorAdapter.class)
 		public Color color;
-		@XmlElement
 		public float distance;
 		@XmlJavaTypeAdapter(Vector2Adapter.class)
 		public Vector2 local;

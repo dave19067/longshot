@@ -10,7 +10,7 @@
 		<z>0.1</z>
       </part>
       <part xsi:type="drawablePart">
-      	<textureName>objects/white</textureName>
+      	<textureName>objects/circle</textureName>
       </part>
       <part xsi:type="colorChangePart">
       	<startColor>

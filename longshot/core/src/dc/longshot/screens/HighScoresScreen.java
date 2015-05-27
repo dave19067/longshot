@@ -25,6 +25,7 @@ import dc.longshot.models.ScoreEntryComparator;
 import dc.longshot.system.Input;
 import dc.longshot.ui.UIPack;
 import dc.longshot.util.InputUtils;
+import dc.longshot.util.Timer;
 import dc.longshot.util.XmlContext;
 
 public class HighScoresScreen implements Screen {
@@ -41,6 +42,7 @@ public class HighScoresScreen implements Screen {
 	private TextField nameField = null;
 	private Stage stage;
 	private InputProcessor highScoresInputProcessor;
+	private final Timer transitionTimer = new Timer(1);
 
 	public HighScoresScreen(final UIPack uiPack, final GameSession gameSession) {
 		this.uiPack = uiPack;
@@ -61,6 +63,7 @@ public class HighScoresScreen implements Screen {
 	@Override
 	public void render(final float delta) {
 		stage.act(delta);
+		transitionTimer.tick(delta);
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.draw();
@@ -181,13 +184,16 @@ public class HighScoresScreen implements Screen {
 
 		@Override
 		public final boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
-			if (newScoreEntry != null) {
-				newScoreEntry.name = nameField.getText();
-				gameSession.addHighScore(newScoreEntry);
-				xmlContext.marshal(gameSession, Gdx.files.local(Paths.GAME_SESSION_PATH));
+			if (transitionTimer.isElapsed()) {
+				if (newScoreEntry != null) {
+					newScoreEntry.name = nameField.getText();
+					gameSession.addHighScore(newScoreEntry);
+					xmlContext.marshal(gameSession, Gdx.files.local(Paths.GAME_SESSION_PATH));
+				}
+				closedDelegate.notify(new NoArgsEvent());
+				return true;
 			}
-			closedDelegate.notify(new NoArgsEvent());
-			return true;
+			return false;
 		}
 
 		@Override

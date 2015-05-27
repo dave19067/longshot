@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.badlogic.gdx.math.Vector2;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.math.Vector2;
 @XmlAccessorType(XmlAccessType.NONE)
 public final class WaypointsPart {
 
-	@XmlElement
 	private float endBuffer = 0;
 	private final List<Vector2> waypoints = new ArrayList<Vector2>();
 	

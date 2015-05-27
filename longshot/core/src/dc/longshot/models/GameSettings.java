@@ -3,21 +3,24 @@ package dc.longshot.models;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.badlogic.gdx.Graphics.DisplayMode;
 
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public final class GameSettings {
 
+	@XmlElement
 	private int width;
+	@XmlElement
 	private int height;
+	@XmlElement
 	private int refreshRate;
+	@XmlElement
 	private int bitsPerPixel;
+	@XmlElement
 	private boolean isFullScreen;
 	@XmlElementWrapper
 	private Map<InputAction, Integer> inputActions;
