@@ -28,10 +28,9 @@ public final class EntityFactory {
 		this.convexHullCache = convexHullCache;
 	}
 	
-	public final Entity createBackgroundElement(final float[] vertices, final Vector3 position, 
-			final FloatRange zRange, final String regionName) {
+	public final Entity createBackgroundElement(final float[] vertices, final Vector2 size, final Vector3 position, 
+			final FloatRange zRange, final TextureRegion textureRegion) {
 		Entity entity = new Entity();
-		TextureRegion textureRegion = textureCache.getTextureRegion(regionName);
 		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion, vertices);
 		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region));
 		Color color = Color.WHITE.cpy().lerp(Color.BLACK, position.z / zRange.min());
@@ -44,8 +43,8 @@ public final class EntityFactory {
 		}
 		TransformPart transformPart = new TransformPart(new Polygon(transformedVertices), position);
 		float minZScale = 0.5f;
-		Vector2 size = EntityUtils.calculateSize(transformPart.getSize(), position.z, minZScale, zRange);
-		transformPart.setSize(size);
+		Vector2 adjustedSize = EntityUtils.calculateSize(size, position.z, minZScale, zRange);
+		transformPart.setSize(adjustedSize);
 		entity.attach(transformPart);
 		return entity;
 	}

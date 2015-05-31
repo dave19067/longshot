@@ -13,6 +13,7 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -108,6 +109,7 @@ import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
 import dc.longshot.util.FloatRange;
 import dc.longshot.util.IntRange;
+import dc.longshot.util.Maths;
 import dc.longshot.util.PathUtils;
 import dc.longshot.util.XmlContext;
 
@@ -432,23 +434,32 @@ public final class LevelController {
 	}
 
 	private void spawnBackgroundEntities() {
-		IntRange widthRange = new IntRange((int)(1 * UnitConvert.PIXELS_PER_UNIT), 
-				(int)(3 * UnitConvert.PIXELS_PER_UNIT));
+		TextureRegion lightWindowRegion = textureCache.getTextureRegion("objects/window_light");
+		TextureRegion darkWindowRegion = textureCache.getTextureRegion("objects/window_dark");
+		TextureRegion backRegion = textureCache.getTextureRegion("backgrounds/scraper_back");
+		int cellWidth = Math.max(lightWindowRegion.getRegionWidth(), darkWindowRegion.getRegionWidth()) * 3;
+		int cellHeight = Math.max(lightWindowRegion.getRegionHeight(), darkWindowRegion.getRegionHeight()) * 3;
+		Texture scraperTexture = TextureFactory.createScraperTexture(lightWindowRegion, darkWindowRegion, backRegion, 
+				cellWidth, cellHeight);
+		TextureRegion scraperRegion = new TextureRegion(scraperTexture);
+		textureCache.addRegion("backgrounds/scraper", scraperRegion);
+		IntRange columnsRange = new IntRange(3, 5);
+		IntRange rowsRange = new IntRange(2, 15);
 		FloatRange numRange = new FloatRange(100, 200);
-		FloatRange heightRatioRange = new FloatRange(1.5f, 4);
 		FloatRange zRange = new FloatRange(-100, 0);
 		for (int i = 0; i < numRange.random(); i++) {
-			TextureRegion region = textureCache.getTextureRegion("backgrounds/scraper");
-			int textureX = MathUtils.random(0, region.getRegionWidth() - 1);
-			int textureY = MathUtils.random(0, region.getRegionHeight() - 1);
-			int width = widthRange.random();
-			int height = (int)(width * heightRatioRange.random());
-			float[] vertices = PolygonFactory.createRectangleVertices(textureX, textureY, width, height);
-			float x = MathUtils.random(-width / UnitConvert.PIXELS_PER_UNIT, PolygonUtils.right(level.getBoundsBox()));
-			float y = 0;
+			int numColumns = columnsRange.random();
+			int numRows = rowsRange.random();
+			int regionWidth = numColumns * cellWidth;
+			int regionHeight = numRows * cellHeight;
+			int regionX = Maths.round(MathUtils.random(0, scraperRegion.getRegionWidth() - regionWidth - 1), cellWidth);
+			int regionY = Maths.round(MathUtils.random(0, scraperRegion.getRegionHeight() - regionHeight - 1), cellHeight);
+			float[] vertices = PolygonFactory.createRectangleVertices(regionX, regionY, regionWidth, regionHeight);
+			Vector2 size = new Vector2(numColumns * 0.6f, numRows * 0.8f);
+			float x = MathUtils.random(-size.x, PolygonUtils.right(level.getBoundsBox()));
 			float z = zRange.random();
-			Entity entity = entityFactory.createBackgroundElement(vertices, new Vector3(x, y, z), zRange, 
-					"backgrounds/scraper");
+			Entity entity = entityFactory.createBackgroundElement(vertices, size, new Vector3(x, 0, z), zRange, 
+					scraperRegion);
 			entityManager.add(entity);
 		}
 	}

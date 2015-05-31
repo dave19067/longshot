@@ -37,7 +37,7 @@ public final class TextureCache {
 			Texture texture = new Texture(fileHandle);
 			texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 			TextureRegion region = new TextureRegion(texture);
-			addRegion(namespace, fileHandle.nameWithoutExtension(), region);
+			addRegion(namespace + fileHandle.nameWithoutExtension(), region);
 		}
 	}
 	
@@ -49,8 +49,8 @@ public final class TextureCache {
 		}
 	}
 	
-	public void addRegion(final String namespace, final String name, final TextureRegion region) {
-		textureRegions.put(namespace + name, region);
+	public void addRegion(final String name, final TextureRegion region) {
+		textureRegions.put(name, region);
 	}
 	
 	public final PolygonRegion getPolygonRegion(final String name) {

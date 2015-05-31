@@ -25,5 +25,17 @@
             <name>asdasdas</name>
             <score>400</score>
         </highScores>
+        <highScores>
+            <name>asd</name>
+            <score>100</score>
+        </highScores>
+        <highScores>
+            <name>das</name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>asd</name>
+            <score>200</score>
+        </highScores>
     </highScores>
 </gameSession>
