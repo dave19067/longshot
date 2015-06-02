@@ -49,8 +49,8 @@ import dc.longshot.util.XmlContext;
 
 public final class LongshotGame extends Game {
 	
-	private static final Color DUSK_COLOR = ColorUtils.toGdxColor(162, 129, 133);
-	private static final Color NIGHT_COLOR = ColorUtils.toGdxColor(15, 16, 26);
+	private static final Color DUSK_COLOR = ColorUtils.rgbToColor(162, 129, 133);
+	private static final Color NIGHT_COLOR = ColorUtils.rgbToColor(15, 16, 26);
 	private static final String TEMPORARY_PATH = "temp/";
 	private static final String SKIN_PATH = "ui/test/uiskin.json";
 	private static final String MEDIUM_FONT_PATH = "ui/ocr/ocr_32.fnt";

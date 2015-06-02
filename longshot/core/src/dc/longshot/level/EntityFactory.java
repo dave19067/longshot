@@ -3,7 +3,6 @@ package dc.longshot.level;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -12,7 +11,6 @@ import dc.longshot.epf.Entity;
 import dc.longshot.game.EntityUtils;
 import dc.longshot.geometry.ConvexHullCache;
 import dc.longshot.geometry.UnitConvert;
-import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.TransformPart;
@@ -28,12 +26,12 @@ public final class EntityFactory {
 		this.convexHullCache = convexHullCache;
 	}
 	
-	public final Entity createBackgroundElement(final float[] vertices, final Vector2 size, final Vector3 position, 
-			final FloatRange zRange, final TextureRegion textureRegion) {
+	public final Entity createBackgroundElement(final Vector2 size, final Vector3 position, 
+			final FloatRange zRange, final Color tint, final PolygonRegion region) {
 		Entity entity = new Entity();
-		PolygonRegion region = RegionFactory.createPolygonRegion(textureRegion, vertices);
-		DrawablePart drawablePart = new DrawablePart(new PolygonSprite(region));
-		Color color = Color.WHITE.cpy().lerp(Color.BLACK, position.z / zRange.min());
+		PolygonSprite sprite = new PolygonSprite(region);
+		DrawablePart drawablePart = new DrawablePart(sprite);
+		Color color = tint.cpy().lerp(Color.BLACK, position.z / zRange.min());
 		drawablePart.getSprite().setColor(color);
 		entity.attach(drawablePart);
 		float[] shiftedVertices = region.getVertices();

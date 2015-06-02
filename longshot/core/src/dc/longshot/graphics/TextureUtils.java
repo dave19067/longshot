@@ -2,6 +2,7 @@ package dc.longshot.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -18,7 +19,7 @@ public class TextureUtils {
 		SpriteBatch spriteBatch = new SpriteBatch();
 		spriteBatch.setProjectionMatrix(projection);
 		
-		FrameBuffer frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+		FrameBuffer frameBuffer = new FrameBuffer(Format.RGBA8888, width, height, false);
 		frameBuffer.begin();
 		spriteBatch.begin();
 		spriteBatch.draw(textureRegion, 0, 0, width, height);

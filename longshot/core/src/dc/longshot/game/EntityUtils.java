@@ -29,7 +29,7 @@ public final class EntityUtils {
 			final FloatRange zRange) {
 		float zPercent = (z - zRange.min()) / zRange.difference(); 
 		float zScalePercent = minZScale + (1 - minZScale) * zPercent;
-		return originalSize.scl(zScalePercent);
+		return originalSize.cpy().scl(zScalePercent);
 	}
 	
 }

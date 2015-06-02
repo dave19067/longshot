@@ -37,5 +37,13 @@
             <name>asd</name>
             <score>200</score>
         </highScores>
+        <highScores>
+            <name>das</name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>sfd</name>
+            <score>200</score>
+        </highScores>
     </highScores>
 </gameSession>
