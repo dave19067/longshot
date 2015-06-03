@@ -10,7 +10,7 @@
     <spawns>
         <entry>
             <key>missile</key>
-            <value>40</value>
+            <value>1</value>
         </entry>
     </spawns>
 </level>

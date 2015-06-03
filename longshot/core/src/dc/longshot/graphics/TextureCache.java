@@ -20,11 +20,12 @@ public final class TextureCache {
 
 	private static final String[] TEXTURE_EXTENSIONS = { "png", "jpg" };
 	
-	private final Map<String, TextureRegion> textureRegions = new HashMap<String, TextureRegion>();
+	private final List<TextureRegion> textureRegions = new ArrayList<TextureRegion>();
+	private final Map<String, TextureRegion> nameToTextureRegions = new HashMap<String, TextureRegion>();
 	private final List<TextureAtlas> textureAtlases = new ArrayList<TextureAtlas>();
 	
 	public final Collection<String> getRegionNames() {
-		return textureRegions.keySet();
+		return nameToTextureRegions.keySet();
 	}
 	
 	public final void addTextures(final FileHandle fileHandle, final String namespace) {
@@ -45,12 +46,16 @@ public final class TextureCache {
 		TextureAtlas atlas = new TextureAtlas(fileHandle);
 		textureAtlases.add(atlas);
 		for (AtlasRegion atlasRegion : atlas.getRegions()) {
-			textureRegions.put(namespace + atlasRegion.name, atlasRegion);
+			nameToTextureRegions.put(namespace + atlasRegion.name, atlasRegion);
 		}
 	}
 	
+	public void addRegion(final TextureRegion region) {
+		textureRegions.add(region);
+	}
+	
 	public void addRegion(final String name, final TextureRegion region) {
-		textureRegions.put(name, region);
+		nameToTextureRegions.put(name, region);
 	}
 	
 	public final PolygonRegion getPolygonRegion(final String name) {
@@ -59,17 +64,22 @@ public final class TextureCache {
 	}
 	
 	public final TextureRegion getTextureRegion(final String name) {
-		if (!textureRegions.containsKey(name)) {
+		if (!nameToTextureRegions.containsKey(name)) {
 			throw new IllegalArgumentException("Could not get texture region " + name + " because it does not exist");
 		}
-		return textureRegions.get(name);
+		return nameToTextureRegions.get(name);
 	}
 	
 	public final void dispose() {
 		for (TextureAtlas atlas : textureAtlases) {
 			atlas.dispose();
 		}
-		for (TextureRegion region : textureRegions.values()) {
+		dispose(textureRegions);
+		dispose(nameToTextureRegions.values());
+	}
+	
+	private final void dispose(final Collection<TextureRegion> textureRegions) {
+		for (TextureRegion region : textureRegions) {
 			region.getTexture().dispose();
 		}
 	}

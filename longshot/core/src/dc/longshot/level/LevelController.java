@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import box2dLight.RayHandler;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -68,11 +67,9 @@ import dc.longshot.eventing.NoArgsListener;
 import dc.longshot.game.Fragmenter;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.ConvexHullCache;
-import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
-import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.models.Alliance;
 import dc.longshot.models.DebugSettings;
@@ -109,10 +106,8 @@ import dc.longshot.parts.converters.TransformPartConverter;
 import dc.longshot.screeneffects.Shake;
 import dc.longshot.sound.SoundCache;
 import dc.longshot.system.ExecutionState;
-import dc.longshot.util.ColorUtils;
 import dc.longshot.util.FloatRange;
 import dc.longshot.util.IntRange;
-import dc.longshot.util.Maths;
 import dc.longshot.util.PathUtils;
 import dc.longshot.util.XmlContext;
 
@@ -180,7 +175,7 @@ public final class LevelController {
 					new LightPartConverter(rayHandler), 
 					new TransformPartConverter(convexHullCache)
 				});
-		entityFactory = new EntityFactory(textureCache, convexHullCache);
+		entityFactory = new EntityFactory(textureCache, convexHullCache, level.getBoundsBox());
 		entityManager = new EntityManager();
 		entityManager.addEntityAddedListener(entityAdded());
 		entityManager.addEntityRemovedListener(entityRemoved());
@@ -437,7 +432,6 @@ public final class LevelController {
 	}
 
 	private void spawnBackgroundEntities() {
-		// TODO: Cleanup
 		TextureRegion lightWindowRegion = textureCache.getTextureRegion("objects/window_light");
 		TextureRegion darkWindowRegion = textureCache.getTextureRegion("objects/window_dark");
 		int cellWidth = Math.max(lightWindowRegion.getRegionWidth(), darkWindowRegion.getRegionWidth()) * 3;
@@ -445,33 +439,15 @@ public final class LevelController {
 		Texture windowsTexture = TextureFactory.createWindowsTexture(300, 400, cellWidth, cellHeight, 
 				lightWindowRegion, darkWindowRegion);
 		TextureRegion windowsRegion = new TextureRegion(windowsTexture);
-		textureCache.addRegion("backgrounds/windows", windowsRegion);
+		textureCache.addRegion(windowsRegion);
 		IntRange columnsRange = new IntRange(3, 5);
 		IntRange rowsRange = new IntRange(2, 15);
-		FloatRange numRange = new FloatRange(100, 200);
+		IntRange numRange = new IntRange(100, 200);
 		FloatRange zRange = new FloatRange(-100, 0);
 		PolygonRegion backRegion = textureCache.getPolygonRegion("objects/white");
-		for (int i = 0; i < numRange.random(); i++) {
-			int numColumns = columnsRange.random();
-			int numRows = rowsRange.random();
-			int regionWidth = numColumns * cellWidth;
-			int regionHeight = numRows * cellHeight;
-			int regionX = Maths.round(MathUtils.random(0, windowsRegion.getRegionWidth() - regionWidth - 1), cellWidth);
-			int regionY = Maths.round(MathUtils.random(0, windowsRegion.getRegionHeight() - regionHeight - 1), cellHeight);
-			float[] vertices = PolygonFactory.createRectangleVertices(regionX, regionY, regionWidth, regionHeight);
-			PolygonRegion region = RegionFactory.createPolygonRegion(windowsRegion, vertices);
-			Vector2 size = new Vector2(numColumns * 0.6f, numRows * 0.8f);
-			float x = MathUtils.random(-size.x, PolygonUtils.right(level.getBoundsBox()));
-			float z = zRange.random();
-			Entity windows = entityFactory.createBackgroundElement(size, new Vector3(x, 0, z + 0.1f), zRange, Color.WHITE, 
-					region);
-			entityManager.add(windows);
-			float h = MathUtils.random(0, ColorUtils.H_MAX);
-			Color tint = ColorUtils.hsvToColor(h, 10, 50);
-			Entity scraperBack = entityFactory.createBackgroundElement(size, new Vector3(x, 0, z), zRange, tint, 
-					backRegion);
-			entityManager.add(scraperBack);
-		}
+		List<Entity> backgroundEntities = entityFactory.createBackgroundElements(numRange, columnsRange, rowsRange, 
+				cellWidth, cellHeight, zRange, windowsRegion, backRegion);
+		entityManager.addAll(backgroundEntities);
 	}
 	
 	private void setupCamera() {
