@@ -148,6 +148,7 @@ public final class LevelController {
 	private List<EntitySystem> entitySystems;
 	private RotateToCursorSystem rotateToCursorSystem;
 	private final List<SpawnInfo> spawnInfos = new ArrayList<SpawnInfo>();
+	private List<Entity> backgroundEntities;
 	private boolean finished = false;
 	private double accumulatedDelta = 0;
 	private float time = 0;
@@ -413,7 +414,8 @@ public final class LevelController {
 	private void spawnInitialEntities() {
 		spawnGround();
 		spawnShooter();
-		spawnBackgroundEntities();
+		backgroundEntities = createBackgroundEntities();
+		entityManager.addAll(backgroundEntities);
 	}
 	
 	private void spawnGround() {
@@ -431,7 +433,7 @@ public final class LevelController {
 		shooterTransformPart.setPosition(shooterPosition);
 	}
 
-	private void spawnBackgroundEntities() {
+	private List<Entity> createBackgroundEntities() {
 		TextureRegion lightWindowRegion = textureCache.getTextureRegion("objects/window_light");
 		TextureRegion darkWindowRegion = textureCache.getTextureRegion("objects/window_dark");
 		int cellWidth = Math.max(lightWindowRegion.getRegionWidth(), darkWindowRegion.getRegionWidth()) * 3;
@@ -445,9 +447,8 @@ public final class LevelController {
 		IntRange numRange = new IntRange(100, 200);
 		FloatRange zRange = new FloatRange(-100, 0);
 		PolygonRegion backRegion = textureCache.getPolygonRegion("objects/white");
-		List<Entity> backgroundEntities = entityFactory.createBackgroundElements(numRange, columnsRange, rowsRange, 
-				cellWidth, cellHeight, zRange, windowsRegion, backRegion);
-		entityManager.addAll(backgroundEntities);
+		return entityFactory.createBackgroundElements(numRange, columnsRange, rowsRange, cellWidth, cellHeight, zRange,
+				windowsRegion, backRegion);
 	}
 	
 	private void setupCamera() {
@@ -626,6 +627,9 @@ public final class LevelController {
 					&& entity.get(AlliancePart.class).getAlliance() == Alliance.PLAYER) {
 				entityManager.remove(entity);
 			}
+		}
+		for (Entity entity : backgroundEntities) {
+			entityManager.remove(entity);
 		}
 		Entity groundExploder = new Entity();
 		FloatRange diameterRange = new FloatRange(0.5f, 5);

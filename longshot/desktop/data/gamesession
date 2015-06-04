@@ -45,5 +45,9 @@
             <name>sfd</name>
             <score>200</score>
         </highScores>
+        <highScores>
+            <name>asdasdasd</name>
+            <score>300</score>
+        </highScores>
     </highScores>
 </gameSession>

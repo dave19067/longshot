@@ -22,6 +22,7 @@ import dc.longshot.geometry.UnitConvert;
 import dc.longshot.graphics.RegionFactory;
 import dc.longshot.graphics.TextureCache;
 import dc.longshot.parts.DrawablePart;
+import dc.longshot.parts.FragsPart;
 import dc.longshot.parts.TransformPart;
 import dc.longshot.util.ColorUtils;
 import dc.longshot.util.FloatRange;
@@ -96,6 +97,7 @@ public final class EntityFactory {
 		Vector2 adjustedSize = EntityUtils.calculateSize(size, position.z, minZScale, zRange);
 		transformPart.setSize(adjustedSize);
 		entity.attach(transformPart);
+		entity.attach(new FragsPart());
 		return entity;
 	}
 	
