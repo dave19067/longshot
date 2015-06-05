@@ -26,10 +26,6 @@
             <score>400</score>
         </highScores>
         <highScores>
-            <name>asd</name>
-            <score>100</score>
-        </highScores>
-        <highScores>
             <name>das</name>
             <score>400</score>
         </highScores>
@@ -47,6 +43,10 @@
         </highScores>
         <highScores>
             <name>asdasdasd</name>
+            <score>300</score>
+        </highScores>
+        <highScores>
+            <name>das</name>
             <score>300</score>
         </highScores>
     </highScores>

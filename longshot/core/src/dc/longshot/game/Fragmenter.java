@@ -1,12 +1,9 @@
 package dc.longshot.game;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,9 +16,7 @@ import dc.longshot.geometry.PolygonFactory;
 import dc.longshot.geometry.PolygonUtils;
 import dc.longshot.geometry.UnitConvert;
 import dc.longshot.geometry.VectorUtils;
-import dc.longshot.graphics.PolygonRegionKey;
 import dc.longshot.graphics.RegionFactory;
-import dc.longshot.graphics.TextureUtils;
 import dc.longshot.parts.ColorChangePart;
 import dc.longshot.parts.DrawablePart;
 import dc.longshot.parts.SpeedPart;
@@ -34,8 +29,6 @@ public final class Fragmenter {
 	private final int fragWidth;
 	private final int fragHeight;
 	private final float fragSpeedMultiplier;
-	private final Map<PolygonRegionKey, List<PolygonSprite>> regionToFragSprites
-		= new HashMap<PolygonRegionKey, List<PolygonSprite>>();
 	
 	public Fragmenter(final int fragWidth, final int fragHeight, final float fragSpeedMultiplier) {
 		this.fragWidth = fragWidth;
@@ -45,17 +38,16 @@ public final class Fragmenter {
 	
 	public final List<Entity> createFrags(final PolygonRegion region, final Polygon parentPolygon, final float z, 
 			final float fadeTime) {
-		List<PolygonSprite> fragSprites;
-		PolygonRegionKey key = new PolygonRegionKey(region);
-		if (regionToFragSprites.containsKey(key)) {
-			fragSprites = regionToFragSprites.get(key);
-		}
-		else {
-			fragSprites = createFragSprites(region, fragWidth, fragHeight);
-		}
+		List<PolygonSprite> fragSprites = createFragSprites(region, fragWidth, fragHeight);
+		return createFrags(region.getRegion().getRegionWidth(), region.getRegion().getRegionHeight(), parentPolygon, 
+				fragSprites, z, fadeTime);
+	}
+	
+	private final List<Entity> createFrags(final int regionWidth, final int regionHeight, final Polygon parentPolygon, 
+			final List<PolygonSprite> fragSprites, final float z, final float fadeTime) {
 		List<Entity> frags = new ArrayList<Entity>();
 		Vector2 scale = UnitConvert.worldToPixel(PolygonUtils.size(parentPolygon))
-				.scl(1.0f / region.getRegion().getRegionWidth(), 1.0f / region.getRegion().getRegionHeight());
+				.scl(1.0f / regionWidth, 1.0f / regionHeight);
 		for (PolygonSprite fragSprite : fragSprites) {
 			Entity frag = createFrag(fragSprite, parentPolygon, scale, z, fadeTime);
 			frags.add(frag);
@@ -68,9 +60,9 @@ public final class Fragmenter {
 		Entity entity = new Entity();
 		Polygon fragPolygon = new Polygon();
 		fragPolygon.setRotation(parentPolygon.getRotation());
-		Vector2 fragSize = UnitConvert.pixelToWorld(fragSprite.getWidth() * scale.x, fragSprite.getHeight() * scale.y);
+		Vector2 fragSize = UnitConvert.pixelToWorld(fragSprite.getWidth(), fragSprite.getHeight()).scl(scale);
 		fragPolygon.setVertices(PolygonFactory.createRectangleVertices(fragSize.x, fragSize.y));
-		Vector2 worldPosition = UnitConvert.pixelToWorld(fragSprite.getX() * scale.x, fragSprite.getY() * scale.y);
+		Vector2 worldPosition = UnitConvert.pixelToWorld(fragSprite.getX(), fragSprite.getY()).scl(scale);
 		Vector2 globalPosition = PolygonUtils.toGlobal(worldPosition.x, worldPosition.y, parentPolygon);
 		entity.attach(new TransformPart(fragPolygon, new Vector3(globalPosition.x, globalPosition.y, z)));
 		PolygonSprite sprite = new PolygonSprite(fragSprite);
@@ -90,37 +82,22 @@ public final class Fragmenter {
 		return VectorUtils.lengthened(offset, offset.len() * fragSpeedMultiplier);
 	}
 	
-	private final List<PolygonSprite> createFragSprites(final PolygonRegion region, final int fragWidth, 
+	private final List<PolygonSprite> createFragSprites(final PolygonRegion polygonRegion, final int fragWidth, 
 			final int fragHeight) {
 		List<PolygonSprite> fragSprites = new ArrayList<PolygonSprite>();
-		Pixmap pixmap = TextureUtils.toPixmap(region.getRegion());
-		for (int x = 0; x < pixmap.getWidth(); x += fragWidth) {
-			for (int y = 0; y < pixmap.getHeight(); y += fragHeight) {
-				int width = Math.min(fragWidth, pixmap.getWidth() - x);
-				int height = Math.min(fragHeight, pixmap.getHeight() - y);
-				if (containsOpaquePixel(pixmap, x, y, width, height)) {
-					TextureRegion croppedRegion = new TextureRegion(region.getRegion(), x, y, width, height);
-					PolygonSprite sprite = new PolygonSprite(RegionFactory.createPolygonRegion(croppedRegion));
-					sprite.setOrigin(0, 0);
-					sprite.setPosition(x, pixmap.getHeight() - y - height);
-					fragSprites.add(sprite);
-				}
+		TextureRegion textureRegion = polygonRegion.getRegion();
+		for (int x = 0; x < textureRegion.getRegionWidth(); x += fragWidth) {
+			for (int y = 0; y < textureRegion.getRegionHeight(); y += fragHeight) {
+				int width = Math.min(fragWidth, textureRegion.getRegionWidth() - x);
+				int height = Math.min(fragHeight, textureRegion.getRegionHeight() - y);
+				TextureRegion fragRegion = new TextureRegion(polygonRegion.getRegion(), x, y, width, height);
+				PolygonSprite fragSprite = new PolygonSprite(RegionFactory.createPolygonRegion(fragRegion));
+				fragSprite.setOrigin(0, 0);
+				fragSprite.setPosition(x, textureRegion.getRegionHeight() - y - height);
+				fragSprites.add(fragSprite);
 			}
 		}
-		regionToFragSprites.put(new PolygonRegionKey(region), fragSprites);
 		return fragSprites;
-	}
-	
-	private final boolean containsOpaquePixel(final Pixmap pixmap, final int left, final int bottom, 
-			final int width, final int height) {
-		for (int x = left; x < left + width; x++) {
-			for (int y = bottom; y < bottom + height; y++) {
-				if (!TextureUtils.isAlpha(pixmap.getPixel(x, y))) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 	
 }
