@@ -6,20 +6,12 @@
     </levelNames>
     <highScores>
         <highScores>
-            <name></name>
-            <score>300</score>
-        </highScores>
-        <highScores>
             <name>das</name>
             <score>900</score>
         </highScores>
         <highScores>
             <name>as</name>
             <score>400</score>
-        </highScores>
-        <highScores>
-            <name>dsadsa</name>
-            <score>200</score>
         </highScores>
         <highScores>
             <name>asdasdas</name>
@@ -30,16 +22,8 @@
             <score>400</score>
         </highScores>
         <highScores>
-            <name>asd</name>
-            <score>200</score>
-        </highScores>
-        <highScores>
             <name>das</name>
             <score>400</score>
-        </highScores>
-        <highScores>
-            <name>sfd</name>
-            <score>200</score>
         </highScores>
         <highScores>
             <name>asdasdasd</name>
@@ -48,6 +32,22 @@
         <highScores>
             <name>das</name>
             <score>300</score>
+        </highScores>
+        <highScores>
+            <name>asd</name>
+            <score>400</score>
+        </highScores>
+        <highScores>
+            <name>dasd</name>
+            <score>300</score>
+        </highScores>
+        <highScores>
+            <name>dav</name>
+            <score>300</score>
+        </highScores>
+        <highScores>
+            <name></name>
+            <score>500</score>
         </highScores>
     </highScores>
 </gameSession>

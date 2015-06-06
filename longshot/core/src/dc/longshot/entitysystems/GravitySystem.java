@@ -15,7 +15,7 @@ public final class GravitySystem extends EntitySystem {
 	private static final float ACCELERATION = -20;
 
 	@Override
-	public void update(final float delta, final Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(GravityPart.class)) {
 			TranslatePart translatePart = entity.get(TranslatePart.class);
 			Vector2 velocity = translatePart.getVelocity();

@@ -23,7 +23,7 @@ public final class FollowerSystem extends EntitySystem {
 	}
 	
 	@Override
-	public void initialize(final Entity entity) {
+	public final void initialize(final Entity entity) {
 		if (entity.hasActive(FollowerPart.class)) {
 			FollowerPart followerPart = entity.get(FollowerPart.class);
 			List<Entity> followers = new ArrayList<Entity>();
@@ -48,7 +48,7 @@ public final class FollowerSystem extends EntitySystem {
 	}
 
 	@Override
-	public void update(final float delta, final Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(FollowerPart.class)) {
 			for (Entity follower : entity.get(FollowerPart.class).getFollowers()) {
 				Vector2 waypoint = entity.get(TransformPart.class).getCenter();

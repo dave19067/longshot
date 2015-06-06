@@ -22,7 +22,7 @@ public final class BoundPositionSystem extends EntitySystem {
 	}
 	
 	@Override
-	public void update(final float delta, final Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(BoundsPart.class)) {
 			TransformPart transformPart = entity.get(TransformPart.class);
 			Rectangle boundingBox = transformPart.getBoundingBox();

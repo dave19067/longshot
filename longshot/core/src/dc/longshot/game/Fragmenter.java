@@ -78,7 +78,7 @@ public final class Fragmenter {
 	}
 	
 	private final Vector2 calculateVelocity(final Polygon parentPolygon, final Polygon childPolygon) {
-		Vector2 offset = VectorUtils.offset(PolygonUtils.center(parentPolygon), PolygonUtils.center(childPolygon));
+		Vector2 offset = VectorUtils.offset(getFragOrigin(parentPolygon), PolygonUtils.center(childPolygon));
 		return VectorUtils.lengthened(offset, offset.len() * fragSpeedMultiplier);
 	}
 	
@@ -98,6 +98,10 @@ public final class Fragmenter {
 			}
 		}
 		return fragSprites;
+	}
+	
+	private final Vector2 getFragOrigin(final Polygon polygon) {
+		return PolygonUtils.center(polygon);
 	}
 	
 }

@@ -21,7 +21,7 @@ public final class GroundExploderSystem extends EntitySystem {
 	}
 	
 	@Override
-	public void update(final float delta, final Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(GroundExploderPart.class)) {
 			GroundExploderPart groundExploderPart = entity.get(GroundExploderPart.class);
 			float explodeRate = groundExploderPart.getExplodeRate();

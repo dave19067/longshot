@@ -118,8 +118,8 @@ public final class LevelController {
 	private static final float MIN_RANDOM_SPEED_PERCENT = 0.3f;
 	private static final int FRAG_WIDTH = 8;
 	private static final int FRAG_HEIGHT = 8;
-	private static final float FRAG_SPEED_MULTIPLIER = 50;
-	private static final int FRAG_FADE_TIME = 2;
+	private static final float FRAG_SPEED_MULTIPLIER = 25;
+	private static final int FRAG_FADE_TIME = 200;
 	private static EntityZComparator ENTITY_Z_COMPARATOR = new EntityZComparator();
 	
 	private final EventDelegate<LevelFinishedListener> finishedDelegate = new EventDelegate<LevelFinishedListener>();
@@ -444,7 +444,7 @@ public final class LevelController {
 		textureCache.addRegion(windowsRegion);
 		IntRange columnsRange = new IntRange(3, 5);
 		IntRange rowsRange = new IntRange(2, 15);
-		IntRange numRange = new IntRange(100, 200);
+		IntRange numRange = new IntRange(50, 75);
 		FloatRange zRange = new FloatRange(-100, 0);
 		PolygonRegion backRegion = textureCache.getPolygonRegion("objects/white");
 		return entityFactory.createBackgroundElements(numRange, columnsRange, rowsRange, cellWidth, cellHeight, zRange,

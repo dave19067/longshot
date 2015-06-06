@@ -52,7 +52,7 @@ public final class GhostSystem extends EntitySystem {
 	}
 
 	@Override
-	public void update(final float delta, final Entity entity) {
+	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(GhostPart.class)) {
 			GhostPart ghostPart = entity.get(GhostPart.class);
 			if (ghostPart.ghostMode()) {
