@@ -41,7 +41,6 @@ import dc.longshot.util.XmlContext;
 public final class OptionsScreen implements Screen {
 
 	private static final int DEFAULT_SPACE_LEFT = 20;
-	private static final Color KEY_ENTRY_COLOR = Color.YELLOW.cpy();
 	private static final DisplayModeComparator DISPLAY_MODE_COMPARATOR = new DisplayModeComparator();
 	
 	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
@@ -193,7 +192,8 @@ public final class OptionsScreen implements Screen {
 				currentInputAction = inputAction;
 				keyLabel.setText("Press a key");
 				normalColor = keyLabel.getColor().cpy();
-				keyLabel.setColor(KEY_ENTRY_COLOR);
+				final Color keyEntryColor = Color.YELLOW.cpy();
+				keyLabel.setColor(keyEntryColor);
 			}
 		});
 	}

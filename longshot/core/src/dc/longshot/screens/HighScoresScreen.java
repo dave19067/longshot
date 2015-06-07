@@ -29,9 +29,6 @@ import dc.longshot.util.Timer;
 import dc.longshot.util.XmlContext;
 
 public class HighScoresScreen implements Screen {
-
-	private static final int MAX_NAME_LENGTH = 10;
-	private static final int SCORE_SPACE_LEFT = 100;
 	
 	private final EventDelegate<NoArgsListener> closedDelegate = new EventDelegate<NoArgsListener>();
 	
@@ -140,9 +137,10 @@ public class HighScoresScreen implements Screen {
 				fontColor = Color.WHITE.cpy();
 				scoresTable.add(uiPack.label(highScore.name, FontSize.SMALL)).left();
 			}
+			final int scoreSpaceLeft = 100;
 			String scoreString = Integer.toString(highScore.score);
 			Label scoreLabel = uiPack.label(scoreString, FontSize.SMALL, fontColor);
-			scoresTable.add(scoreLabel).spaceLeft(SCORE_SPACE_LEFT).right().row();
+			scoresTable.add(scoreLabel).spaceLeft(scoreSpaceLeft).right().row();
 		}
 		return scoresTable;
 	}
@@ -161,7 +159,8 @@ public class HighScoresScreen implements Screen {
 		TextField nameField = uiPack.textField(FontSize.SMALL);
 		nameField.getStyle().background = null;
 		nameField.getStyle().fontColor = fontColor;
-		nameField.setMaxLength(MAX_NAME_LENGTH);
+		final int maxNameLength = 10;
+		nameField.setMaxLength(maxNameLength);
 		return nameField;
 	}
 	

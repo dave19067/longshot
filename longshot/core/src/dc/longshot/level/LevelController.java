@@ -113,14 +113,7 @@ import dc.longshot.util.XmlContext;
 
 public final class LevelController {
 
-	private static final float MAX_UPDATE_DELTA = 0.01f;
 	private static final float INITIAL_SPAWN_DELAY = 3;
-	private static final float MIN_RANDOM_SPEED_PERCENT = 0.3f;
-	private static final int FRAG_WIDTH = 8;
-	private static final int FRAG_HEIGHT = 8;
-	private static final float FRAG_SPEED_MULTIPLIER = 25;
-	private static final int FRAG_FADE_TIME = 200;
-	private static EntityZComparator ENTITY_Z_COMPARATOR = new EntityZComparator();
 	
 	private final EventDelegate<LevelFinishedListener> finishedDelegate = new EventDelegate<LevelFinishedListener>();
 
@@ -136,7 +129,7 @@ public final class LevelController {
 	private final EntitySpawner entitySpawner;
 	private final CollisionManager collisionManager;
 	private final BackdropManager backdropManager;
-	private final Fragmenter fragmenter = new Fragmenter(FRAG_WIDTH, FRAG_HEIGHT, FRAG_SPEED_MULTIPLIER);
+	private final Fragmenter fragmenter = new Fragmenter(8, 8, 25);
 	private final EntityFactory entityFactory;
 	private final Map<InputAction, Integer> inputActions;
 	private final LevelSession levelSession = new LevelSession();
@@ -213,16 +206,17 @@ public final class LevelController {
 		if (levelSession.getExecutionState() == ExecutionState.RUNNING) {
 			camera.update();
 			accumulatedDelta += actualDelta;
-			while (accumulatedDelta >= MAX_UPDATE_DELTA) {
-				time += MAX_UPDATE_DELTA;
+			final float maxUpdateDelta = 0.01f;
+			while (accumulatedDelta >= maxUpdateDelta) {
+				time += maxUpdateDelta;
 				collisionManager.checkCollisions(entityManager.getManaged());
-				updateSpawning(MAX_UPDATE_DELTA);
-				backdropManager.update(MAX_UPDATE_DELTA);
+				updateSpawning(maxUpdateDelta);
+				backdropManager.update(maxUpdateDelta);
 				entityManager.update();
-				updateEntities(MAX_UPDATE_DELTA);
-				shake.update(MAX_UPDATE_DELTA);
+				updateEntities(maxUpdateDelta);
+				shake.update(maxUpdateDelta);
 				rayHandler.update();
-				accumulatedDelta -= MAX_UPDATE_DELTA;
+				accumulatedDelta -= maxUpdateDelta;
 			}
 			checkFinished();
 		}
@@ -305,11 +299,12 @@ public final class LevelController {
 						entity.get(BoundsRemovePart.class).getBounds());
 				spawnOnDeath(entity, boundsRemoved);
 				if (entity.hasActive(FragsPart.class)) {
+					final int fragFadeTime = 2;
 					DrawablePart drawablePart = entity.get(DrawablePart.class);
 					TransformPart transformPart = entity.get(TransformPart.class);
 					Polygon polygon = transformPart.getPolygon();
 					List<Entity> frags = fragmenter.createFrags(drawablePart.getSprite().getRegion(), polygon, 
-							transformPart.getZ(), FRAG_FADE_TIME);
+							transformPart.getZ(), fragFadeTime);
 					entityManager.addAll(frags);
 				}
 				if (entity.hasActive(PointsPart.class)) {
@@ -554,9 +549,10 @@ public final class LevelController {
 	
 	private void setupDownward(final Entity entity) {
 		if (entity.has(SpeedPart.class)) {
+			final float minRandomSpeedPercent = 0.3f;
 			SpeedPart speedPart = entity.get(SpeedPart.class);
 			float speed = speedPart.getSpeed();
-			float newSpeed = MathUtils.random(speed * MIN_RANDOM_SPEED_PERCENT, speed);
+			float newSpeed = MathUtils.random(speed * minRandomSpeedPercent, speed);
 			speedPart.setSpeed(newSpeed);
 		}
 		placeAbove(entity);
@@ -661,8 +657,9 @@ public final class LevelController {
 		
 		spriteBatch.setProjectionMatrix(camera.combined);
 		spriteBatch.begin();
+		final EntityZComparator entityZComparator = new EntityZComparator();
 		List<Entity> entities = entityManager.getManaged();
-		Collections.sort(entities, ENTITY_Z_COMPARATOR);
+		Collections.sort(entities, entityZComparator);
 		for (Entity entity : entities) {
 			if (entity.hasActive(DrawablePart.class)) {
 				DrawablePart drawablePart = entity.get(DrawablePart.class);

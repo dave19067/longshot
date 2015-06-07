@@ -21,8 +21,6 @@ import dc.longshot.parts.WaypointsPart;
 
 public final class CurvedMovementSystem extends EntitySystem {
 	
-	private final int SAMPLE_NUM = 20;
-	
 	private final Rectangle boundsBox;
 	
 	public CurvedMovementSystem(final Rectangle boundsBox) {
@@ -57,10 +55,11 @@ public final class CurvedMovementSystem extends EntitySystem {
 	}
 	
 	private List<Vector2> createWaypoints(final Vector2 p0, final Vector2 p1, final Vector2 p2, final Vector2 p3) {
+		final int sampleNum = 20;
 		List<Vector2> waypoints = new ArrayList<Vector2>();
-		for (int i = 0; i < SAMPLE_NUM; i++) {
+		for (int i = 0; i < sampleNum; i++) {
 			Vector2 out = new Vector2();
-			Bezier.cubic(out, (float)i / SAMPLE_NUM, p0, p1, p2, p3, new Vector2());
+			Bezier.cubic(out, (float)i / sampleNum, p0, p1, p2, p3, new Vector2());
 			waypoints.add(out);
 		}
 		return waypoints;

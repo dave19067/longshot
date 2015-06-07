@@ -9,17 +9,15 @@ import dc.longshot.parts.TranslatePart;
 
 public final class GravitySystem extends EntitySystem {
 
-	/**
-	 * Gravity acceleration in world units/s^2.
-	 */
-	private static final float ACCELERATION = -20;
 
 	@Override
 	public final void update(final float delta, final Entity entity) {
 		if (entity.hasActive(GravityPart.class)) {
 			TranslatePart translatePart = entity.get(TranslatePart.class);
 			Vector2 velocity = translatePart.getVelocity();
-			velocity.y += ACCELERATION * delta;
+			// Gravity acceleration in world units/s^2
+			final float acceleration = -20;
+			velocity.y += acceleration * delta;
 			translatePart.setVelocity(velocity);
 		}
 	}

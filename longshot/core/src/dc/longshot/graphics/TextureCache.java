@@ -17,8 +17,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public final class TextureCache {
-
-	private static final String[] TEXTURE_EXTENSIONS = { "png", "jpg" };
 	
 	private final List<TextureRegion> textureRegions = new ArrayList<TextureRegion>();
 	private final Map<String, TextureRegion> nameToTextureRegions = new HashMap<String, TextureRegion>();
@@ -29,12 +27,13 @@ public final class TextureCache {
 	}
 	
 	public final void addTextures(final FileHandle fileHandle, final String namespace) {
+		final String[] textureExtensions = { "png", "jpg" };
 		if (fileHandle.isDirectory()) {
 			for (FileHandle child : fileHandle.list()) {
 				addTextures(child, namespace);
 			}
 		}
-		else if (ArrayUtils.contains(TEXTURE_EXTENSIONS, fileHandle.extension())) {
+		else if (ArrayUtils.contains(textureExtensions, fileHandle.extension())) {
 			Texture texture = new Texture(fileHandle);
 			texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 			TextureRegion region = new TextureRegion(texture);

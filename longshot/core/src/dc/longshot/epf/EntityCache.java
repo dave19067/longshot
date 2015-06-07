@@ -11,7 +11,6 @@ import dc.longshot.util.XmlContext;
 
 public final class EntityCache {
 
-	private static final String ENTITY_EXTENSION = ".xml";
 	private final XmlContext xmlContext;
 	private final EntityAdapter entityAdapter;
 	private final String root;
@@ -27,7 +26,8 @@ public final class EntityCache {
 		if (!cache.containsKey(entityType)) {
 			InputStream inputStream;
 			try {
-				inputStream = new FileInputStream(root + entityType + ENTITY_EXTENSION);
+				final String entityExtension = ".xml";
+				inputStream = new FileInputStream(root + entityType + entityExtension);
 			}
 			catch (FileNotFoundException e) {
 				throw new RuntimeException(e);

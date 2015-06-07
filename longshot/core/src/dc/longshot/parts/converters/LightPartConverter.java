@@ -16,8 +16,6 @@ import dc.longshot.xmladapters.Vector2Adapter;
 
 public final class LightPartConverter implements Converter {
 	
-	private static final int RAY_NUM = 8;
-	
 	private final RayHandler rayHandler;
 	
 	public LightPartConverter(final RayHandler rayHandler) {
@@ -31,8 +29,9 @@ public final class LightPartConverter implements Converter {
 
 	@Override
 	public Object convert(final Object object) {
+		final int rayNum = 8;
 		LightPart rawLightPart = (LightPart)object;
-		Light light = new PointLight(rayHandler, RAY_NUM, rawLightPart.color, rawLightPart.distance, 0, 0);
+		Light light = new PointLight(rayHandler, rayNum, rawLightPart.color, rawLightPart.distance, 0, 0);
 		light.setActive(false);
 		return new dc.longshot.parts.LightPart(light, rawLightPart.local);
 	}

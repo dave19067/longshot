@@ -49,18 +49,7 @@ import dc.longshot.util.XmlContext;
 
 public final class LongshotGame extends Game {
 	
-	private static final Color DUSK_COLOR = ColorUtils.rgbToColor(162, 129, 133);
-	private static final Color NIGHT_COLOR = ColorUtils.rgbToColor(15, 16, 26);
-	private static final String TEMPORARY_PATH = "temp/";
-	private static final String SKIN_PATH = "ui/test/uiskin.json";
-	private static final String MEDIUM_FONT_PATH = "ui/ocr/ocr_32.fnt";
-	private static final String SMALL_FONT_PATH = "ui/ocr/ocr_24.fnt";
-	private static final String LEVELS_PATH = "levels/";
-	private static final String ATLAS_EXTENSION = ".atlas";
 	private static final String TEXTURES_PATH = "textures/";
-	private static final String[] TEXTURE_PATHS = new String[] { TEXTURES_PATH + "backgrounds/", TEXTURES_PATH + "ui/" };
-	private static final String[] TEXTURE_PACK_PATHS = new String[] { TEXTURES_PATH + "objects/" };
-	private static final String SOUNDS_PATH = "sounds/";
 	
 	private final ScreenManager screenManager = new ScreenManager();
 	private final XmlContext xmlContext = new XmlContext(XmlBindings.BOUND_CLASSES);
@@ -106,19 +95,23 @@ public final class LongshotGame extends Game {
 	}
 	
 	private TextureCache createTextureCache() {
+		final String[] texturePaths = new String[] { TEXTURES_PATH + "backgrounds/", TEXTURES_PATH + "ui/" };
 		TextureCache textureCache = new TextureCache();
-		for (String path : TEXTURE_PATHS) {
+		for (String path : texturePaths) {
 			String namespace = createTextureNamespace(path);
 			String absolutePath = PathUtils.internalToAbsolutePath(path);
 			textureCache.addTextures(Gdx.files.absolute(absolutePath), namespace);
 		}
-		for (String path : TEXTURE_PACK_PATHS) {
+		final String[] texturePackPaths = new String[] { TEXTURES_PATH + "objects/" };
+		final String tempPath = "temp/";
+		final String atlasExtension = ".atlas";
+		for (String path : texturePackPaths) {
 			String inputDir = PathUtils.internalToAbsolutePath(path);
-			String outputDir = Gdx.files.local(TEMPORARY_PATH).file().getAbsolutePath();
+			String outputDir = Gdx.files.local(tempPath).file().getAbsolutePath();
 			String name = path.replace("/", "_");
 			TexturePacker.process(inputDir, outputDir, name);
 			String namespace = createTextureNamespace(path);
-			textureCache.addTextureAtlas(Gdx.files.local(TEMPORARY_PATH + name + ATLAS_EXTENSION), namespace);
+			textureCache.addTextureAtlas(Gdx.files.local(tempPath + name + atlasExtension), namespace);
 		}
 		return textureCache;
 	}
@@ -128,18 +121,22 @@ public final class LongshotGame extends Game {
 	}
 	
 	private UIPack createUIPack() {
-		Skin skin = new Skin(Gdx.files.internal(SKIN_PATH));
-		BitmapFont mediumFont = new BitmapFont(Gdx.files.internal(MEDIUM_FONT_PATH));
-		BitmapFont smallFont = new BitmapFont(Gdx.files.internal(SMALL_FONT_PATH));
+		final String skinPath = "ui/test/uiskin.json";
+		final String mediumFontPath = "ui/ocr/ocr_32.fnt";
+		final String smallFontPath = "ui/ocr/ocr_24.fnt";
+		Skin skin = new Skin(Gdx.files.internal(skinPath));
+		BitmapFont mediumFont = new BitmapFont(Gdx.files.internal(mediumFontPath));
+		BitmapFont smallFont = new BitmapFont(Gdx.files.internal(smallFontPath));
 		return new UIPack(skin, mediumFont, smallFont);
 	}
 	
 	private SoundCache<SoundKey> createSoundCache() {
+		final String soundsPath = "sounds/";
 		SoundCache<SoundKey> soundCache = new SoundCache<SoundKey>();
-		soundCache.add(SoundKey.LASER, SOUNDS_PATH + "laser-blast.wav");
-		soundCache.add(SoundKey.EXPLOSION, SOUNDS_PATH + "fridobeck_explosion.wav");
-		soundCache.add(SoundKey.POWER_DOWN, SOUNDS_PATH + "power_down.wav");
-		soundCache.add(SoundKey.POWER_UP, SOUNDS_PATH + "power-up.wav");
+		soundCache.add(SoundKey.LASER, soundsPath + "laser-blast.wav");
+		soundCache.add(SoundKey.EXPLOSION, soundsPath + "fridobeck_explosion.wav");
+		soundCache.add(SoundKey.POWER_DOWN, soundsPath + "power_down.wav");
+		soundCache.add(SoundKey.POWER_UP, soundsPath + "power-up.wav");
 		return soundCache;
 	}
 	
@@ -282,10 +279,13 @@ public final class LongshotGame extends Game {
 		else {
 			nightRatio = (float)playSession.getLevelNum() / (playSession.getLevelCount() - 1);
 		}
-		Color lerpedDuskColor = DUSK_COLOR.cpy().lerp(NIGHT_COLOR, nightRatio);
+		final Color duskColor = ColorUtils.rgbToColor(162, 129, 133);
+		final Color nightColor = ColorUtils.rgbToColor(15, 16, 26);
+		final String levelsPath = "levels/";
+		Color lerpedDuskColor = duskColor.cpy().lerp(nightColor, nightRatio);
 		String levelName = playSession.advanceLevel();
-		Level level = xmlContext.unmarshal(Gdx.files.internal(LEVELS_PATH + levelName));
-		RectangleGradient rectangleGradient = new RectangleGradient(NIGHT_COLOR, NIGHT_COLOR, lerpedDuskColor, 
+		Level level = xmlContext.unmarshal(Gdx.files.internal(levelsPath + levelName));
+		RectangleGradient rectangleGradient = new RectangleGradient(nightColor, nightColor, lerpedDuskColor, 
 				lerpedDuskColor);
 		level.setSkyGradient(rectangleGradient);
 		List<DecorationProfile> decorationProfiles = createDecorationProfiles(level.getBoundsBox(), nightRatio);
