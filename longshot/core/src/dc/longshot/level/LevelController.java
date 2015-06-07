@@ -547,7 +547,7 @@ public final class LevelController {
 		Rectangle boundsBox = level.getBoundsBox();
 		TransformPart transform = entity.get(TransformPart.class);
 		Vector2 size = transform.getSize();
-		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.y);
+		float spawnX = MathUtils.random(boundsBox.x, PolygonUtils.right(boundsBox) - size.x);
 		Vector2 spawnPosition = new Vector2(spawnX, PolygonUtils.top(boundsBox));
 		transform.setPosition(spawnPosition);
 	}
@@ -605,7 +605,7 @@ public final class LevelController {
 		float unboundedOverlapY = PolygonUtils.top(boundsBox) - transformPart.getBoundingBox().y;
 		TranslatePart translate = entity.get(TranslatePart.class);
 		Vector2 velocity = translate.getVelocity();
-		Vector2 outOfBoundsOffset = velocity.cpy().scl(unboundedOverlapY / velocity.y);
+		Vector2 outOfBoundsOffset = velocity.scl(unboundedOverlapY / velocity.y);
 		transformPart.setPosition(transformPart.getPosition().add(outOfBoundsOffset));
 	}
 	

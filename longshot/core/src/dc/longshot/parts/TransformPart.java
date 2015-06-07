@@ -14,6 +14,10 @@ public final class TransformPart {
 
 	private Polygon polygon = new Polygon();
 	private final float z;
+	/**
+	 * size stored for performance, rather than calculated on the fly when calling {@link #getSize()}
+	 */
+	private Vector2 size;
 	
 	public TransformPart(final Polygon polygon, final float z) {
 		this(polygon, new Vector3(0, 0, z));
@@ -22,8 +26,9 @@ public final class TransformPart {
 	public TransformPart(final Polygon polygon, final Vector3 position) {
 		this.polygon = polygon;
 		this.polygon.setPosition(position.x, position.y);
-		this.z = position.z;
 		this.polygon.setOrigin(0, 0);
+		z = position.z;
+		size = PolygonUtils.size(polygon);
 	}
 	
 	public final Polygon getPolygon() {
@@ -32,19 +37,22 @@ public final class TransformPart {
 	
 	public final void setPolygon(final Polygon polygon) {
 		this.polygon = polygon;
+		size = PolygonUtils.size(polygon);
 	}
 	
 	public final void setVertices(final float[] vertices) {
 		polygon.setVertices(vertices);
+		size = PolygonUtils.size(polygon);
 	}
 
 	public final Vector2 getSize() {
-		return PolygonUtils.size(polygon);
+		return size;
 	}
 	
 	public final void setSize(final Vector2 size) {
 		float[] sizedVertices = VertexUtils.sizedVertices(polygon.getVertices(), size);
 		polygon.setVertices(sizedVertices);
+		this.size = size;
 	}
 	
 	public final Vector2 getBoundingSize() {
