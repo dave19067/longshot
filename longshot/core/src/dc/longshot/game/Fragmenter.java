@@ -26,37 +26,30 @@ import dc.longshot.parts.TranslatePart;
 
 public final class Fragmenter {
 	
-	private final int fragWidth;
-	private final int fragHeight;
-	private final float fragSpeedMultiplier;
-	
-	public Fragmenter(final int fragWidth, final int fragHeight, final float fragSpeedMultiplier) {
-		this.fragWidth = fragWidth;
-		this.fragHeight = fragHeight;
-		this.fragSpeedMultiplier = fragSpeedMultiplier;
+	private Fragmenter() {
 	}
 	
-	public final List<Entity> createFrags(final PolygonRegion region, final Polygon parentPolygon, final float z, 
-			final float fadeTime) {
-		List<PolygonSprite> fragSprites = createFragSprites(region, fragWidth, fragHeight);
+	public static final List<Entity> createFrags(final PolygonRegion region, final Polygon parentPolygon, 
+			final FragParams params) {
+		List<PolygonSprite> fragSprites = createFragSprites(region, params.width, params.height);
 		return createFrags(region.getRegion().getRegionWidth(), region.getRegion().getRegionHeight(), parentPolygon, 
-				fragSprites, z, fadeTime);
+				fragSprites, params);
 	}
 	
-	private final List<Entity> createFrags(final int regionWidth, final int regionHeight, final Polygon parentPolygon, 
-			final List<PolygonSprite> fragSprites, final float z, final float fadeTime) {
+	private static final List<Entity> createFrags(final int regionWidth, final int regionHeight, 
+			final Polygon parentPolygon, final List<PolygonSprite> fragSprites, final FragParams params) {
 		List<Entity> frags = new ArrayList<Entity>();
 		Vector2 scale = UnitConvert.worldToPixel(PolygonUtils.size(parentPolygon))
 				.scl(1.0f / regionWidth, 1.0f / regionHeight);
 		for (PolygonSprite fragSprite : fragSprites) {
-			Entity frag = createFrag(fragSprite, parentPolygon, scale, z, fadeTime);
+			Entity frag = createFrag(fragSprite, parentPolygon, scale, params);
 			frags.add(frag);
 		}
 		return frags;
 	}
 	
-	private final Entity createFrag(final PolygonSprite fragSprite, final Polygon parentPolygon, final Vector2 scale, 
-			final float z, final float fadeTime) {
+	private static final Entity createFrag(final PolygonSprite fragSprite, final Polygon parentPolygon, 
+			final Vector2 scale, final FragParams params) {
 		Entity entity = new Entity();
 		Polygon fragPolygon = new Polygon();
 		fragPolygon.setRotation(parentPolygon.getRotation());
@@ -64,25 +57,26 @@ public final class Fragmenter {
 		fragPolygon.setVertices(PolygonFactory.createRectangleVertices(fragSize.x, fragSize.y));
 		Vector2 worldPosition = UnitConvert.pixelToWorld(fragSprite.getX(), fragSprite.getY()).scl(scale);
 		Vector2 globalPosition = PolygonUtils.toGlobal(worldPosition.x, worldPosition.y, parentPolygon);
-		entity.attach(new TransformPart(fragPolygon, new Vector3(globalPosition.x, globalPosition.y, z)));
+		entity.attach(new TransformPart(fragPolygon, new Vector3(globalPosition.x, globalPosition.y, params.z)));
 		PolygonSprite sprite = new PolygonSprite(fragSprite);
 		entity.attach(new DrawablePart(sprite));
-		Vector2 velocity = calculateVelocity(parentPolygon, fragPolygon);
+		Vector2 velocity = calculateVelocity(parentPolygon, fragPolygon, params.speedModifier);
 		entity.attach(new SpeedPart(velocity.len()));
 		TranslatePart translatePart = new TranslatePart();
 		entity.attach(translatePart);
 		EntityUtils.setDirection(entity, velocity);
-		entity.attach(new TimedDeathPart(fadeTime));
-		entity.attach(new ColorChangePart(fadeTime, Color.WHITE.cpy(), Color.CLEAR.cpy()));
+		entity.attach(new TimedDeathPart(params.fadeTime));
+		entity.attach(new ColorChangePart(params.fadeTime, Color.WHITE.cpy(), Color.CLEAR.cpy()));
 		return entity;
 	}
 	
-	private final Vector2 calculateVelocity(final Polygon parentPolygon, final Polygon childPolygon) {
+	private static final Vector2 calculateVelocity(final Polygon parentPolygon, final Polygon childPolygon, 
+			final float speedModifier) {
 		Vector2 offset = VectorUtils.offset(getFragOrigin(parentPolygon), PolygonUtils.center(childPolygon));
-		return VectorUtils.lengthened(offset, offset.len() * fragSpeedMultiplier);
+		return VectorUtils.lengthened(offset, offset.len() * speedModifier);
 	}
 	
-	private final List<PolygonSprite> createFragSprites(final PolygonRegion polygonRegion, final int fragWidth, 
+	private static final List<PolygonSprite> createFragSprites(final PolygonRegion polygonRegion, final int fragWidth, 
 			final int fragHeight) {
 		List<PolygonSprite> fragSprites = new ArrayList<PolygonSprite>();
 		TextureRegion textureRegion = polygonRegion.getRegion();
@@ -100,7 +94,7 @@ public final class Fragmenter {
 		return fragSprites;
 	}
 	
-	private final Vector2 getFragOrigin(final Polygon polygon) {
+	private static final Vector2 getFragOrigin(final Polygon polygon) {
 		return PolygonUtils.center(polygon);
 	}
 	

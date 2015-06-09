@@ -64,6 +64,7 @@ import dc.longshot.epf.EntitySpawner;
 import dc.longshot.epf.EntitySystem;
 import dc.longshot.eventing.EventDelegate;
 import dc.longshot.eventing.NoArgsListener;
+import dc.longshot.game.FragParams;
 import dc.longshot.game.Fragmenter;
 import dc.longshot.geometry.Bound;
 import dc.longshot.geometry.ConvexHullCache;
@@ -129,7 +130,6 @@ public final class LevelController {
 	private final EntitySpawner entitySpawner;
 	private final CollisionManager collisionManager;
 	private final BackdropManager backdropManager;
-	private final Fragmenter fragmenter = new Fragmenter(8, 8, 25);
 	private final EntityFactory entityFactory;
 	private final Map<InputAction, Integer> inputActions;
 	private final LevelSession levelSession = new LevelSession();
@@ -299,17 +299,15 @@ public final class LevelController {
 						entity.get(BoundsRemovePart.class).getBounds());
 				spawnOnDeath(entity, boundsRemoved);
 				if (entity.hasActive(FragsPart.class)) {
-					final int fragFadeTime = 2;
 					DrawablePart drawablePart = entity.get(DrawablePart.class);
 					TransformPart transformPart = entity.get(TransformPart.class);
 					Polygon polygon = transformPart.getPolygon();
-					List<Entity> frags = fragmenter.createFrags(drawablePart.getSprite().getRegion(), polygon, 
-							transformPart.getZ(), fragFadeTime);
+					FragParams fragParams = createFragParams(transformPart.getZ());
+					List<Entity> frags = Fragmenter.createFrags(drawablePart.getSprite().getRegion(), polygon, fragParams);
 					entityManager.addAll(frags);
 				}
 				if (entity.hasActive(PointsPart.class)) {
 					if (!boundsRemoved) {
-						// TODO: make an internal score variable instead of store playSession
 						playSession.addToScore(entity.get(PointsPart.class).getPoints());
 					}
 				}
@@ -338,6 +336,16 @@ public final class LevelController {
 					spawnTransform.getSize());
 			spawnTransform.setPosition(position);
 		}
+	}
+	
+	private FragParams createFragParams(final float z) {
+		FragParams fragParams = new FragParams();
+		fragParams.fadeTime = 2;
+		fragParams.height = 8;
+		fragParams.width = 8;
+		fragParams.speedModifier = 20;
+		fragParams.z = z;
+		return fragParams;
 	}
 	
 	private NoArgsListener noHealth(final Entity entity) {
@@ -439,7 +447,7 @@ public final class LevelController {
 		textureCache.addRegion(windowsRegion);
 		IntRange columnsRange = new IntRange(3, 5);
 		IntRange rowsRange = new IntRange(2, 15);
-		IntRange numRange = new IntRange(50, 75);
+		IntRange numRange = new IntRange(50, 100);
 		FloatRange zRange = new FloatRange(-100, 0);
 		PolygonRegion backRegion = textureCache.getPolygonRegion("objects/white");
 		return entityFactory.createBackgroundElements(numRange, columnsRange, rowsRange, cellWidth, cellHeight, zRange,

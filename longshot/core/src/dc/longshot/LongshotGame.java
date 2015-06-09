@@ -296,16 +296,11 @@ public final class LongshotGame extends Game {
 	private List<DecorationProfile> createDecorationProfiles(final Rectangle boundsBox, final float nightRatio) {
 		List<DecorationProfile> decorationProfiles = new ArrayList<DecorationProfile>();
 		if (nightRatio < 0.66f) {
-			PolygonRegion cloudRegion = textureCache.getPolygonRegion("objects/cloud");
-			Rectangle cloudBoundsBox = new Rectangle(boundsBox);
-			PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
-			FloatRange sizeRange = new FloatRange(3, 6);
-			FloatRange xyRatioRange = new FloatRange(1, 2);
-			FloatRange zRange = new FloatRange(-200, -100);
-			FloatRange speedRange = new FloatRange(0.75f, 1.25f);
-			DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 8, sizeRange, xyRatioRange, 
-					zRange, 0.5f, speedRange, cloudRegion);
-			decorationProfiles.add(cloudProfile);
+			String[] cloudRegionNames = new String[] { "objects/cloud", "objects/cloud2", "objects/cloud3" };
+			for (String cloudRegionName : cloudRegionNames) {
+				DecorationProfile cloudProfile = createCloudDecorationProfile(boundsBox, cloudRegionName);
+				decorationProfiles.add(cloudProfile);
+			}
 		}
 		if (nightRatio > 0.5f) {
 			PolygonRegion starRegion = textureCache.getPolygonRegion("objects/star");
@@ -317,6 +312,19 @@ public final class LongshotGame extends Game {
 			decorationProfiles.add(starProfile);
 		}
 		return decorationProfiles;
+	}
+	
+	private DecorationProfile createCloudDecorationProfile(final Rectangle boundsBox, final String regionName) {
+		PolygonRegion cloudRegion = textureCache.getPolygonRegion(regionName);
+		Rectangle cloudBoundsBox = new Rectangle(boundsBox);
+		PolygonUtils.translateY(cloudBoundsBox, cloudBoundsBox.height / 2);
+		FloatRange sizeRange = new FloatRange(3, 6);
+		FloatRange xyRatioRange = new FloatRange(1, 2);
+		FloatRange zRange = new FloatRange(-200, -100);
+		FloatRange speedRange = new FloatRange(0.75f, 1.25f);
+		DecorationProfile cloudProfile = new DecorationProfile(cloudBoundsBox, false, 25, sizeRange, xyRatioRange, 
+				zRange, 0.5f, speedRange, cloudRegion);
+		return cloudProfile;
 	}
 	
 }
