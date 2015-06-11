@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <gameSession>
     <levelNames>
-        <levelNames>level1.xml</levelNames>
-        <levelNames>level1.xml</levelNames>
+        <levelNames>wave1.xml</levelNames>
+        <levelNames>wave2.xml</levelNames>
+        <levelNames>wave3.xml</levelNames>
+        <levelNames>wave4.xml</levelNames>
+        <levelNames>wave5.xml</levelNames>
+        <levelNames>wave7.xml</levelNames>
+        <levelNames>wave8.xml</levelNames>
+        <levelNames>wave9.xml</levelNames>
+        <levelNames>wave10.xml</levelNames>
+        <levelNames>wave11.xml</levelNames>
+        <levelNames>wave12.xml</levelNames>
     </levelNames>
     <highScores>
         <highScores>

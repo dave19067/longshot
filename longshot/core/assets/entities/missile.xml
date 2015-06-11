@@ -13,7 +13,7 @@
       	<textureName>objects/missile</textureName>
       </part>
       <part xsi:type="speedPart">
-      	<speed>50</speed>
+      	<speed>6</speed>
       </part>
       <part xsi:type="healthPart">
       	<maxHealth>1</maxHealth>

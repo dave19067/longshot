@@ -11,7 +11,7 @@ public final class LevelSession {
 		return executionState;
 	}
 	
-	public final void setExecutionState(ExecutionState executionState) {
+	public final void setExecutionState(final ExecutionState executionState) {
 		this.executionState = executionState;
 	}
 	

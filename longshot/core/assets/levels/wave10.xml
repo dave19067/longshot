@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<level>
+    <boundsBox>
+        <x>0</x>
+        <y>0</y>
+        <width>40</width>
+        <height>30</height>
+    </boundsBox>
+    <spawnDuration>75</spawnDuration>
+    <spawns>
+        <entry>
+            <key>nuke</key>
+            <value>12</value>
+        </entry>
+        <entry>
+            <key>missile</key>
+            <value>35</value>
+        </entry>
+        <entry>
+            <key>ufoglow</key>
+            <value>8</value>
+        </entry>
+        <entry>
+            <key>saw</key>
+            <value>6</value>
+        </entry>
+        <entry>
+            <key>caterpillar</key>
+            <value>3</value>
+        </entry>
+    </spawns>
+</level>

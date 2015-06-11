@@ -6,14 +6,22 @@
         <width>40</width>
         <height>30</height>
     </boundsBox>
-    <spawnDuration>30</spawnDuration>
+    <spawnDuration>60</spawnDuration>
     <spawns>
         <entry>
-            <key>missile</key>
-            <value>15</value>
+            <key>nuke</key>
+            <value>10</value>
         </entry>
         <entry>
-            <key>nuke</key>
+            <key>missile</key>
+            <value>27</value>
+        </entry>
+        <entry>
+            <key>ufoglow</key>
+            <value>7</value>
+        </entry>
+        <entry>
+            <key>saw</key>
             <value>5</value>
         </entry>
     </spawns>
