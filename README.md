@@ -1,6 +1,8 @@
 longshot
 ========
 
+Demo video: https://www.youtube.com/watch?v=kOH3aVeWIe0
+
 Main goal of this project is to create reusable libraries.  Experiments with Entity-Component architecture, 2d lighting effects, user-interface architectures, 2d art, dynamic backgrounds, complex enemy movement, and more.
 
 External frameworks used: libgdx, box2dlights, and cloning. 
